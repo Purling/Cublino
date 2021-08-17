@@ -3,9 +3,12 @@
 #
 
 members:
-  - name:
-    uid:
-  - name:
-    uid:
-  - name:
-    uid:
+  - name: Yuechen Liu
+    uid: u7227895
+    contact: u7227895@anu.edu.au
+  - name: Ziling Ouyang
+    uid: u7312578
+    contact: u7312578@anu.edu.au
+  - name: Zane Gates
+    uid: u7334218
+    contact: u7334218@anu.edu.au
