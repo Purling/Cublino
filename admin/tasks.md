@@ -9,6 +9,12 @@ Everyone: create application skeleton - meeting 14:00 Sunday 22 August
 
 ## Week 5
 
+Zane: construct UML diagram for classes in LaTeX - meeting
+
+Yuechen: javadocs + create classes - meeting
+
+Ziling: prettify the UI example - meeting
+
 Everyone: further develop application skeleton - meeting 11:00 Tuesday 24 August
 
 ## Week 6
