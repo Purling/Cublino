@@ -3,8 +3,8 @@ package comp1140.ass2.GameLogic;
 import comp1140.ass2.Board;
 import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.State.Die;
-import comp1140.ass2.State.Player;
 import comp1140.ass2.State.Direction;
+import comp1140.ass2.State.Players;
 
 /**
  * The player will be allowed to decide which version of cublino he or she wants to play.
@@ -25,7 +25,7 @@ public abstract class Game{
     /**
      * store the current player that is making his moves
      */
-    Player currentPlayer;
+    Players currentPlayer;
 
     /**
      * The die that is currently selected to be moved

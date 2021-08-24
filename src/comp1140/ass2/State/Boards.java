@@ -1,8 +1,8 @@
 package comp1140.ass2.State;
 
 public class Boards {
-    Player whitePlayer;
-    Player blackPlayer;
+    Players whitePlayer;
+    Players blackPlayer;
 
     /**
      * A 2d array to represent the current status of the board
