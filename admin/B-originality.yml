@@ -50,9 +50,12 @@ code:
 # Add as many "url+licence+comment" entries as necessary
 # (or remove it altogether if you haven't used any external assets)
 assets:
-  - comment:
-    url:
-    licence:
+  - comment: Die image for demonstrative GUI design use
+    url: https://svgsilh.com/9e9e9e/image/41187.html
+    licence: CC0 1.0 
+  - comment: Image of two dice for demonstrative GUI design use
+    url: https://svgsilh.com/9e9e9e/image/2027245.html
+    licence: CC0 1.0 
 
 
 # Sign *your* name and uids here. (Remove entries if you have fewer
