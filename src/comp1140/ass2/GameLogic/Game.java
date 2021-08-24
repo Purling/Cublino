@@ -1,6 +1,6 @@
 package comp1140.ass2.GameLogic;
 
-import comp1140.ass2.Board;
+import comp1140.ass2.gui.Board;
 import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.State.Die;
 import comp1140.ass2.State.Direction;
