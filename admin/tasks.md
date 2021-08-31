@@ -19,6 +19,12 @@ Everyone: further develop application skeleton - meeting 11:00 Tuesday 24 August
 
 ## Week 6
 
+Zane: Task 5
+
+Yuechen: Tasks 3 and 6
+
+Ziling: Tasks 4 and 7
+
 ## Mid-Semester Break
 
 ## Week 7
