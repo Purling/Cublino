@@ -18,8 +18,7 @@ public class Die {
 
     /** Given the coordinates, the values of the dice on each side, and the owner of the dice,
     * construct the corresponding dice.*/
-    public Die(int top, int down, int front, int back, int left, int right, int x, int y, Players player){
-
+    public Die(int top, int down, int front, int back, int left, int right, int x, int y, Players player) {
         this.top = top;
         this.down = down;
         this.front = front;
@@ -29,6 +28,58 @@ public class Die {
         this.x = x;
         this.y = y;
         this.player = player;
+    }
+
+    public Die(String placement, Players whitePlayer, Players blackPlayer) {
+        assert placement.length() == 3;
+        int orientation = placement.charAt(0);
+        if (97 <= orientation && orientation <= 122) {
+            this.player = whitePlayer;
+            orientation -= 97;
+        } else {
+            this.player = blackPlayer;
+            orientation -= 65;
+        }
+        assert 0 <= orientation && orientation < 24;
+
+        // All 24 orientations in the order {top}{front}{left},
+        // manually determined by yours' truly
+        int[][] orientations = new int[][] {
+                {1, 2, 3},
+                {1, 3, 5},
+                {1, 4, 2},
+                {1, 5, 4},
+                {2, 1, 4},
+                {2, 3, 1},
+                {2, 4, 6},
+                {2, 6, 3},
+                {3, 1, 2},
+                {3, 2, 6},
+                {3, 5, 1},
+                {3, 6, 5},
+                {4, 1, 5},
+                {4, 2, 1},
+                {4, 5, 6},
+                {4, 6, 2},
+                {5, 1, 3},
+                {5, 3, 6},
+                {5, 4, 1},
+                {5, 6, 4},
+                {6, 2, 4},
+                {6, 3, 2},
+                {6, 4, 5},
+                {6, 5, 3}
+        };
+
+        this.top = orientations[orientation][0];
+        this.down = 7 - this.top;
+        this.front = orientations[orientation][1];
+        this.back = 7 - this.front;
+        this.left = orientations[orientation][2];
+        this.right = 7 - this.left;
+
+        this.x = placement.charAt(1) - 'a';
+        this.y = placement.charAt(2) - '1';
     }
 
     /**
@@ -68,6 +119,13 @@ public class Die {
      */
     public String getPosition(int x, int y){
         return "";
+    }
+
+    public int getX() {return x;}
+    public int getY() {return y;}
+
+    public boolean getColor() {
+        return player.getWhite();
     }
 
     /**

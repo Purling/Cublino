@@ -8,13 +8,30 @@ public class Players {
      */
     Die[] myDice;
 
+    boolean isWhite;
+
     /**
      * Get the information of a particular dice from a series of dices
      * @param i
      * @return
      */
-
     public Die getDice(int i) {
         return myDice[i];
+    }
+
+    public Players(boolean isWhite) {
+        this.isWhite = isWhite;
+    }
+
+    public void setDice(Die[] dice) {
+        myDice = dice;
+    }
+
+    public void setOneDie(int index, Die die) {
+        myDice[index] = die;
+    }
+
+    public boolean getWhite() {
+        return this.isWhite;
     }
 }
