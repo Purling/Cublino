@@ -57,7 +57,38 @@ public class Cublino {
      * @return true if the input state is well formed, otherwise false
      */
     public static Boolean isStateWellFormed(String state) {
-        return null; // FIXME Task 3 (P)
+        if (state != null && state.length() % 3 == 1) {
+            if (state.charAt(0) == 'p' || state.charAt(0) == 'c'
+                    || state.charAt(0) == 'P' || state.charAt(0) == 'C') {
+                int l = (state.length() - 1) / 3;
+                if (l != 0) {
+                    int i = 1;
+                    while (i < state.length()){
+                        String x;
+                        if (i+3 == state.length()) {
+                            x = state.substring(i);
+                        }
+                        else {
+                            x = state.substring(i, i + 3);
+                        }
+
+                        if (x.charAt(0) < 'A' || (x.charAt(0) > 'X' && x.charAt(0) < 'a')
+                                || x.charAt(0) > 'x') {
+                            return false;
+                        }
+                        else if (x.charAt(1) > 'g' || x.charAt(1) < 'a') {
+                            return false;
+                        }
+                        else if (x.charAt(2) > '7' || x.charAt(2) < '1') {
+                            return false;
+                        }
+                        i+=3;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
