@@ -81,6 +81,8 @@ public class Cublino {
      */
     public static Boolean isStateValid(String state) {
         // White player has upper case and black player has lower case
+
+        if(Boolean.FALSE.equals(isStateWellFormed(state))) return false;
         return isStateWellFormed(state); // FIXME Task 4 (P)
     }
 

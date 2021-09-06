@@ -52,4 +52,14 @@ public class Boards {
     public boolean isOnBoard(int x, int y){
         return false;
     }
+
+    // Converts a game string to dice and players
+    public void stringToDice(String encodedState){
+        
+    }
+
+    public boolean isSamePosition(){
+        return false;
+        // TODO Complete isSamePosition
+    }
 }
