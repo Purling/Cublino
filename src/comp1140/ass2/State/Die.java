@@ -113,12 +113,10 @@ public class Die {
 
     /**
      * Get the current position of the dice in the form of a string
-     * @param x
-     * @param y
      * @return string x+""+y
      */
-    public String getPosition(int x, int y){
-        return "";
+    public String getPosition(){
+        return x + "" + y;
     }
 
     public int getX() {return x;}
@@ -154,7 +152,6 @@ public class Die {
      * The orientation of he dice is not changed in a Jump movement
      * @param d
      * @param direction
-     * @return
      */
     public void jump(Die d, Direction direction){
     }
