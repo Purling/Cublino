@@ -11,12 +11,16 @@ public class Players {
     boolean isWhite;
 
     /**
-     * Get the information of a particular dice from a series of dices
+     * Get the information of a particular die from a series of dices
      * @param i
      * @return
      */
-    public Die getDice(int i) {
+    public Die getDie(int i) {
         return myDice[i];
+    }
+
+    public Die[] getDice() {
+        return myDice;
     }
 
     public Players(boolean isWhite) {
