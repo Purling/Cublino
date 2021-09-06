@@ -80,13 +80,13 @@ public class Boards {
         int blackCount = 0;
 
         for (int i = 1; i < encodedState.length(); i += 3) {
-            Die d = new Die(encodedState.substring(i, i+3), whitePlayer, blackPlayer);
-            if (d.getPlayer().equals(whitePlayer)){
-                whiteDice[whiteCount] = d;
+            Die die = new Die(encodedState.substring(i, i+3), whitePlayer, blackPlayer);
+            if (die.getPlayer().equals(whitePlayer)){
+                whiteDice[whiteCount] = die;
                 whiteCount++;
             }
             else{
-                blackDice[blackCount] = d;
+                blackDice[blackCount] = die;
                 blackCount++;
             }
         }

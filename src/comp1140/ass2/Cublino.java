@@ -1,5 +1,6 @@
 package comp1140.ass2;
 
+import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
 
@@ -83,15 +84,16 @@ public class Cublino {
      * @return true if the input state is valid, otherwise false
      */
     public static Boolean isStateValid(String state) {
-        // White player has upper case and black player has lower case
 
         if(Boolean.FALSE.equals(isStateWellFormed(state))) return false;
 
         Boards board = new Boards();
         board.setWhiteAndBlackPlayer(state);
+        PurCublino purCublino = new PurCublino();
 
         if(board.isSamePosition()) return false;
-        return isStateWellFormed(state); // FIXME Task 4 (P)
+        return (!purCublino.isGameValid(board));
+        // FIXME Task 4 (P)
     }
 
     /**
