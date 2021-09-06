@@ -33,7 +33,7 @@ public class Die {
     public Die(String placement, Players whitePlayer, Players blackPlayer) {
         assert placement.length() == 3;
         int orientation = placement.charAt(0);
-        if (97 <= orientation && orientation <= 122) {
+        if (Character.isLowerCase(orientation)) {
             this.player = whitePlayer;
             orientation -= 97;
         } else {
@@ -43,7 +43,7 @@ public class Die {
         assert 0 <= orientation && orientation < 24;
 
         // All 24 orientations in the order {top}{front}{left},
-        // manually determined by yours' truly
+        // manually determined by yours truly
         int[][] orientations = new int[][] {
                 {1, 2, 3},
                 {1, 3, 5},
@@ -155,7 +155,7 @@ public class Die {
      * Only the postion of the dice will change accordingly
      * The orientation of he dice is not changed in a Jump movement
      * @param d
-     * @param direction
+     * @param direction The direction the dice will jump in
      */
     public void jump(Die d, Direction direction){
     }

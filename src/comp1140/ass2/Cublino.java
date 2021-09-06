@@ -128,7 +128,7 @@ public class Cublino {
 
         if(board.isSamePosition()) return false;
 
-        if(state.charAt(0) == 'P' || state.charAt(0) == 'p'){
+        if(state.toLowerCase().charAt(0) == 'p'){
             return purCublino.isGameValid(board);
         } else {
             return contraCublino.isGameValid(board);
