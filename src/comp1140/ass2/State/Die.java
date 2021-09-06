@@ -103,6 +103,11 @@ public class Die {
         return player;
     }
 
+    @Override
+    public String toString() {
+        return player.toString() + " " + getPosition();
+    }
+
     /** Obtain the direction of the next desired movement
      * @param d
      * @return Direction
@@ -141,7 +146,6 @@ public class Die {
      * the orientation and position of the dice will change accordingly
      * @param d
      * @param direction
-     * @return
      */
     public void roll(Die d, Direction direction){
     }

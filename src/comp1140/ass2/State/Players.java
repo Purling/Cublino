@@ -35,6 +35,11 @@ public class Players {
         myDice[index] = die;
     }
 
+    @Override
+    public String toString() {
+        return "" + isWhite;
+    }
+
     public boolean getWhite() {
         return this.isWhite;
     }

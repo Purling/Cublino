@@ -17,15 +17,15 @@ public class PurCublino extends Game {
         return (board.getBlackPlayer().getDice().length == 7 && board.getWhitePlayer().getDice().length == 7);
     }
 
-    private boolean isGameFinished(Boards board){
+    private boolean isGameInvalid(Boards board){
 
         Die[] white = board.getWhitePlayer().getDice();
         Die[] black = board.getBlackPlayer().getDice();
 
-        return Arrays.stream(white).allMatch(d -> d.getX() == 0) || Arrays.stream(black).allMatch(d -> d.getX() == 6);
+        return Arrays.stream(white).allMatch(d -> d.getY() == 0) && Arrays.stream(black).allMatch(d -> d.getY() == 6);
     }
 
     public boolean isGameValid(Boards board){
-        return (isDiceAmountCorrect(board) && !isGameFinished(board));
+        return (isDiceAmountCorrect(board) && !isGameInvalid(board));
     }
 }
