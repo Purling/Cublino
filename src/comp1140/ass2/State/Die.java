@@ -89,9 +89,9 @@ public class Die {
     public int getTop() {return this.top;}
 
     /**
-     *  Get the value of the dice on a particular side
-     * @param d
-     * @return
+     *  Get the value of the die on a particular side
+     * @param d The side of the die the value is on
+     * @return The int value on the particular side of the die
      */
     public int getSide(Direction d){
         return -1;
@@ -127,8 +127,16 @@ public class Die {
     public int getX() {return x;}
     public int getY() {return y;}
 
+    public boolean isWhiteDieFinished() {
+        return getY() == 0;
+    }
+
+    public boolean isBlackDieFinished() {
+        return getY() == 6;
+    }
+
     public boolean getColor() {
-        return player.getWhite();
+        return player.isWhite();
     }
 
     /**

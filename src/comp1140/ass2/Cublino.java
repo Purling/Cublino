@@ -119,14 +119,14 @@ public class Cublino {
      */
     public static Boolean isStateValid(String state) {
 
-        if(Boolean.FALSE.equals(isStateWellFormed(state)) || state.length() == 1) return false;
+        if(!isStateWellFormed(state) || state.length() == 1) return false;
 
         Boards board = new Boards();
         board.setWhiteAndBlackPlayer(state);
         PurCublino purCublino = new PurCublino();
         ContraCublino contraCublino = new ContraCublino();
 
-        if(board.isSamePosition()) return false;
+        if(board.containsOverlappingPieces()) return false;
 
         if(state.toLowerCase().charAt(0) == 'p'){
             return purCublino.isGameValid(board);

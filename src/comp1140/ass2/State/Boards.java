@@ -1,12 +1,12 @@
 package comp1140.ass2.State;
 
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 public class Boards {
     private Players whitePlayer = new Players(true);
     private Players blackPlayer = new Players(false);
-    private static final int BOARD_DIMENSION = 7;
+    public static final int BOARD_DIMENSION = 7;
 
     /**
      * A 2d array to represent the current status of the board
@@ -55,43 +55,33 @@ public class Boards {
         return false;
     }
 
-    public boolean isSamePosition(){
-
-        Die[] white = whitePlayer.getDice();
-        Die[] black = blackPlayer.getDice();
-        Die[] allDice = Stream.concat(Arrays.stream(white),Arrays.stream(black)).toArray(Die[] :: new);
-        ArrayList<String> positions = new ArrayList<>();
-
-        for(Die die : allDice){
-            if(positions.contains(die.getPosition())){
-                return true;
-            } else{
-                positions.add(die.getPosition());
-            }
-        }
-        return false;
+    public boolean containsOverlappingPieces() {
+        List<String> white = Arrays.stream(whitePlayer.getDice()).map(Die::getPosition).collect(Collectors.toList());
+        List<String> black = Arrays.stream(blackPlayer.getDice()).map(Die::getPosition).collect(Collectors.toList());
+        Set<String> allPieces = new HashSet<>();
+        allPieces.addAll(white);
+        allPieces.addAll(black);
+        return allPieces.size() != (white.size() + black.size());
     }
 
     public void setWhiteAndBlackPlayer(String encodedState){
 
-        Die[] whiteDice = new Die[7];
-        Die[] blackDice = new Die[7];
-        int whiteCount = 0;
-        int blackCount = 0;
+        List<Die> whiteDice = new ArrayList<>();
+        List<Die> blackDice = new ArrayList<>();
+        encodedState = encodedState.substring(1);
+        String[] diceList = encodedState.split("(?<=\\G.{3})");
 
-        for (int i = 1; i < encodedState.length(); i += 3) {
-            Die die = new Die(encodedState.substring(i, i+3), whitePlayer, blackPlayer);
-            if (die.getPlayer().equals(whitePlayer)){
-                whiteDice[whiteCount] = die;
-                whiteCount++;
+        for (String dieStr : diceList) {
+            Die die = new Die(dieStr, whitePlayer, blackPlayer);
+            if (die.getPlayer().isWhite()){
+               whiteDice.add(die);
             }
             else{
-                blackDice[blackCount] = die;
-                blackCount++;
+                blackDice.add(die);
             }
         }
-        whitePlayer.setDice(Arrays.stream(whiteDice).filter(Objects::nonNull).toArray(Die[] :: new));
-        blackPlayer.setDice(Arrays.stream(blackDice).filter(Objects::nonNull).toArray(Die[] :: new));
+        whitePlayer.setDice(whiteDice.toArray(new Die[]{}));
+        blackPlayer.setDice(blackDice.toArray(new Die[]{}));
     }
 
     public Players getWhitePlayer() {

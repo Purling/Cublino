@@ -13,21 +13,21 @@ public class ContraCublino extends Game {
     public ContraCublino(){
     }
 
-    private boolean isDiceAmountCorrect(Boards board){
-        return (board.getBlackPlayer().getDice().length + board.getWhitePlayer().getDice().length <= 14);
+    @Override
+    public boolean isDiceAmountCorrect(Boards board){
+        return (board.getBlackPlayer().getDice().length + board.getWhitePlayer().getDice().length <= 2 * Boards.BOARD_DIMENSION);
     }
 
-    private boolean isGameInvalid(Boards board){
+    @Override
+    public boolean hasBothWon(Boards board){
 
         Die[] white = board.getWhitePlayer().getDice();
         Die[] black = board.getBlackPlayer().getDice();
-        Die[] whiteEnd = Arrays.stream(white).filter(d -> d.getY() == 0).toArray(Die[] :: new);
-        Die[] blackEnd = Arrays.stream(black).filter(d -> d.getY() == 6).toArray(Die[] :: new);
 
-        return whiteEnd.length + blackEnd.length > 1;
+        return Arrays.stream(white).filter(Die::isWhiteDieFinished).count() + Arrays.stream(black).filter(Die::isBlackDieFinished).count() > 1;
     }
 
     public boolean isGameValid(Boards board){
-        return (isDiceAmountCorrect(board) && !isGameInvalid(board));
+        return (isDiceAmountCorrect(board) && !hasBothWon(board));
     }
 }

@@ -1,10 +1,13 @@
 package comp1140.ass2.GameLogic;
 
+import comp1140.ass2.State.Boards;
 import comp1140.ass2.gui.Board;
 import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.State.Die;
 import comp1140.ass2.State.Direction;
 import comp1140.ass2.State.Players;
+
+import java.util.Arrays;
 
 /**
  * The player will be allowed to decide which version of cublino he or she wants to play.
@@ -47,6 +50,10 @@ public abstract class Game{
      * the result in terms of winning and tie when the game is finished
      */
     Result result;
+
+    abstract protected boolean hasBothWon(Boards board);
+
+    abstract protected boolean isDiceAmountCorrect(Boards board);
 
     /**
      * Indicate the type of move that is going to be made

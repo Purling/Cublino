@@ -40,7 +40,7 @@ public class Players {
         return "" + isWhite;
     }
 
-    public boolean getWhite() {
+    public boolean isWhite() {
         return this.isWhite;
     }
 }
