@@ -40,6 +40,62 @@ public class Boards {
     public Boards() {
     }
 
+    public String stateToPosition(String encodedPosition){
+        char[] encodedCh = encodedPosition.toCharArray();
+        StringBuilder sb = new StringBuilder();
+
+        for(int i = 0; i < encodedCh.length; i++){
+            if (i % 2 == 0) {
+                sb.append((int) encodedCh[i] - 'a');
+            } else {
+                sb.append((int) encodedCh[i] - '1');
+            }
+        }
+        return sb.toString();
+    }
+
+    public int getManhattanDistance(String startPosition, String endPosition){
+        return getDistance(Integer.parseInt(startPosition.substring(0,1)) , Integer.parseInt(endPosition.substring(0,1)))
+                + getDistance(Integer.parseInt(startPosition.substring(1)) , Integer.parseInt(endPosition.substring(1)));
+    }
+
+    /**
+     * Gets the position of the middle of two dice with a Manhattan distance of 2
+     * @param startPosition position of first die
+     * @param endPosition position of second die
+     * @return The position which is between the two dice
+     */
+    public String getMiddlePosition(String startPosition, String endPosition){
+        if (startPosition.charAt(0) == endPosition.charAt(0)) {
+            return startPosition.charAt(0) + ((startPosition.charAt(1) > endPosition.charAt(1))
+                    ? Character.toString(startPosition.charAt(1) - 1)
+                    : Character.toString(endPosition.charAt(1) - 1));
+        } else {
+            return (startPosition.charAt(0) > endPosition.charAt(0))
+                    ? Character.toString(startPosition.charAt(0) - 1) + startPosition.charAt(1)
+                    : Character.toString(endPosition.charAt(0) - 1) + startPosition.charAt(1);
+        }
+    }
+
+    private int getDistance(int point1, int point2) {
+        return Math.abs(point1-point2);
+    }
+
+    public boolean isAdjacent(String startPosition, String endPosition){
+        return getManhattanDistance(startPosition, endPosition) == 1;
+    }
+
+    public boolean sameAxis(String startPosition, String endPosition) {
+        return startPosition.charAt(0) == endPosition.charAt(0)
+                || startPosition.charAt(1) == endPosition.charAt(1);
+    }
+
+    /**
+     * Gets the die at the specified location on the board
+     * @param x x-coordinate on board
+     * @param y y-coordinate on board
+     * @return A die or null if there is no die at particular location
+     */
     public Die getAt(int x, int y) {
         return board[y][x];
     }

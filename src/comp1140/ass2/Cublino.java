@@ -3,9 +3,6 @@ package comp1140.ass2;
 import comp1140.ass2.GameLogic.ContraCublino;
 import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Boards;
-import comp1140.ass2.State.Die;
-
-import java.util.Arrays;
 
 public class Cublino {
 
@@ -175,7 +172,24 @@ public class Cublino {
      * @return true if the step is valid for the given state, otherwise false
      */
     public static Boolean isValidStepPur(String state, String step) {
-        return null; // FIXME Task 7 (D)
+
+        Boards board = new Boards(state);
+        PurCublino purCublino = new PurCublino(Character.isUpperCase(state.charAt(0)));
+        String dicePosition = board.stateToPosition(step).substring(0,2);
+        String endPosition = board.stateToPosition(step).substring(2);
+
+        if(board.getAt(Integer.parseInt(endPosition.substring(0,1)), Integer.parseInt(endPosition.substring((1)))) != null) return false;
+
+        if (board.isAdjacent(dicePosition, endPosition)) {
+            return !purCublino.isMoveBackwards(dicePosition,endPosition);
+        } else if (board.getManhattanDistance(dicePosition,endPosition) == 2) {
+            return !purCublino.isMoveBackwards(dicePosition,endPosition)
+                    && (board.getAt(Integer.parseInt(board.getMiddlePosition(dicePosition, endPosition).substring(0,1)),
+                    Integer.parseInt(board.getMiddlePosition(dicePosition, endPosition).substring((1)))) != null)
+                    && (board.sameAxis(dicePosition, endPosition));
+        } else {
+            return false;
+        }
     }
 
     /**

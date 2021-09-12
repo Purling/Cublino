@@ -11,6 +11,11 @@ import java.util.Arrays;
 public class PurCublino extends Game {
 
     public PurCublino(){
+        super();
+    }
+
+    public PurCublino(boolean isWhite){
+        super(isWhite);
     }
 
     @Override
@@ -26,6 +31,10 @@ public class PurCublino extends Game {
 
         return Arrays.stream(white).allMatch(Die::isWhiteDieFinished) && Arrays.stream(black).allMatch(Die::isBlackDieFinished);
     }
+
+//    public boolean isJump() {
+//
+//    }
 
     public boolean isGameValid(Boards board){
         return (isDiceAmountCorrect(board) && !hasBothWon(board));

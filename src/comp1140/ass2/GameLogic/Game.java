@@ -55,6 +55,21 @@ public abstract class Game{
 
     abstract protected boolean isDiceAmountCorrect(Boards board);
 
+    public Game(){
+    }
+
+    public Game(boolean isWhite){
+        this.currentPlayer = new Players(isWhite);
+    }
+
+    public boolean isMoveBackwards(String startPosition, String endPosition){
+        if(currentPlayer.isWhite()){
+            return (Integer.parseInt(endPosition.substring(1)) - Integer.parseInt(startPosition.substring(1))) < 0;
+        } else {
+            return (Integer.parseInt(startPosition.substring(1)) - Integer.parseInt(endPosition.substring(1))) < 0;
+        }
+    }
+
     /**
      * Indicate the type of move that is going to be made
      * Either roll or jump
@@ -98,8 +113,8 @@ public abstract class Game{
     }
     /**
      * determine whether the game is over or not
-     * @param b
-     * @return
+     * @param b A board
+     * @return True if the game is over and false otherwise
      */
     public boolean isGameOver(Board b){
         return false;
