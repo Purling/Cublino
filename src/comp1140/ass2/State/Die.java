@@ -94,7 +94,13 @@ public class Die {
      * @return The int value on the particular side of the die
      */
     public int getSide(Direction d){
-        return -1;
+        switch (d) {
+            case UP: return back;
+            case DOWN: return front;
+            case LEFT: return left;
+            case RIGHT: return right;
+            default: return -1;
+        }
     }
     /** Get the current player that is making moves
      * @return Player
