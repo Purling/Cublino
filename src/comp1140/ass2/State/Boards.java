@@ -37,10 +37,13 @@ public class Boards {
         }
     }
 
+    /**
+     * Empty constructor for Boards
+     */
     public Boards() {
     }
 
-    public String stateToPosition(String encodedPosition){
+    public Positions statesToPositions(String encodedPosition) {
         char[] encodedCh = encodedPosition.toCharArray();
         StringBuilder sb = new StringBuilder();
 
@@ -51,12 +54,37 @@ public class Boards {
                 sb.append((int) encodedCh[i] - '1');
             }
         }
-        return sb.toString();
+        return new Positions(sb.substring(0,2), sb.substring(2));
     }
 
-    public int getManhattanDistance(String startPosition, String endPosition){
-        return getDistance(Integer.parseInt(startPosition.substring(0,1)) , Integer.parseInt(endPosition.substring(0,1)))
-                + getDistance(Integer.parseInt(startPosition.substring(1)) , Integer.parseInt(endPosition.substring(1)));
+    public static class Positions {
+        private String start;
+        private String end;
+
+        public Positions(String start, String end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public String getStart() {
+            return start;
+        }
+
+        public String getEnd() {
+            return end;
+        }
+    }
+
+    public static int getPositionX(String x) {
+        return Integer.parseInt(x.substring(0,1));
+    }
+
+    public static int getPositionY(String x) {
+        return Integer.parseInt(x.substring(1));
+    }
+
+    public int getManhattanDistance(String startPosition, String endPosition) {
+        return Math.abs(getPositionX(startPosition) - getPositionX(endPosition)) + Math.abs(getPositionY(startPosition) - getPositionY(endPosition));
     }
 
     /**
@@ -65,29 +93,31 @@ public class Boards {
      * @param endPosition position of second die
      * @return The position which is between the two dice
      */
-    public String getMiddlePosition(String startPosition, String endPosition){
-        if (startPosition.charAt(0) == endPosition.charAt(0)) {
-            return startPosition.charAt(0) + ((startPosition.charAt(1) > endPosition.charAt(1))
-                    ? Character.toString(startPosition.charAt(1) - 1)
-                    : Character.toString(endPosition.charAt(1) - 1));
+    public static String getMiddlePosition(String startPosition, String endPosition) {
+        if (getPositionX(startPosition) == getPositionX(endPosition)) {
+            return "" + getPositionX(startPosition)
+                    + (getPositionY(startPosition) > getPositionY(endPosition)
+                        ? getPositionY(startPosition) - 1
+                        : getPositionY(endPosition) - 1);
         } else {
-            return (startPosition.charAt(0) > endPosition.charAt(0))
-                    ? Character.toString(startPosition.charAt(0) - 1) + startPosition.charAt(1)
-                    : Character.toString(endPosition.charAt(0) - 1) + startPosition.charAt(1);
+            return (getPositionX(startPosition) > getPositionX(endPosition))
+                    ? "" + (getPositionX(startPosition) - 1) + getPositionY(startPosition)
+                    : "" + (getPositionX(endPosition) - 1) + getPositionY(startPosition);
         }
     }
 
-    private int getDistance(int point1, int point2) {
-        return Math.abs(point1-point2);
-    }
-
-    public boolean isAdjacent(String startPosition, String endPosition){
+    public boolean isAdjacent(String startPosition, String endPosition) {
         return getManhattanDistance(startPosition, endPosition) == 1;
     }
 
-    public boolean sameAxis(String startPosition, String endPosition) {
-        return startPosition.charAt(0) == endPosition.charAt(0)
-                || startPosition.charAt(1) == endPosition.charAt(1);
+    /**
+     * Returns whether two positions are horinzontal or vertical to each other
+     * @param position1 Position on board
+     * @param position2 Position on board
+     * @return True if positions are on the same axis(column/row), false otherwise
+     */
+    public static boolean sameAxis(String position1, String position2) {
+        return getPositionX(position1) == getPositionX(position2) || getPositionY(position1) == getPositionY(position2);
     }
 
     /**
@@ -120,7 +150,7 @@ public class Boards {
         return allPieces.size() != (white.size() + black.size());
     }
 
-    public void setWhiteAndBlackPlayer(String encodedState){
+    public void setWhiteAndBlackPlayer(String encodedState) {
 
         List<Die> whiteDice = new ArrayList<>();
         List<Die> blackDice = new ArrayList<>();

@@ -175,18 +175,16 @@ public class Cublino {
 
         Boards board = new Boards(state);
         PurCublino purCublino = new PurCublino(Character.isUpperCase(state.charAt(0)));
-        String dicePosition = board.stateToPosition(step).substring(0,2);
-        String endPosition = board.stateToPosition(step).substring(2);
+        Boards.Positions positions = board.statesToPositions(step);
+        String start = positions.getStart();
+        String end = positions.getEnd();
 
-        if(board.getAt(Integer.parseInt(endPosition.substring(0,1)), Integer.parseInt(endPosition.substring((1)))) != null) return false;
+        if(board.getAt(Boards.getPositionX(end), Boards.getPositionY(end)) != null) return false;
 
-        if (board.isAdjacent(dicePosition, endPosition)) {
-            return !purCublino.isMoveBackwards(dicePosition,endPosition);
-        } else if (board.getManhattanDistance(dicePosition,endPosition) == 2) {
-            return !purCublino.isMoveBackwards(dicePosition,endPosition)
-                    && (board.getAt(Integer.parseInt(board.getMiddlePosition(dicePosition, endPosition).substring(0,1)),
-                    Integer.parseInt(board.getMiddlePosition(dicePosition, endPosition).substring((1)))) != null)
-                    && (board.sameAxis(dicePosition, endPosition));
+        if (board.isAdjacent(start, end)) {
+            return !purCublino.isMoveBackwards(start,end);
+        } else if (board.getManhattanDistance(start,end) == 2) {
+            return purCublino.isJumpValid(board, start, end);
         } else {
             return false;
         }

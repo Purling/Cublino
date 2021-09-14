@@ -14,6 +14,11 @@ public class ContraCublino extends Game {
     }
 
     @Override
+    protected boolean isMoveLegal() {
+        return false;
+    }
+
+    @Override
     public boolean isDiceAmountCorrect(Boards board){
         return (board.getBlackPlayer().getDice().length + board.getWhitePlayer().getDice().length <= 2 * Boards.BOARD_DIMENSION);
     }
