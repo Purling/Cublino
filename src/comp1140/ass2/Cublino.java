@@ -3,9 +3,6 @@ package comp1140.ass2;
 import comp1140.ass2.GameLogic.ContraCublino;
 import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Boards;
-import comp1140.ass2.State.Die;
-
-import java.util.Arrays;
 
 public class Cublino {
 
@@ -205,7 +202,22 @@ public class Cublino {
      * @return true if the step is valid for the given state, otherwise false
      */
     public static Boolean isValidStepPur(String state, String step) {
-        return null; // FIXME Task 7 (D)
+
+        Boards board = new Boards(state);
+        PurCublino purCublino = new PurCublino(Character.isUpperCase(state.charAt(0)));
+        Boards.Positions positions = board.statesToPositions(step);
+        String start = positions.getStart();
+        String end = positions.getEnd();
+
+        if(board.getAt(Boards.getPositionX(end), Boards.getPositionY(end)) != null) return false;
+
+        if (board.isAdjacent(start, end)) {
+            return !purCublino.isMoveBackwards(start,end);
+        } else if (board.getManhattanDistance(start,end) == 2) {
+            return purCublino.isJumpValid(board, start, end);
+        } else {
+            return false;
+        }
     }
 
     /**

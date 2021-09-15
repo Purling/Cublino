@@ -55,6 +55,21 @@ public abstract class Game{
 
     abstract protected boolean isDiceAmountCorrect(Boards board);
 
+    public Game(){
+    }
+
+    public Game(boolean isWhite){
+        this.currentPlayer = new Players(isWhite);
+    }
+
+    public boolean isMoveBackwards(String startPosition, String endPosition){
+        if(currentPlayer.isWhite()){
+            return (Boards.getPositionY(endPosition) - Boards.getPositionY(startPosition)) < 0;
+        } else {
+            return (Boards.getPositionY(startPosition) - Boards.getPositionY(endPosition)) < 0;
+        }
+    }
+
     /**
      * Indicate the type of move that is going to be made
      * Either roll or jump
@@ -83,11 +98,9 @@ public abstract class Game{
 
     /**
      * determine whether a move is legal or not
-     * @return
+     * @return True if the move is legal, false otherwise
      */
-    public boolean isLegalMove(){
-        return false;
-    }
+    abstract protected boolean isMoveLegal();
 
     /**
      * Display all the legal turns according to the current status of the board
@@ -98,8 +111,8 @@ public abstract class Game{
     }
     /**
      * determine whether the game is over or not
-     * @param b
-     * @return
+     * @param b A board
+     * @return True if the game is over and false otherwise
      */
     public boolean isGameOver(Board b){
         return false;

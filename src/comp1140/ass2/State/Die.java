@@ -89,12 +89,18 @@ public class Die {
     public int getTop() {return this.top;}
 
     /**
-     *  Get the value of the die on a particular side
+     * Get the value of the die on a particular side
      * @param d The side of the die the value is on
-     * @return The int value on the particular side of the die
+     * @return The int value on the particular side of the die or -1 if not valid
      */
     public int getSide(Direction d){
-        return -1;
+        switch (d) {
+            case UP: return back;
+            case DOWN: return front;
+            case LEFT: return left;
+            case RIGHT: return right;
+            default: return -1;
+        }
     }
     /** Get the current player that is making moves
      * @return Player
@@ -140,31 +146,27 @@ public class Die {
     }
 
     /**
-     * Returns whether or not the current instance of dice is adjacent to another given dice
-     * @param other
-     * @return
+     * Returns whether the current instance of dice is adjacent to another given dice
+     * @param other A die
+     * @return True if dice are adjacent, false otherwise
      */
     public boolean isAdjacent(Die other){
         return false;
-
     }
 
     /**
-     * Roll the dice in a given direction
-     * the orientation and position of the dice will change accordingly
-     * @param d
-     * @param direction
+     * Roll the dice in a given direction the orientation and position of the dice will change accordingly
+     * @param die A die
+     * @param direction The direction the die will roll in
      */
-    public void roll(Die d, Direction direction){
+    public void roll(Die die, Direction direction){
     }
 
     /**
-     * Let the dice jump in a given direction
-     * Only the postion of the dice will change accordingly
-     * The orientation of he dice is not changed in a Jump movement
-     * @param d
+     * Lets the dice jump in a given direction. Only the position of the dice will change.
+     * @param die A die
      * @param direction The direction the dice will jump in
      */
-    public void jump(Die d, Direction direction){
+    public void jump(Die die, Direction direction){
     }
 }
