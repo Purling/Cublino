@@ -147,7 +147,34 @@ public class Cublino {
      * @return 1 if player one has won, 2 if player two has won, 3 if the result is a draw, otherwise 0.
      */
     public static int isGameOverPur(String state) {
-        return -1; // FIXME Task 6 (D)
+        if (state.charAt(0) != 'p' && state.charAt(0)!= 'P') return 0;
+        else {
+            int p1 = 0;
+            int p2 = 0;
+            int p1s = 0;
+            int p2s = 0;
+            int i = 0;
+            while (i < 14){
+                String s = state.substring(3*i+1, 3*i+4);
+                if (s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && s.charAt(2) == '7'){
+                    p1++;
+                    p1s += (s.charAt(0) - 'A')/4 + 1;
+                    i++;
+                }
+                else if (s.charAt(0) >= 'a' && s.charAt(0) <= 'z' && s.charAt(2) == '1'){
+                    p2++;
+                    p2s += (s.charAt(0) - 'a')/4 + 1;
+                    i++;
+                }
+                else i++;
+            }
+                if (p1 == 7 || p2 == 7) {
+                    if (p1s == p2s) return 3;
+                    else if (p1s < p2s) return 2;
+                    else return 1;
+                }
+                else return 0;
+        }
     }
 
     /**
@@ -175,18 +202,16 @@ public class Cublino {
 
         Boards board = new Boards(state);
         PurCublino purCublino = new PurCublino(Character.isUpperCase(state.charAt(0)));
-        String dicePosition = board.stateToPosition(step).substring(0,2);
-        String endPosition = board.stateToPosition(step).substring(2);
+        Boards.Positions positions = board.statesToPositions(step);
+        String start = positions.getStart();
+        String end = positions.getEnd();
 
-        if(board.getAt(Integer.parseInt(endPosition.substring(0,1)), Integer.parseInt(endPosition.substring((1)))) != null) return false;
+        if(board.getAt(Boards.getPositionX(end), Boards.getPositionY(end)) != null) return false;
 
-        if (board.isAdjacent(dicePosition, endPosition)) {
-            return !purCublino.isMoveBackwards(dicePosition,endPosition);
-        } else if (board.getManhattanDistance(dicePosition,endPosition) == 2) {
-            return !purCublino.isMoveBackwards(dicePosition,endPosition)
-                    && (board.getAt(Integer.parseInt(board.getMiddlePosition(dicePosition, endPosition).substring(0,1)),
-                    Integer.parseInt(board.getMiddlePosition(dicePosition, endPosition).substring((1)))) != null)
-                    && (board.sameAxis(dicePosition, endPosition));
+        if (board.isAdjacent(start, end)) {
+            return !purCublino.isMoveBackwards(start,end);
+        } else if (board.getManhattanDistance(start,end) == 2) {
+            return purCublino.isJumpValid(board, start, end);
         } else {
             return false;
         }
@@ -232,6 +257,11 @@ public class Cublino {
      * @return the resulting state after the move has been applied
      */
     public static String applyMovePur(String state, String move) {
+        if (!isValidMovePur(state, move)) return state;
+        else{
+
+
+        }
         return null; // FIXME Task 9 (P)
     }
 

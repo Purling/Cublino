@@ -64,9 +64,9 @@ public abstract class Game{
 
     public boolean isMoveBackwards(String startPosition, String endPosition){
         if(currentPlayer.isWhite()){
-            return (Integer.parseInt(endPosition.substring(1)) - Integer.parseInt(startPosition.substring(1))) < 0;
+            return (Boards.getPositionY(endPosition) - Boards.getPositionY(startPosition)) < 0;
         } else {
-            return (Integer.parseInt(startPosition.substring(1)) - Integer.parseInt(endPosition.substring(1))) < 0;
+            return (Boards.getPositionY(startPosition) - Boards.getPositionY(endPosition)) < 0;
         }
     }
 
@@ -98,11 +98,9 @@ public abstract class Game{
 
     /**
      * determine whether a move is legal or not
-     * @return
+     * @return True if the move is legal, false otherwise
      */
-    public boolean isLegalMove(){
-        return false;
-    }
+    abstract protected boolean isMoveLegal();
 
     /**
      * Display all the legal turns according to the current status of the board
