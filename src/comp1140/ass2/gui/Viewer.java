@@ -25,7 +25,6 @@ import java.io.File;
 import comp1140.ass2.State.Boards;
 
 import javafx.scene.*;
-import javafx.util.Duration;
 
 /**
  * A very simple viewer for piece placements in the Cublino game.
@@ -48,6 +47,8 @@ public class Viewer extends Application {
 
     private SubScene boardSubscene = new SubScene(new Group(), VIEWER_WIDTH, VIEWER_HEIGHT);
 
+    double mouseX = 0;
+
     /**
      * Draw a placement in the window, removing any previously drawn one
      *
@@ -59,9 +60,6 @@ public class Viewer extends Application {
 
         Group subRoot = new Group();
         Group boardGroup = new Group();
-
-        AmbientLight light = new AmbientLight(Color.WHITE);
-        boardGroup.getChildren().add(light);
 
         // Generic JavaFX window setup
         boardSubscene = new SubScene(subRoot, VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
@@ -83,30 +81,31 @@ public class Viewer extends Application {
             }
         }
 
-        // Position the board and dice in 3D space
-        boardGroup.setTranslateX(VIEWER_WIDTH/2);
-        boardGroup.setTranslateY(VIEWER_HEIGHT*3/4-200);
+        // ALlow the board group to be rotated as the mouse is dragged
         boardGroup.setRotationAxis(new Point3D(0, 1, 0));
-        boardGroup.setRotate(20);
+        boardGroup.setOnMousePressed(e -> {
+            mouseX = e.getSceneX();
+        });
+        boardGroup.setOnMouseDragged(e -> {
+            boardGroup.setRotate(boardGroup.getRotate() + (mouseX - e.getSceneX())/10);
+            mouseX = e.getSceneX();
+        });
 
         // Establish, position and rotate camera
         PerspectiveCamera camera = new PerspectiveCamera();
         camera.setRotationAxis(new Point3D(1, 0, 0));
-        camera.setTranslateY(-100);
-        camera.setTranslateZ(-200);
+        camera.setTranslateY(100-VIEWER_HEIGHT*3/4);
+        camera.setTranslateZ(-250);
+        camera.setTranslateX(-VIEWER_WIDTH/2);
         camera.setRotate(-30);
         boardSubscene.setCamera(camera);
 
-        subRoot.getChildren().add(boardGroup);
+        // Establish soft white lighting to remove shading and shadows
+        AmbientLight light = new AmbientLight(Color.WHITE);
+        boardGroup.getChildren().add(light);
 
+        subRoot.getChildren().add(boardGroup);
         root.getChildren().add(boardSubscene);
-        RotateTransition rotateTransition = new RotateTransition();
-        rotateTransition.setDuration(Duration.millis(50000));
-        rotateTransition.setNode(boardGroup);
-        rotateTransition.setByAngle(360);
-        rotateTransition.setCycleCount(1);
-        rotateTransition.setAutoReverse(false);
-        rotateTransition.play();
     }
 
     /**
@@ -283,5 +282,4 @@ public class Viewer extends Application {
         box.toBack();
         return box;
     }
-
 }

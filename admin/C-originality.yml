@@ -27,9 +27,9 @@ declaration: >-
 #
 # Add as many "name+comment" entries as necessary
 # (or remove it altogether if you haven't collaborated with anyone)
-collaboration:
-  - name:
-    comment: >-
+#collaboration:
+#  - name:
+#    comment: >-
 
 # Use this to list any code that you used that you did not write,
 # aside from code provided by the lecturer.  Provide a comment
@@ -39,9 +39,13 @@ collaboration:
 # Add as many "url+licence+comment" entries as necessary
 # (or remove it altogether if you haven't used any external code)
 code:
-  - comment:
-    url:
-    licence:
+  - comment: UV coordinates for a 3D cube for task 5
+    url: https://stackoverflow.com/a/34663339
+    licence: CC-BY-SA
+  - comment: Used for splitting String into substrings
+    url: https://stackoverflow.com/a/3761521
+    licence: CC-BY-SA 3.0
+
 
 # Use this to list any assets (artwork, sound, etc) that you used.
 # Provide a comment explaining your use of that asset and the URL
@@ -49,18 +53,18 @@ code:
 #
 # Add as many "url+licence+comment" entries as necessary
 # (or remove it altogether if you haven't used any external assets)
-assets:
-  - comment:
-    url:
-    licence:
+#assets:
+#  - comment:
+#    url:
+#    licence:
 
 
 # Sign *your* name and uids here. (Remove entries if you have fewer
 # than three members.)
 signatures:
-  - name:
-    uid:
-  - name:
-    uid:
-  - name:
-    uid:
+  - name: Ziling Ouyang
+    uid: u7312578
+  - name: Zane Gates
+    uid: u7334218
+  - name: Yuechen Liu
+    uid: u7227895

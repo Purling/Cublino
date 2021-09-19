@@ -149,35 +149,32 @@ public class Cublino {
     public static int isGameOverPur(String state) {
         if (state.charAt(0) != 'p' && state.charAt(0)!= 'P') return 0;
         else {
-            int p1Top = 0;
-            int p2Top = 0;
-            int p1Bottom = 0;
-            int p2Bottom = 0;
+            int p1 = 0;
+            int p2 = 0;
             int p1s = 0;
             int p2s = 0;
             int i = 0;
             while (i < 14){
                 String s = state.substring(3*i+1, 3*i+4);
                 if (s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && s.charAt(2) == '7'){
-                    p1Top++;
+                    p1++;
                     p1s += (s.charAt(0) - 'A')/4 + 1;
                     i++;
                 }
                 else if (s.charAt(0) >= 'a' && s.charAt(0) <= 'z' && s.charAt(2) == '1'){
-                    p2Top++;
+                    p2++;
                     p2s += (s.charAt(0) - 'a')/4 + 1;
                     i++;
                 }
                 else i++;
             }
-                if (p1Top == 7 || p2Top == 7 || p1Bottom == 7 || p2Bottom == 7) {
+                if (p1 == 7 || p2 == 7) {
                     if (p1s == p2s) return 3;
                     else if (p1s < p2s) return 2;
-                    else if (p1s > p2s) return 1;
+                    else return 1;
                 }
                 else return 0;
         }
-        return 0;
     }
 
     /**
