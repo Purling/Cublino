@@ -126,6 +126,11 @@ public class Viewer extends Application {
         hb.setLayoutX(230);
         hb.setLayoutY(VIEWER_HEIGHT - 50);
         controls.getChildren().add(hb);
+
+        Label instructions = new Label("Drag the mouse horizontally to rotate view");
+        instructions.setLayoutX(10);
+        instructions.setLayoutY(10);
+        controls.getChildren().add(instructions);
     }
 
     @Override
