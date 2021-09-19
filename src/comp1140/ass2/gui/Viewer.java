@@ -267,13 +267,13 @@ public class Viewer extends Application {
     final static PhongMaterial blackTileMaterial = new PhongMaterial();
 
     public static void createMaterials() {
-        Image whiteTexture = new Image(new File("src/comp1140/ass2/gui/whitedie.png").toURI().toString());
-        Image blackTexture = new Image(new File("src/comp1140/ass2/gui/blackdie.png").toURI().toString());
+        Image whiteTexture = new Image(new File(URI_BASE + "whitedie.png").toURI().toString());
+        Image blackTexture = new Image(new File(URI_BASE + "blackdie.png").toURI().toString());
         whiteMaterial.setDiffuseMap(whiteTexture);
         blackMaterial.setDiffuseMap(blackTexture);
 
-        Image whiteTileTexture = new Image(new File("src/comp1140/ass2/gui/whitetile.png").toURI().toString());
-        Image blackTileTexture = new Image(new File("src/comp1140/ass2/gui/blacktile.png").toURI().toString());
+        Image whiteTileTexture = new Image(new File(URI_BASE + "whitetile.png").toURI().toString());
+        Image blackTileTexture = new Image(new File(URI_BASE + "blacktile.png").toURI().toString());
         whiteTileMaterial.setDiffuseMap(whiteTileTexture);
         blackTileMaterial.setDiffuseMap(blackTileTexture);
     }
