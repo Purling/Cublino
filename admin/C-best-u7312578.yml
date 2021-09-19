@@ -29,10 +29,11 @@ declaration: >-
 #
 # Add as many "url+licence+comment" entries as necessary
 # (or remove it altogether if you haven't used any external code)
-#code:
-#  - comment:
-#    url:
-#    licence:
+code:
+  - comment: Used for splitting String into substrings
+    url: https://stackoverflow.com/a/3761521
+    licence: CC-BY-SA 3.0
+
 
 # I wish to submit the following classes as entirely my own (remove this if
 # you want to just submit methods):
