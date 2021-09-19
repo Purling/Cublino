@@ -42,6 +42,10 @@ code:
   - comment: UV coordinates for a 3D cube for task 5
     url: https://stackoverflow.com/a/34663339
     licence: CC-BY-SA
+  - comment: Used for splitting String into substrings
+    url: https://stackoverflow.com/a/3761521
+    licence: CC-BY-SA 3.0
+
 
 # Use this to list any assets (artwork, sound, etc) that you used.
 # Provide a comment explaining your use of that asset and the URL
