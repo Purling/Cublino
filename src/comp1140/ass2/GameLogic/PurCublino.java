@@ -47,6 +47,18 @@ public class PurCublino extends Game {
     }
 
     public boolean isStepValidPur(String state, String step) {
+        return PurCublino.checkPurStepValid(state, step, PurCublino::checkBoardStartAndEndPosition);
+   }
+
+    public static boolean checkBoardStartAndEndPosition(Boards board, String start, String end) {
+        return board.getAtPosition(start) != null || board.getAtPosition(end) == null;
+    }
+
+    public interface EndOccupied {
+        boolean test(Boards board, String start, String end);
+    }
+
+    public static Boolean checkPurStepValid(String state, String step, EndOccupied endOccupied) {
 
         Boards board = new Boards(state);
         PurCublino purCublino = new PurCublino(Character.isUpperCase(state.charAt(0)));
@@ -54,8 +66,7 @@ public class PurCublino extends Game {
         String start = positions.getStart();
         String end = positions.getEnd();
 
-        if(board.getAt(Boards.getPositionX(end), Boards.getPositionY(end)) != null
-                || board.getAt(Boards.getPositionX(start), Boards.getPositionY(start)) == null) return false;
+        if(endOccupied.test(board, start, end)) return false;
 
         if (board.isAdjacent(start, end)) {
             return !purCublino.isMoveBackwards(start,end);

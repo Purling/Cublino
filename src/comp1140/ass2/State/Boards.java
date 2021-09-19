@@ -87,6 +87,7 @@ public class Boards {
         return Math.abs(getPositionX(startPosition) - getPositionX(endPosition)) + Math.abs(getPositionY(startPosition) - getPositionY(endPosition));
     }
 
+
     /**
      * Gets the position of the middle of two dice with a Manhattan distance of 2
      * @param startPosition position of first die
@@ -129,6 +130,11 @@ public class Boards {
     public Die getAt(int x, int y) {
         return board[y][x];
     }
+
+    public Die getAtPosition(String position) {
+        return getAt(Boards.getPositionX(position), Boards.getPositionY(position));
+    }
+
 
     /**
      * Check whether or not a given location locates on the board
