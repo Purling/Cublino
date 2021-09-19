@@ -64,8 +64,13 @@ public class Viewer extends Application {
         // Generic JavaFX window setup
         boardSubscene = new SubScene(subRoot, VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
 
-        // Stores the particular state the board should show
-        Boards boards = new Boards(placement);
+        Boards boards = null;
+        try {
+            // Stores the particular state the board should show
+            boards = new Boards(placement);
+        } catch (Exception e) {
+            // If the user inputs an invalid board state, show a blank board without crashing
+        }
 
         // Iterate over every tile in the board
         for (int x = 0; x < 7; x++) {
@@ -74,6 +79,7 @@ public class Viewer extends Application {
                 boardGroup.getChildren().add(makeTile(x, y));
 
                 // If the game state contains a die at the current position, construct it as well
+                if (boards == null) continue;
                 Die die = boards.getAt(x, y);
                 if (die == null) continue;
                 Point3D position = new Point3D(125 * (x-3), 0, 125 * (y-3));
