@@ -36,15 +36,16 @@ declaration: >-
 
 # I wish to submit the following classes as entirely my own (remove this if
 # you want to just submit methods):
-class:
-   - 
-   - 
+#class:
+#   - 
+#   - 
 
 # I wish to submit the following methods as entirely my own (remove this if
 # you want to just submit classes):
 method:
-   - 
-   - 
+   - checkPurStepValid() https://gitlab.cecs.anu.edu.au/u7312578/comp1140-ass2-tue12s/-/blob/master/src/comp1140/ass2/GameLogic/PurCublino.java#L61-78
+   - setWhiteAndBlackPlayer() https://gitlab.cecs.anu.edu.au/u7312578/comp1140-ass2-tue12s/-/blob/master/src/comp1140/ass2/State/Boards.java#L153-171
+   - hasBothWon() https://gitlab.cecs.anu.edu.au/u7312578/comp1140-ass2-tue12s/-/blob/master/src/comp1140/ass2/GameLogic/ContraCublino.java#L27-33
 
 # sign *your* name and uid here
 name: Ziling Ouyang
