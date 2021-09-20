@@ -61,6 +61,8 @@ public class Viewer extends Application {
         Group subRoot = new Group();
         Group boardGroup = new Group();
 
+        root.getChildren().remove(boardSubscene);
+
         // Generic JavaFX window setup
         boardSubscene = new SubScene(subRoot, VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
 
