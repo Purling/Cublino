@@ -144,11 +144,11 @@ public class Die {
     public int getY() {return y;}
 
     public boolean isWhiteDieFinished() {
-        return getY() == 0;
+        return getY() == 6;
     }
 
     public boolean isBlackDieFinished() {
-        return getY() == 6;
+        return getY() == 0;
     }
 
     public boolean isDieWhite() {
