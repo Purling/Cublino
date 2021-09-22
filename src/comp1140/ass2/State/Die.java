@@ -8,7 +8,7 @@ public class Die {
     * values will vary when the position/ orientation of the dice changes
      */
     private int top;
-    private int down;
+    private int down; // Shouldn't this be called bottom?
     private int front;
     private int back;
     private int left;
@@ -34,10 +34,10 @@ public class Die {
         assert placement.length() == 3;
         int orientation = placement.charAt(0);
         if (Character.isLowerCase(orientation)) {
-            this.player = whitePlayer;
+            this.player = blackPlayer;
             orientation -= 97;
         } else {
-            this.player = blackPlayer;
+            this.player = whitePlayer;
             orientation -= 65;
         }
         assert 0 <= orientation && orientation < 24;
@@ -111,7 +111,7 @@ public class Die {
 
     @Override
     public String toString() {
-        return player.toString() + " " + getPosition();
+        return player.toString() + " (" + getX() + "," + getY() + ")";
     }
 
     /** Obtain the direction of the next desired movement
@@ -130,6 +130,16 @@ public class Die {
         return x + "" + y;
     }
 
+    public void setPosition(int x, int y){
+        this.x = x;
+        this.y = y;
+    }
+
+    public void setPosition(String position){
+        this.x = Integer.parseInt(position.substring(0,1));
+        this.y = Integer.parseInt(position.substring(1));
+    }
+
     public int getX() {return x;}
     public int getY() {return y;}
 
@@ -141,7 +151,7 @@ public class Die {
         return getY() == 6;
     }
 
-    public boolean getColor() {
+    public boolean isDieWhite() {
         return player.isWhite();
     }
 
@@ -155,11 +165,89 @@ public class Die {
     }
 
     /**
-     * Roll the dice in a given direction the orientation and position of the dice will change accordingly
-     * @param die A die
+     * Tip the dice in a given direction the orientation and position of the dice will change accordingly
      * @param direction The direction the die will roll in
      */
-    public void roll(Die die, Direction direction){
+    public void tip(Direction direction){
+
+        switch (direction) {
+            case UP -> {
+                int top = getTop();
+                setTop(getBack());
+                setBack(getDown());
+                setDown(getFront());
+                setFront(top);
+                setPosition(getX(), getY() - 1);
+            }
+            case DOWN -> {
+                int top1 = getTop();
+                setTop(getFront());
+                setFront(getDown());
+                setDown(getBack());
+                setBack(top1);
+                setPosition(getX(), getY() + 1);
+            }
+            case LEFT -> {
+                int left = getLeft();
+                setLeft(getTop());
+                setTop(getRight());
+                setRight(getDown());
+                setDown(left);
+                setPosition(getX() - 1, getY());
+            }
+            case RIGHT -> {
+                int left1 = getLeft();
+                setLeft(getDown());
+                setDown(getRight());
+                setRight(getTop());
+                setDown(left1);
+                setPosition(getX() + 1, getY());
+            }
+        }
+    }
+
+    public void setTop(int top) {
+        this.top = top;
+    }
+
+    public int getDown() {
+        return down;
+    }
+
+    public void setDown(int down) {
+        this.down = down;
+    }
+
+    public int getFront() {
+        return front;
+    }
+
+    public void setFront(int front) {
+        this.front = front;
+    }
+
+    public int getBack() {
+        return back;
+    }
+
+    public void setBack(int back) {
+        this.back = back;
+    }
+
+    public int getLeft() {
+        return left;
+    }
+
+    public void setLeft(int left) {
+        this.left = left;
+    }
+
+    public int getRight() {
+        return right;
+    }
+
+    public void setRight(int right) {
+        this.right = right;
     }
 
     /**
