@@ -14,8 +14,8 @@ public class ContraCublino extends Game {
     }
 
     @Override
-    protected boolean isMoveLegal() {
-        return false;
+    protected Boards applyStep(Boards board, Die die, String endPosition) {
+        return null;
     }
 
     @Override

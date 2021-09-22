@@ -19,8 +19,25 @@ public class PurCublino extends Game {
     }
 
     @Override
-    protected boolean isMoveLegal() {
-        return false;
+    public Boards applyStep(Boards board, Die die, String endPosition) {
+
+        if(board.getAt(endPosition) != null) return null;
+        int tipDistance = 1;
+        int jumpDistance = 2;
+        addToStepHistory(new Move(board, null));
+
+        if(!isMoveBackwards(die.getPosition(), endPosition) && Boards.getManhattanDistance(die.getPosition(), endPosition) == tipDistance) {
+            board.applyTip(die, endPosition);
+            addToStepHistory(new Move(board, moveType.TIP));
+            return board;
+        } else if(!isMoveBackwards(die.getPosition(), endPosition)
+                && board.getAt(Boards.getMiddlePosition(die.getPosition(), endPosition)) != null
+                && Boards.getManhattanDistance(die.getPosition(), endPosition) == jumpDistance) {
+            board.applyJump(die, endPosition);
+            addToStepHistory(new Move(board, moveType.JUMP));
+            return board;
+        }
+        return null;
     }
 
     @Override
@@ -46,31 +63,20 @@ public class PurCublino extends Game {
                 && (Boards.sameAxis(startPosition, endPosition));
     }
 
-    public boolean isStepValidPur(String state, String step) {
-        return PurCublino.checkPurStepValid(state, step, PurCublino::checkBoardStartAndEndPosition);
-   }
+    public static Boolean checkPurStepValid(String state, String step) {
 
-    public static boolean checkBoardStartAndEndPosition(Boards board, String start, String end) {
-        return board.getAtPosition(start) != null || board.getAtPosition(end) == null;
-    }
-
-    public interface EndOccupied {
-        boolean test(Boards board, String start, String end);
-    }
-
-    public static Boolean checkPurStepValid(String state, String step, EndOccupied endOccupied) {
-
+        int jumpDistance = 2;
         Boards board = new Boards(state);
         PurCublino purCublino = new PurCublino(Character.isUpperCase(state.charAt(0)));
-        Boards.Positions positions = board.statesToPositions(step);
+        Boards.Positions positions = board.stepToPositions(step);
         String start = positions.getStart();
         String end = positions.getEnd();
 
-        if(endOccupied.test(board, start, end)) return false;
+        if(board.getAtPosition(end) != null) return false;
 
         if (board.isAdjacent(start, end)) {
             return !purCublino.isMoveBackwards(start,end);
-        } else if (board.getManhattanDistance(start,end) == 2) {
+        } else if (Boards.getManhattanDistance(start,end) == jumpDistance) {
             return purCublino.isJumpValid(board, start, end);
         } else {
             return false;

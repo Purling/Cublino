@@ -4,10 +4,10 @@ import comp1140.ass2.State.Boards;
 import comp1140.ass2.gui.Board;
 import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.State.Die;
-import comp1140.ass2.State.Direction;
 import comp1140.ass2.State.Players;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The player will be allowed to decide which version of cublino he or she wants to play.
@@ -15,20 +15,36 @@ import java.util.Arrays;
  */
 
 public abstract class Game{
+
+    public enum moveType {
+        TIP, JUMP
+    }
+
+    public class Move {
+        Boards board;
+        moveType type;
+
+        public Move(Boards board, moveType type) {
+            this.board = board;
+            this.type = type;
+        }
+
+        public moveType getType() {
+            return type;
+        }
+    }
     /**
      * the current board two players are playing on
      */
     Board board;
 
-    /**
-     * store the current number of turns the player has already done
-     */
-    int turn;
+    private List<Move> stepHistory = new ArrayList<>();
+    private Game[] turnHistory;
 
     /**
      * store the current player that is making his moves
      */
-    Players currentPlayer;
+    private Players currentPlayer;
 
     /**
      * The die that is currently selected to be moved
@@ -40,6 +56,7 @@ public abstract class Game{
      */
     Controller whitePlayer;
     Controller blackPlayer;
+
     /**
      * Check whether a player has made moves or not.
      * if the player has possible legal moves then at least one move should be made by the player
@@ -51,17 +68,35 @@ public abstract class Game{
      */
     Result result;
 
+    /**
+     * Returns if both players have achieved a win condition simultaneously
+     * @return True if both players have won, False otherwise
+     */
     abstract protected boolean hasBothWon(Boards board);
 
+    /**
+     * Returns if each player has a legal amount of dice
+     * @return True if the dice amount is valid, False otherwise
+     */
     abstract protected boolean isDiceAmountCorrect(Boards board);
 
+    /**
+     * Empty constructor for Game
+     */
     public Game(){
     }
 
+    /**
+     * Constructor for Game which takes in a value for isWhite
+     */
     public Game(boolean isWhite){
         this.currentPlayer = new Players(isWhite);
     }
 
+    /**
+     * Returns if the die is going backwards. This depends on the current player
+     * @return True if the die is going backwards, False otherwise
+     */
     public boolean isMoveBackwards(String startPosition, String endPosition){
         if(currentPlayer.isWhite()){
             return (Boards.getPositionY(endPosition) - Boards.getPositionY(startPosition)) < 0;
@@ -70,25 +105,7 @@ public abstract class Game{
         }
     }
 
-    /**
-     * Indicate the type of move that is going to be made
-     * Either roll or jump
-     */
-    public enum MoveType{Roll, Jump}
-
-    /**
-     * make move (only one move) to the dice
-     * multiple moves can be made by calling the function for multiple times
-     * the function will not be called when at least one move is applied
-     * and the player decides not to make any extra move,
-     * or no more legal moves can be applied
-     * @param t
-     * @param x
-     * @param y
-     * @param d
-     */
-    public void makeMove(MoveType t, int x, int y, Direction d){
-    }
+    abstract protected Boards applyStep(Boards board, Die die, String endPosition);
 
     /**
      * End the player's turn when there is no more legal moves or the player is desired to
@@ -96,19 +113,26 @@ public abstract class Game{
     public void endTurn(){
     }
 
-    /**
-     * determine whether a move is legal or not
-     * @return True if the move is legal, false otherwise
-     */
-    abstract protected boolean isMoveLegal();
+    public void addToStepHistory(Move move) {
+        stepHistory.add(move);
+    }
+
+    public List<Move> getStepHistory() {
+        return stepHistory;
+    }
+
+    public Players getCurrentPlayer() {
+        return currentPlayer;
+    }
 
     /**
      * Display all the legal turns according to the current status of the board
-     * @return
+     * @return A list of boards representing different possible moves
      */
     public Board[] legalTurns(){
         return null;
     }
+
     /**
      * determine whether the game is over or not
      * @param b A board

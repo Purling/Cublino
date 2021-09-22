@@ -3,10 +3,65 @@ package comp1140.ass2.State;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static comp1140.ass2.State.Direction.*;
+
 public class Boards {
     private Players whitePlayer = new Players(true);
     private Players blackPlayer = new Players(false);
     public static final int BOARD_DIMENSION = 7;
+
+    public static class Positions {
+        private String start;
+        private String end;
+        private String coordinate;
+
+        public Positions(String start, String end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public Positions(String coordinate) {
+            this.coordinate = coordinate;
+        }
+
+        public int getX() {
+            return Integer.parseInt(coordinate.substring(0,1));
+        }
+
+        public int getY() {
+            return Integer.parseInt(coordinate.substring(1,2));
+        }
+
+        public String getStart() {
+            return start;
+        }
+
+        public String getCoordinate() {
+            return coordinate;
+        }
+
+        public String getEnd() {
+            return end;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Positions positions = (Positions) o;
+            return Objects.equals(coordinate, positions.coordinate);
+        }
+
+        @Override
+        public int hashCode() {
+            return 0;
+        }
+
+        @Override
+        public String toString() {
+            return coordinate;
+        }
+    }
 
     /**
      * A 2d array to represent the current status of the board
@@ -43,12 +98,14 @@ public class Boards {
     public Boards() {
     }
 
-    public Positions statesToPositions(String encodedPosition) {
+    @Deprecated
+    public Positions stepToPositions(String encodedPosition) {
+        int even = 2;
         char[] encodedCh = encodedPosition.toCharArray();
         StringBuilder sb = new StringBuilder();
 
         for(int i = 0; i < encodedCh.length; i++){
-            if (i % 2 == 0) {
+            if (i % even == 0) {
                 sb.append((int) encodedCh[i] - 'a');
             } else {
                 sb.append((int) encodedCh[i] - '1');
@@ -57,22 +114,67 @@ public class Boards {
         return new Positions(sb.substring(0,2), sb.substring(2));
     }
 
-    public static class Positions {
-        private String start;
-        private String end;
+    /**
+     * Converts a move String into an array of String containing positions
+     * @param move Encoded String of positions
+     * @return String array of board positions indicating steps
+     */
+    public static Positions[] moveToPositions(String move) {
 
-        public Positions(String start, String end) {
-            this.start = start;
-            this.end = end;
-        }
+        int even = 2;
+        char xPositionLowerRange = 'a';
+        char yPositionLowerRange = '1';
+        String twoSplit = "(?<=\\G.{2})";
+        char[] encodedCh = move.toCharArray();
+        StringBuilder sb = new StringBuilder();
 
-        public String getStart() {
-            return start;
+        for(int i = 0; i < encodedCh.length; i++){
+            if (i % even == 0) {
+                sb.append((int) encodedCh[i] - xPositionLowerRange);
+            } else {
+                sb.append((int) encodedCh[i] - yPositionLowerRange);
+            }
         }
+        return Arrays.stream(sb.toString().split(twoSplit)).map(Positions::new).collect(Collectors.toList()).toArray(Positions[]::new);
+    }
 
-        public String getEnd() {
-            return end;
+    public void applyTip(Die initial, String endPosition) {
+
+        String start = initial.getPosition();
+
+        if(getAt(endPosition) == null) {
+            initial.tip(getDirection(initial, endPosition));
+            initial.setPosition(endPosition);
+            setAt(endPosition, initial);
+            setAt(start,null);
         }
+    }
+
+    public void applyJump(Die initial, String endPosition) {
+
+        String start = initial.getPosition();
+
+        if(getAt(endPosition) == null) {
+            initial.setPosition(endPosition);
+            setAt(endPosition, initial);
+            setAt(start,null);
+        }
+    }
+
+    public Direction getDirection(Die initial, String endPosition) {
+
+        Positions end = new Positions(endPosition);
+
+        if(initial.getX() > end.getX()){
+            return LEFT;
+        } else if(initial.getX() < end.getX()) {
+            return RIGHT;
+        } else if(initial.getY() > end.getY()) {
+            return UP;
+        } else if(initial.getY() < end.getY()) {
+            return DOWN;
+        }
+        return null;
     }
 
     public static int getPositionX(String x) {
@@ -83,10 +185,9 @@ public class Boards {
         return Integer.parseInt(x.substring(1));
     }
 
-    public int getManhattanDistance(String startPosition, String endPosition) {
+    public static int getManhattanDistance(String startPosition, String endPosition) {
         return Math.abs(getPositionX(startPosition) - getPositionX(endPosition)) + Math.abs(getPositionY(startPosition) - getPositionY(endPosition));
     }
-
 
     /**
      * Gets the position of the middle of two dice with a Manhattan distance of 2
@@ -112,7 +213,7 @@ public class Boards {
     }
 
     /**
-     * Returns whether two positions are horinzontal or vertical to each other
+     * Returns whether two positions are horizontal or vertical to each other
      * @param position1 Position on board
      * @param position2 Position on board
      * @return True if positions are on the same axis(column/row), false otherwise
@@ -131,20 +232,24 @@ public class Boards {
         return board[y][x];
     }
 
-    public Die getAtPosition(String position) {
-        return getAt(Boards.getPositionX(position), Boards.getPositionY(position));
+    public Die getAt(String position) {
+        int x = Integer.parseInt(position.substring(0,1));
+        int y = Integer.parseInt(position.substring(1));
+        return board[y][x];
     }
 
+    public void setAt(int x, int y, Die die) {
+        board[y][x] = die;
+    }
 
-    /**
-     * Check whether or not a given location locates on the board
-     * Return true if the given coordinates locate on the board
-     * False otherwise
-     * @param x x-coordinate on board
-     * @param y y-coordinate on board
-     */
-    public boolean isOnBoard(int x, int y){
-        return false;
+    public void setAt(String position, Die die) {
+        int x = Integer.parseInt(position.substring(0,1));
+        int y = Integer.parseInt(position.substring(1));
+        board[y][x] = die;
+    }
+
+    public Die getAtPosition(String position) {
+        return getAt(Boards.getPositionX(position), Boards.getPositionY(position));
     }
 
     public boolean containsOverlappingPieces() {
@@ -158,10 +263,11 @@ public class Boards {
 
     public void setWhiteAndBlackPlayer(String encodedState) {
 
+        String tripleSplit = "(?<=\\G.{3})";
         List<Die> whiteDice = new ArrayList<>();
         List<Die> blackDice = new ArrayList<>();
         encodedState = encodedState.substring(1);
-        String[] diceList = encodedState.split("(?<=\\G.{3})");
+        String[] diceList = encodedState.split(tripleSplit);
 
         for (String dieStr : diceList) {
             Die die = new Die(dieStr, whitePlayer, blackPlayer);
@@ -186,13 +292,5 @@ public class Boards {
 
     public Die[][] getBoard() {
         return board;
-    }
-
-    public void setBoard(Die[][] board) {
-        this.board = board;
-    }
-
-    private String[] getPositionArray(Die[] player){
-        return null;
     }
 }

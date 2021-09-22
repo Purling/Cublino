@@ -1,8 +1,10 @@
 package comp1140.ass2;
 
 import comp1140.ass2.GameLogic.ContraCublino;
+import comp1140.ass2.GameLogic.Game;
 import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Boards;
+import comp1140.ass2.State.Die;
 
 public class Cublino {
 
@@ -116,8 +118,12 @@ public class Cublino {
      */
     public static Boolean isStateValid(String state) {
 
-        if(!isStateWellFormed(state) || state.length() == 1) return false;
+        char purMode = 'p';
+        int noDie = 1;
 
+        if(!isStateWellFormed(state) || (state.toLowerCase().charAt(0) == purMode && state.length() == noDie)) return false;
+
+        char gameMode = state.toLowerCase().charAt(0);
         Boards board = new Boards();
         board.setWhiteAndBlackPlayer(state);
         PurCublino purCublino = new PurCublino();
@@ -125,7 +131,7 @@ public class Cublino {
 
         if(board.containsOverlappingPieces()) return false;
 
-        if(state.toLowerCase().charAt(0) == 'p'){
+        if(gameMode == purMode){
             return purCublino.isGameValid(board);
         } else {
             return contraCublino.isGameValid(board);
@@ -199,11 +205,7 @@ public class Cublino {
      * @return true if the step is valid for the given state, otherwise false
      */
     public static Boolean isValidStepPur(String state, String step) {
-        return PurCublino.checkPurStepValid(state, step, (board, start, end)-> checkBoardEndPosition(board, end));
-    }
-
-    private static boolean checkBoardEndPosition(Boards board, String position) {
-        return board.getAtPosition(position) != null;
+        return PurCublino.checkPurStepValid(state, step);
     }
 
     /**
@@ -229,7 +231,32 @@ public class Cublino {
      * @return true if the move is valid for the given state, otherwise false
      */
     public static Boolean isValidMovePur(String state, String move) {
-        return null; // FIXME Task 8 (P)
+
+        Boards board = new Boards(state);
+        PurCublino pur = new PurCublino(Character.isUpperCase(state.charAt(0)));
+
+        if(move.length() == 0) return false;
+        Boards.Positions[] stepPositions = Boards.moveToPositions(move);
+
+        if((board.getAt(stepPositions[0].getCoordinate()) != null)
+                && pur.getCurrentPlayer().isWhite() == board.getAt(stepPositions[0].getCoordinate()).isDieWhite()){
+            for(int i = 1; i < stepPositions.length; i++) {
+                if (board != null) {
+                    Die die = board.getAt(stepPositions[i - 1].getCoordinate());
+                    board = pur.applyStep(board, die, stepPositions[i].getCoordinate());
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        if(board == null || stepPositions[0].equals(stepPositions[stepPositions.length - 1])) return false;
+        if(pur.getStepHistory().size() > 0) {
+            pur.getStepHistory().remove(1); // Only first move can be a tip
+            return pur.getStepHistory().stream().noneMatch((x) -> x.getType() == Game.moveType.TIP);
+        } else {
+            return false;
+        }
     }
 
     /**

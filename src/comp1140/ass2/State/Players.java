@@ -11,13 +11,9 @@ public class Players {
     boolean isWhite;
 
     /**
-     * Get the information of a particular die from a series of dices
-     * @param i
-     * @return
+     * store the current number of turns the player has already done
      */
-    public Die getDie(int i) {
-        return myDice[i];
-    }
+    int turn;
 
     public Die[] getDice() {
         return myDice;
@@ -37,7 +33,7 @@ public class Players {
 
     @Override
     public String toString() {
-        return "" + isWhite;
+        return isWhite ? "White" : "Black";
     }
 
     public boolean isWhite() {

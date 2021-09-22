@@ -2,7 +2,6 @@ package comp1140.ass2.gui;
 
 import comp1140.ass2.State.Die;
 import comp1140.ass2.State.Direction;
-import javafx.animation.RotateTransition;
 import javafx.application.Application;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
@@ -210,7 +209,7 @@ public class Viewer extends Application {
         MeshView dieMeshView = new MeshView(dieMesh);
 
         // Apply the die texture to the mesh
-        dieMeshView.setMaterial(die.getColor() ? whiteMaterial : blackMaterial);
+        dieMeshView.setMaterial(die.isDieWhite() ? whiteMaterial : blackMaterial);
 
         // Reposition and scale the mesh
         dieMeshView.setTranslateX(position.getX());
