@@ -3,7 +3,7 @@ package comp1140.ass2.GameLogic;
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
 
-import java.util.Arrays;
+import java.util.List;
 
 /** A type of cublino
  /* extends from Game class*/
@@ -24,15 +24,18 @@ public class PurCublino extends Game {
         if(board.getAt(endPosition) != null) return null;
         int tipDistance = 1;
         int jumpDistance = 2;
-        addToStepHistory(new Move(board, null));
+        String diePosition = die.getPosition();
 
-        if(!isMoveBackwards(die.getPosition(), endPosition) && Boards.getManhattanDistance(die.getPosition(), endPosition) == tipDistance) {
+        if(getStepHistory().size() == 0){
+            addToStepHistory(new Move(board, null));
+        }
+
+        if(!isMoveBackwards(diePosition, endPosition) && Boards.getManhattanDistance(diePosition, endPosition) == tipDistance) {
             board.applyTip(die, endPosition);
             addToStepHistory(new Move(board, moveType.TIP));
             return board;
-        } else if(!isMoveBackwards(die.getPosition(), endPosition)
-                && board.getAt(Boards.getMiddlePosition(die.getPosition(), endPosition)) != null
-                && Boards.getManhattanDistance(die.getPosition(), endPosition) == jumpDistance) {
+        } else if(!isMoveBackwards(diePosition, endPosition) && board.getAt(Boards.getMiddlePosition(diePosition, endPosition)) != null
+                && Boards.getManhattanDistance(diePosition, endPosition) == jumpDistance) {
             board.applyJump(die, endPosition);
             addToStepHistory(new Move(board, moveType.JUMP));
             return board;
@@ -42,16 +45,16 @@ public class PurCublino extends Game {
 
     @Override
     public boolean isDiceAmountCorrect(Boards board){
-        return (board.getBlackPlayer().getDice().length + board.getWhitePlayer().getDice().length == 2 * Boards.BOARD_DIMENSION);
+        return (board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() == 2 * Boards.BOARD_DIMENSION);
     }
 
     @Override
     public boolean hasBothWon(Boards board){
 
-        Die[] white = board.getWhitePlayer().getDice();
-        Die[] black = board.getBlackPlayer().getDice();
+        List<Die> white = board.getWhitePlayer().getDice();
+        List<Die> black = board.getBlackPlayer().getDice();
 
-        return Arrays.stream(white).allMatch(Die::isWhiteDieFinished) && Arrays.stream(black).allMatch(Die::isBlackDieFinished);
+        return white.stream().allMatch(Die::isWhiteDieFinished) && black.stream().allMatch(Die::isBlackDieFinished);
     }
 
     public boolean isJumpValid(Boards board,String startPosition, String endPosition) {
@@ -68,9 +71,9 @@ public class PurCublino extends Game {
         int jumpDistance = 2;
         Boards board = new Boards(state);
         PurCublino purCublino = new PurCublino(Character.isUpperCase(state.charAt(0)));
-        Boards.Positions positions = board.stepToPositions(step);
-        String start = positions.getStart();
-        String end = positions.getEnd();
+        Boards.Positions[] positions = Boards.moveToPositions(step);
+        String start = positions[0].toString();
+        String end = positions[positions.length - 1].toString();
 
         if(board.getAtPosition(end) != null) return false;
 
