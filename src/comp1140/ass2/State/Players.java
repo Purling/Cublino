@@ -1,12 +1,12 @@
 package comp1140.ass2.State;
-
-import comp1140.ass2.State.Die;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Players {
     /**
      * Store the information of the player's dices
      */
-    Die[] myDice;
+    List<Die> myDice = new ArrayList<>();
 
     boolean isWhite;
 
@@ -15,20 +15,12 @@ public class Players {
      */
     int turn;
 
-    public Die[] getDice() {
+    public List<Die> getDice() {
         return myDice;
     }
 
     public Players(boolean isWhite) {
         this.isWhite = isWhite;
-    }
-
-    public void setDice(Die[] dice) {
-        myDice = dice;
-    }
-
-    public void setOneDie(int index, Die die) {
-        myDice[index] = die;
     }
 
     @Override
