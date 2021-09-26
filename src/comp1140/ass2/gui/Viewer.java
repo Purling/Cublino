@@ -151,7 +151,7 @@ public class Viewer extends Application {
     }
 
     public final static TriangleMesh dieMesh = new TriangleMesh();
-    public final static double dieScale = 40;
+    final static double dieScale = 40;
 
     /*      y   Vertices          UV Map
           G-^-----H                 I---J
@@ -211,7 +211,7 @@ public class Viewer extends Application {
             this.die = die;
 
             // Apply the die texture to the mesh
-            setMaterial(die.isDieWhite() ? whiteMaterial : blackMaterial);
+            setMaterial(die.isWhite() ? whiteMaterial : blackMaterial);
 
             // Rotate the mesh to show the correct numbers
             getTransforms().add(necessaryRotations());
@@ -224,27 +224,27 @@ public class Viewer extends Application {
             setTranslateZ(125 * (die.getY()-3));
         }
 
-        public void spin(double degrees) {
+        void spin(double degrees) {
             getTransforms().add(spinTransform(degrees));
         }
 
-        public void pitch(double degrees) {
+        void pitch(double degrees) {
             getTransforms().add(pitchTransform(degrees));
         }
 
-        public void roll(double degrees) {
+        void roll(double degrees) {
             getTransforms().add(rollTransform(degrees));
         }
 
-        public Rotate spinTransform(double degrees) {
+        Rotate spinTransform(double degrees) {
             return new Rotate(degrees, new Point3D(0, 1, 0));
         }
 
-        public Rotate pitchTransform(double degrees) {
+        Rotate pitchTransform(double degrees) {
             return new Rotate(degrees, new Point3D(0, 0, 1));
         }
 
-        public Rotate rollTransform(double degrees) {
+        Rotate rollTransform(double degrees) {
             return new Rotate(degrees, new Point3D(1, 0, 0));
         }
 
@@ -278,7 +278,7 @@ public class Viewer extends Application {
             return backRotation(relativeBackNumber).createConcatenation(topRotation(die.getTop()));
         }
 
-        public Rotate backRotation(int relativeBackFace) {
+        Rotate backRotation(int relativeBackFace) {
             switch(relativeBackFace) {
                 case 1: return spinTransform( 90);
                 case 2: return spinTransform(180);
@@ -287,7 +287,7 @@ public class Viewer extends Application {
             }
         }
 
-        public Rotate topRotation(int topFace) {
+        Rotate topRotation(int topFace) {
             switch(topFace) {
                 case 1: return pitchTransform(-90);
                 case 2: return pitchTransform(180);
@@ -304,18 +304,18 @@ public class Viewer extends Application {
     final static PhongMaterial whiteTileMaterial = new PhongMaterial();
     final static PhongMaterial blackTileMaterial = new PhongMaterial();
 
-    public static void createMaterials() {
+    static void createMaterials() {
         whiteMaterial.setDiffuseMap(makeTextureFromAsset("whitedie.png"));
         blackMaterial.setDiffuseMap(makeTextureFromAsset("blackdie.png"));
         whiteTileMaterial.setDiffuseMap(makeTextureFromAsset("whitetile.png"));
         blackTileMaterial.setDiffuseMap(makeTextureFromAsset("blacktile.png"));
     }
 
-    public static Image makeTextureFromAsset(String path) {
+    static Image makeTextureFromAsset(String path) {
         return new Image(new File(URI_BASE + path).toURI().toString());
     }
 
-    public Box makeTile(int x, int y) {
+    Box makeTile(int x, int y) {
         Box box = new Box(125, 20, 125);
         box.setTranslateX(125*(x-3));
         box.setTranslateY(50);

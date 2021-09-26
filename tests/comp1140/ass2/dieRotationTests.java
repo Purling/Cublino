@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Timeout(value = 1000, unit = MILLISECONDS)
 class dieRotationTests {
 
+    // Defines points at the six cardinal directions at the centre of each face of the unit cube
     static final Point3D up = new Point3D(0, 1, 0);
     static final Point3D down = new Point3D(0, -1, 0);
     static final Point3D left = new Point3D(1, 0, 0);
@@ -25,13 +26,16 @@ class dieRotationTests {
 
     @Test
     public void testAll() {
+        // Loop over every possible placement of a (white) die
         for (char o = 'A'; o <= 'X'; o++) {
             for (char x = 'a'; x <= 'g'; x++) {
                 for (char y = '1'; y < '7'; y++) {
+                    // Construct the die and its model
                     String placementString = "" + o + x + y;
                     Die d = new Die(placementString, null, null);
                     t = new Viewer.DieModel(d).necessaryRotations();
 
+                    // Make sure every face on the model is positioned where the die class suggests it should be
                     makeRotationAssertion(d.getTop(), up, "top");
                     makeRotationAssertion(d.getDown(), down, "bottom");
                     makeRotationAssertion(d.getLeft(), left, "left");
@@ -48,6 +52,7 @@ class dieRotationTests {
                 "Dice with placement " + currentlyTesting + " has incorrect " + faceString + "face");
     }
 
+    // The initial position of the die model before any rotation (e.g. the number 3 is on the front face)
     public Point3D startingPositionOfNumber(int n) {
         switch(n) {
             case 1: return right;
