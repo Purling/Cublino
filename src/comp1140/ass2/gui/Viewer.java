@@ -153,8 +153,8 @@ public class Viewer extends Application {
         primaryStage.show();
     }
 
-    final static TriangleMesh dieMesh = new TriangleMesh();
-    final static double dieScale = 40;
+    public final static TriangleMesh dieMesh = new TriangleMesh();
+    public final static double dieScale = 40;
 
     /*      y   Vertices          UV Map
           G-^-----H                 I---J
