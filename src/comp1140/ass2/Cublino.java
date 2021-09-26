@@ -5,11 +5,7 @@ import comp1140.ass2.GameLogic.Game;
 import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
-import comp1140.ass2.State.Direction;
 
-import java.util.Arrays;
-
-import static comp1140.ass2.GameLogic.PurCublino.getWinner;
 import static comp1140.ass2.State.Boards.boardToString;
 
 public class Cublino {
@@ -159,9 +155,36 @@ public class Cublino {
      * @return 1 if player one has won, 2 if player two has won, 3 if the result is a draw, otherwise 0.
      */
     public static int isGameOverPur(String state) {
-        if (state.charAt(0) != 'p' && state.charAt(0) != 'P') return 0;
-        else return getWinner(state);
+        if (state.charAt(0) != 'p' && state.charAt(0)!= 'P') return 0;
+        else {
+            int p1 = 0;
+            int p2 = 0;
+            int p1s = 0;
+            int p2s = 0;
+            int i = 0;
+            while (i < 14){
+                String s = state.substring(3*i+1, 3*i+4);
+                if (s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && s.charAt(2) == '7'){
+                    p1++;
+                    p1s += (s.charAt(0) - 'A')/4 + 1;
+                    i++;
+                }
+                else if (s.charAt(0) >= 'a' && s.charAt(0) <= 'z' && s.charAt(2) == '1'){
+                    p2++;
+                    p2s += (s.charAt(0) - 'a')/4 + 1;
+                    i++;
+                }
+                else i++;
+            }
+                if (p1 == 7 || p2 == 7) {
+                    if (p1s == p2s) return 3;
+                    else if (p1s < p2s) return 2;
+                    else return 1;
+                }
+                else return 0;
+        }
     }
+
     /**
      * Task 7:
      * Determine whether a single step of a move is valid for a given Pur game.
@@ -246,137 +269,20 @@ public class Cublino {
      * @return the resulting state after the move has been applied
      */
     public static String applyMovePur(String state, String move) {
-
         if (!isValidMovePur(state, move)) return state;
         else{
             Boards board = new Boards(state);
-            PurCublino pur = new PurCublino(Character.isUpperCase(state.charAt(0)));
+            PurCublino pur = new PurCublino(Character.isUpperCase(state.charAt(0)), board);
             Boards.Positions[] stepPositions = Boards.moveToPositions(move);
             char p;
             if(state.charAt(0) == 'p') p = 'P';
             else p = 'p';
 
             for(int i = 1; i < stepPositions.length; i++){
-                Die die = board.getAt(stepPositions[i - 1].getCoordinate());
-                board = pur.applyStep(board, die, stepPositions[i].getCoordinate());
+                Die die = board.getAt(stepPositions[i - 1].toString());
+                pur.applyStep(die, stepPositions[i].toString());
             }
-            return p+boardToString(board);
-
-        }
-//        else {
-//            Boards board = new Boards(state);
-//            Boards.Positions[] position = Boards.moveToPositions(move);
-//            Die die = board.getAt(position[0].getCoordinate());
-//            for (int i =0; i<move.length()-4; i+=2) {
-//                String m = move.substring(i, i + 4);
-//                Direction d = Boards.getD(m);
-//                if (Boards.isTip(m)){
-//                    die.tip(d);
-//                }
-//                else{
-//                    die.jump(d);
-//                }
-//            }
-//            String mLast = move.substring(move.length() - 4);
-//            Direction dLast = Boards.getD(mLast);
-//            if (Boards.isTip(mLast)){
-//                die.tip(dLast);
-//            }
-//            else {
-//                die.jump(dLast);
-//            }
-//            int left = die.getLeft();
-//            int top = die.getTop();
-//            int front = die.getFront();
-//            int[] orientation = {top, front, left};
-//            int[][] orientations = new int[][] {
-//                    {1, 2, 3},
-//                    {1, 3, 5},
-//                    {1, 4, 2},
-//                    {1, 5, 4},
-//                    {2, 1, 4},
-//                    {2, 3, 1},
-//                    {2, 4, 6},
-//                    {2, 6, 3},
-//                    {3, 1, 2},
-//                    {3, 2, 6},
-//                    {3, 5, 1},
-//                    {3, 6, 5},
-//                    {4, 1, 5},
-//                    {4, 2, 1},
-//                    {4, 5, 6},
-//                    {4, 6, 2},
-//                    {5, 1, 3},
-//                    {5, 3, 6},
-//                    {5, 4, 1},
-//                    {5, 6, 4},
-//                    {6, 2, 4},
-//                    {6, 3, 2},
-//                    {6, 4, 5},
-//                    {6, 5, 3}
-//            };
-//
-//            int index = Arrays.asList(orientations).indexOf(orientation);
-//
-//            int ind = state.indexOf(move.substring(0,2));
-//
-//            char dice;
-//            if(state.charAt(ind-1) >= 'A' && state.charAt(ind-1) <= 'Z'){
-//                dice = (char) ('A'+ index);
-//            }
-//            else{
-//                dice = (char) ('a' + index);
-//            }
-//            String replace = dice + move.substring(move.length()-2);
-//            StringBuilder update = new StringBuilder();
-//
-//            if (state.charAt(0) == 'P') update.append('p');
-//            else if(state.charAt(0) == 'p') update.append('P');
-//
-//            if (dice >= 'a'){
-//                update.append(state, 1, 22);
-//                for(int i = 22; i <= 42; i += 3){
-//                    String s = String.valueOf(state.charAt(i)) + String.valueOf(state.charAt(i + 1)) + String.valueOf(state.charAt(i + 2));
-//                    if(state.charAt(i) > dice){
-//                        update.append(s);
-//                    }
-//                    else if(state.charAt(i) <= dice){
-//                        if (state.charAt(i + 1) >= replace.charAt(1)) {
-//                            if (state.charAt(i + 2) >= replace.charAt(2)) {
-//                                update.append(replace);
-//                                update.append(state.substring(i));
-//                                break;
-//                            }
-//                        }
-//                        update.append(s);
-//                    }
-//                    update.append(replace);
-//                }
-//            }
-//
-//            else if (dice <= 'Z'){
-//                for(int i = 1; i <= 22; i += 3){
-//                    String s = String.valueOf(state.charAt(i)) + String.valueOf(state.charAt(i + 1)) + String.valueOf(state.charAt(i + 2));
-//                    if(state.charAt(i) > dice){
-//                        update.append(s);
-//                    }
-//                    else if(state.charAt(i) <= dice){
-//                        if (state.charAt(i + 1) >= replace.charAt(1)) {
-//                            if (state.charAt(i + 2) >= replace.charAt(2)) {
-//                                update.append(replace);
-//                                update.append(state.substring(i));
-//                                break;
-//                            }
-//                        }
-//                        update.append(s);
-//                    }
-//                }
-//
-//            }
-//
-//            return update.toString().replaceFirst(state.charAt(ind-1)+move.substring(0,2), "");
-//
-//        }
+            return p+boardToString(board);}// FIXME Task 9 (P)
     }
 
     /**
