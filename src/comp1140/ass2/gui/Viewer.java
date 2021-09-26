@@ -69,11 +69,10 @@ public class Viewer extends Application {
 
         Boards boards = null;
         try {
-            // Stores the particular state the board should show
             boards = new Boards(placement);
-        } catch (Exception e) {
-            // If the user inputs an invalid board state, show a blank board without crashing
-        }
+        } catch (Exception e) {} // If the user inputs an invalid board state, do not update the display
+
+        if (boards == null) return;
 
         // Iterate over every tile in the board
         for (int y = 0; y < 7; y++) {
@@ -82,16 +81,8 @@ public class Viewer extends Application {
                 boardGroup.getChildren().add(makeTile(x, y));
 
                 // If the game state contains a die at the current position, construct it as well
-                if (boards == null) continue;
                 Die die = boards.getAt(x, y);
-                if (die == null) continue;
-                DieModel dieModel = new DieModel(die);
-                dieModel.setScaleX(dieScale);
-                dieModel.setScaleY(dieScale);
-                dieModel.setScaleZ(dieScale);
-                dieModel.setTranslateX(125 * (x-3));
-                dieModel.setTranslateZ(125 * (y-3));
-                boardGroup.getChildren().add(dieModel);
+                if (die != null) boardGroup.getChildren().add(new DieModel(die));
             }
         }
 
@@ -160,7 +151,7 @@ public class Viewer extends Application {
     }
 
     public final static TriangleMesh dieMesh = new TriangleMesh();
-    public final static double dieScale = 40;
+    final static double dieScale = 40;
 
     /*      y   Vertices          UV Map
           G-^-----H                 I---J
@@ -217,79 +208,94 @@ public class Viewer extends Application {
 
         public DieModel(Die die) {
             super(dieMesh);
-
             this.die = die;
 
             // Apply the die texture to the mesh
-            setMaterial(die.isDieWhite() ? whiteMaterial : blackMaterial);
+            setMaterial(die.isWhite() ? whiteMaterial : blackMaterial);
 
             // Rotate the mesh to show the correct numbers
             getTransforms().add(necessaryRotations());
+
+            // Position and scale the mesh
+            setScaleX(dieScale);
+            setScaleY(dieScale);
+            setScaleZ(dieScale);
+            setTranslateX(125 * (die.getX()-3));
+            setTranslateZ(125 * (die.getY()-3));
         }
 
-        public void spin(double degrees) {
+        void spin(double degrees) {
             getTransforms().add(spinTransform(degrees));
         }
 
-        public void pitch(double degrees) {
+        void pitch(double degrees) {
             getTransforms().add(pitchTransform(degrees));
         }
 
-        public void roll(double degrees) {
+        void roll(double degrees) {
             getTransforms().add(rollTransform(degrees));
         }
 
-        public Rotate spinTransform(double degrees) {
+        Rotate spinTransform(double degrees) {
             return new Rotate(degrees, new Point3D(0, 1, 0));
         }
 
-        public Rotate pitchTransform(double degrees) {
+        Rotate pitchTransform(double degrees) {
             return new Rotate(degrees, new Point3D(0, 0, 1));
         }
 
-        public Rotate rollTransform(double degrees) {
+        Rotate rollTransform(double degrees) {
             return new Rotate(degrees, new Point3D(1, 0, 0));
         }
 
+        /**
+         * Computes the necessary rotation that,
+         * when applied to the default die, orients
+         * it in alignment with the source die
+         *
+         * @returns the required rotation
+         */
         public Transform necessaryRotations() {
-            // Convert from the number on the back face of the die back to the relative number from the placement string
+            // Convert from the number on the back face of the die back to the relative number. For example,
+            // if the top face shows a 5 and the back face shows a 4, this is the third possible back face
+            // since 2 is impossible as it must be on the bottom. Hence the relativeBackNumber would be 3.
             int relativeBackNumber = die.getBack();
+            // Decrement the relative index for each number that it cannot be - namely the top and bottom faces
             if (die.getBack() > die.getTop()) relativeBackNumber--;
             if (die.getBack() > 7 - die.getTop()) relativeBackNumber--;
 
+            // When the top number is 2 or 6, the numbers are reversed, due to chirality
+            if (die.getTop() == 2 || die.getTop() == 6) relativeBackNumber = 5 - relativeBackNumber;
+
             // When the top of the die is an even number, the front and back faces will be swapped
-            // Additionally, when the top number is 2 or 6, the numbers are reversed, due to chirality
             if (die.getTop() % 2 == 0) {
-                if (die.getTop() != 4) relativeBackNumber = 5 - relativeBackNumber;
                 if (relativeBackNumber == 2) relativeBackNumber = 3;
                 else if (relativeBackNumber == 3) relativeBackNumber = 2;
             }
 
-            Transform rotation = transformForBackFace(relativeBackNumber)
-                    .createConcatenation(transformForTopFace(die.getTop()));
-            return rotation;
+            // Apply the rotations one after another to correctly position both faces
+            // If the top and back faces are positioned correctly, the other four must be as well
+            return backRotation(relativeBackNumber).createConcatenation(topRotation(die.getTop()));
         }
 
-        public Rotate transformForBackFace(int relativeBackFace) {
+        Rotate backRotation(int relativeBackFace) {
             switch(relativeBackFace) {
                 case 1: return spinTransform( 90);
                 case 2: return spinTransform(180);
-                case 3: return new Rotate();
                 case 4: return spinTransform(-90);
+                default: return new Rotate(); // 4 (which has a relative index of 3) is the default back face
             }
-            return new Rotate();
         }
 
-        public Rotate transformForTopFace(int topFace) {
+        Rotate topRotation(int topFace) {
             switch(topFace) {
                 case 1: return pitchTransform(-90);
                 case 2: return pitchTransform(180);
                 case 3: return rollTransform(  90);
                 case 4: return rollTransform( -90);
-                case 5: return new Rotate();
                 case 6: return pitchTransform( 90);
+                default: return new Rotate(); // 5 is the default top face
             }
-            return new Rotate();
         }
     }
 
@@ -298,18 +304,18 @@ public class Viewer extends Application {
     final static PhongMaterial whiteTileMaterial = new PhongMaterial();
     final static PhongMaterial blackTileMaterial = new PhongMaterial();
 
-    public static void createMaterials() {
+    static void createMaterials() {
         whiteMaterial.setDiffuseMap(makeTextureFromAsset("whitedie.png"));
         blackMaterial.setDiffuseMap(makeTextureFromAsset("blackdie.png"));
         whiteTileMaterial.setDiffuseMap(makeTextureFromAsset("whitetile.png"));
         blackTileMaterial.setDiffuseMap(makeTextureFromAsset("blacktile.png"));
     }
 
-    public static Image makeTextureFromAsset(String path) {
+    static Image makeTextureFromAsset(String path) {
         return new Image(new File(URI_BASE + path).toURI().toString());
     }
 
-    public Box makeTile(int x, int y) {
+    Box makeTile(int x, int y) {
         Box box = new Box(125, 20, 125);
         box.setTranslateX(125*(x-3));
         box.setTranslateY(50);
