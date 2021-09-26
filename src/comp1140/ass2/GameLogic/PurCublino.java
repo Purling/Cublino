@@ -5,6 +5,8 @@ import comp1140.ass2.State.Die;
 
 import java.util.List;
 
+import static comp1140.ass2.Cublino.isValidMovePur;
+
 /** A type of cublino
  /* extends from Game class*/
 
@@ -101,5 +103,34 @@ public class PurCublino extends Game {
 
     public boolean isGameValid(Boards board){
         return (isDiceAmountCorrect(board) && !hasBothWon(board));
+    }
+
+    public static int getWinner(String state){
+
+        int p1 = 0;
+        int p2 = 0;
+        int p1s = 0;
+        int p2s = 0;
+        int i = 0;
+        while (i < 14){
+            String s = state.substring(3*i+1, 3*i+4);
+            if (s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && s.charAt(2) == '7'){
+                p1++;
+                p1s += (s.charAt(0) - 'A')/4 + 1;
+                i++;
+            }
+            else if (s.charAt(0) >= 'a' && s.charAt(0) <= 'z' && s.charAt(2) == '1'){
+                p2++;
+                p2s += (s.charAt(0) - 'a')/4 + 1;
+                i++;
+            }
+            else i++;
+        }
+        if (p1 == 7 || p2 == 7) {
+            if (p1s > p2s) return 1;
+            else if(p1s < p2s) return 2;
+            else return 3;
+        }
+        return 0;
     }
 }
