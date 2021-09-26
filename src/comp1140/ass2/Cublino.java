@@ -232,31 +232,25 @@ public class Cublino {
      */
     public static Boolean isValidMovePur(String state, String move) {
 
-        Boards board = new Boards(state);
-        PurCublino pur = new PurCublino(Character.isUpperCase(state.charAt(0)));
-
-        if(move.length() == 0) return false;
+        PurCublino pur = new PurCublino(Character.isUpperCase(state.charAt(0)), new Boards(state));
+        Boards board = pur.getBoard();
         Boards.Positions[] stepPositions = Boards.moveToPositions(move);
+        String diePosition = stepPositions[0].toString();
+        String lastPosition = stepPositions[stepPositions.length - 1].toString();
+        int firstStepIndex = 1;
 
-        if((board.getAt(stepPositions[0].getCoordinate()) != null)
-                && pur.getCurrentPlayer().isWhite() == board.getAt(stepPositions[0].getCoordinate()).isDieWhite()){
-            for(int i = 1; i < stepPositions.length; i++) {
-                if (board != null) {
-                    Die die = board.getAt(stepPositions[i - 1].getCoordinate());
-                    board = pur.applyStep(board, die, stepPositions[i].getCoordinate());
-                } else {
-                    return false;
-                }
+        if(move.length() == 0 || board.getAt(diePosition) == null || diePosition.equals(lastPosition)) return false;
+        if(pur.getCurrentPlayer().isWhite() == board.getAt(diePosition).isWhite()){
+            for(int i = firstStepIndex; i < stepPositions.length; i++) {
+                Die initial = board.getAt(stepPositions[i - firstStepIndex].toString());
+                pur.applyStep(initial, stepPositions[i].toString());
+                if(pur.getStepHistory().stream().anyMatch((x) -> x.getType() == Game.MoveType.INVALID)) return false;
             }
         }
 
-        if(board == null || stepPositions[0].equals(stepPositions[stepPositions.length - 1])) return false;
-        if(pur.getStepHistory().size() > 0) {
-            pur.getStepHistory().remove(1); // Only first move can be a tip
-            return pur.getStepHistory().stream().noneMatch((x) -> x.getType() == Game.moveType.TIP);
-        } else {
-            return false;
-        }
+        if(pur.getStepHistory().size() == 0) return false;
+        pur.getStepHistory().remove(firstStepIndex);
+        return pur.getStepHistory().stream().noneMatch((x) -> x.getType() == Game.MoveType.TIP);
     }
 
     /**

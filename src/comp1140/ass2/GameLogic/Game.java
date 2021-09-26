@@ -16,27 +16,31 @@ import java.util.List;
 
 public abstract class Game{
 
-    public enum moveType {
-        TIP, JUMP
+    public enum MoveType {
+        TIP, JUMP, ORIGIN, INVALID
     }
 
     public class Move {
         Boards board;
-        moveType type;
+        MoveType type;
 
-        public Move(Boards board, moveType type) {
+        public Move(Boards board, MoveType type) {
             this.board = board;
             this.type = type;
         }
 
-        public moveType getType() {
+        public MoveType getType() {
             return type;
+        }
+
+        public Boards getBoard() {
+            return board;
         }
     }
     /**
      * the current board two players are playing on
      */
-    Board board;
+    Boards board;
 
     private List<Move> stepHistory = new ArrayList<>();
     private Game[] turnHistory;
@@ -93,6 +97,11 @@ public abstract class Game{
         this.currentPlayer = new Players(isWhite);
     }
 
+    public Game(boolean isWhite, Boards board){
+        this.currentPlayer = new Players(isWhite);
+        this.board = board;
+    }
+
     /**
      * Returns if the die is going backwards. This depends on the current player
      * @return True if the die is going backwards, False otherwise
@@ -105,12 +114,24 @@ public abstract class Game{
         }
     }
 
-    abstract protected Boards applyStep(Boards board, Die die, String endPosition);
+    abstract protected void applyStep(Die die, String endPosition);
 
     /**
      * End the player's turn when there is no more legal moves or the player is desired to
      */
     public void endTurn(){
+    }
+
+    public void applyTip(Die initial, String endPosition) {
+
+        String start = initial.getPosition();
+
+        if(board.getAt(endPosition) == null) {
+            initial.tip(initial.getDirection(endPosition));
+            initial.setPosition(endPosition);
+            board.setAt(endPosition, initial);
+            board.setAt(start,null);
+        }
     }
 
     public void addToStepHistory(Move move) {
@@ -123,6 +144,10 @@ public abstract class Game{
 
     public Players getCurrentPlayer() {
         return currentPlayer;
+    }
+
+    public Boards getBoard() {
+        return board;
     }
 
     /**
