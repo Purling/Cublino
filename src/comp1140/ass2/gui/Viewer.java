@@ -237,10 +237,13 @@ public class Viewer extends Application {
         }
 
         public void rotateToLookLike(Die die) {
+            // Convert from the number on the back face of the die back to the relative number from the placement string
             int relativeBackNumber = die.getBack();
             if (die.getBack() > die.getTop()) relativeBackNumber--;
             if (die.getBack() > 7 - die.getTop()) relativeBackNumber--;
 
+            // When the top of the die is an even number, the front and back faces will be swapped
+            // Additionally, when the top number is 2 or 6, the numbers are reversed, due to chirality
             if (die.getTop() % 2 == 0) {
                 if (die.getTop() != 4) relativeBackNumber = 5 - relativeBackNumber;
                 if (relativeBackNumber == 2) relativeBackNumber = 3;
