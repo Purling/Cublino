@@ -1,5 +1,6 @@
 package comp1140.ass2.State;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 import static comp1140.ass2.State.Direction.*;
@@ -286,5 +287,55 @@ public class Die {
 
     public void setRight(int right) {
         this.right = right;
+    }
+
+    public static String dieToEnc(Die die) {
+        int[][] orientations = new int[][]{
+                {1, 2, 3},
+                {1, 3, 5},
+                {1, 4, 2},
+                {1, 5, 4},
+                {2, 1, 4},
+                {2, 3, 1},
+                {2, 4, 6},
+                {2, 6, 3},
+                {3, 1, 2},
+                {3, 2, 6},
+                {3, 5, 1},
+                {3, 6, 5},
+                {4, 1, 5},
+                {4, 2, 1},
+                {4, 5, 6},
+                {4, 6, 2},
+                {5, 1, 3},
+                {5, 3, 6},
+                {5, 4, 1},
+                {5, 6, 4},
+                {6, 2, 4},
+                {6, 3, 2},
+                {6, 4, 5},
+                {6, 5, 3}
+        };
+        char zero;
+        char one;
+        char two;
+        int[] current = {die.getTop(), die.getFront(), die.getLeft()};
+        int index = -1;
+        for (int i = 0; i < orientations.length; i++) {
+            if (Arrays.equals(orientations[i], current)) {
+                index = i;
+            }
+        }
+        if (die.isWhite()) {
+            zero = (char) (index + 65);
+        } else {
+            zero = (char) (index + 97);
+        }
+        //String z = current.toString();
+
+        one = (char) (die.getX() + 'a');
+        two = (char) (die.getY() + '1');
+
+        return "" + zero + one + two;
     }
 }

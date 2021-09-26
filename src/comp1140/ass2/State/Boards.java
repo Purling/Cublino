@@ -3,6 +3,7 @@ package comp1140.ass2.State;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static comp1140.ass2.State.Die.dieToEnc;
 import static comp1140.ass2.State.Direction.*;
 
 public class Boards {
@@ -205,6 +206,26 @@ public class Boards {
 
     public Players getBlackPlayer() {
         return blackPlayer;
+    }
+
+    public static String boardToString(Boards board){
+        String[] b = new String[14];
+        int index = 0;
+        for(int x = 0; x < 7; x++){
+            for(int y = 0; y < 7; y++){
+                Die die;
+                if(board.getAt(x,y) != null){
+                    die = board.getAt(x,y);
+                    b[index] = dieToEnc(die);
+                    index++;
+                }
+            }
+        }
+        StringBuffer str = new StringBuffer();
+        for(String r : b) {
+            str.append(r);
+        }
+        return str.toString();
     }
 
     @Override

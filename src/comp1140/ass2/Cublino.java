@@ -6,6 +6,8 @@ import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
 
+import static comp1140.ass2.State.Boards.boardToString;
+
 public class Cublino {
 
     // Dice orientation
@@ -269,10 +271,18 @@ public class Cublino {
     public static String applyMovePur(String state, String move) {
         if (!isValidMovePur(state, move)) return state;
         else{
+            Boards board = new Boards(state);
+            PurCublino pur = new PurCublino(Character.isUpperCase(state.charAt(0)), board);
+            Boards.Positions[] stepPositions = Boards.moveToPositions(move);
+            char p;
+            if(state.charAt(0) == 'p') p = 'P';
+            else p = 'p';
 
-
-        }
-        return null; // FIXME Task 9 (P)
+            for(int i = 1; i < stepPositions.length; i++){
+                Die die = board.getAt(stepPositions[i - 1].toString());
+                pur.applyStep(die, stepPositions[i].toString());
+            }
+            return p+boardToString(board);}// FIXME Task 9 (P)
     }
 
     /**
