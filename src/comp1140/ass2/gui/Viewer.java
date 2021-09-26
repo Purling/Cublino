@@ -221,7 +221,7 @@ public class Viewer extends Application {
             this.die = die;
 
             // Apply the die texture to the mesh
-            setMaterial(die.isWhite() ? whiteMaterial : blackMaterial);
+            setMaterial(die.isDieWhite() ? whiteMaterial : blackMaterial);
 
             // Rotate the mesh to show the correct numbers
             getTransforms().add(necessaryRotations());
