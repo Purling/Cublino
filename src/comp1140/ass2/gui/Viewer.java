@@ -15,6 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.MeshView;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
@@ -74,8 +75,8 @@ public class Viewer extends Application {
         }
 
         // Iterate over every tile in the board
-        for (int x = 0; x < 7; x++) {
-            for (int y = 0; y < 7; y++) {
+        for (int y = 0; y < 7; y++) {
+            for (int x = 0; x < 7; x++) {
                 // Construct the checkerboard tile
                 boardGroup.getChildren().add(makeTile(x, y));
 
@@ -84,7 +85,7 @@ public class Viewer extends Application {
                 Die die = boards.getAt(x, y);
                 if (die == null) continue;
                 Point3D position = new Point3D(125 * (x-3), 0, 125 * (y-3));
-                boardGroup.getChildren().add(makeDie(position, die));
+                boardGroup.getChildren().add(new DieModel(position, die));
             }
         }
 
@@ -152,8 +153,8 @@ public class Viewer extends Application {
         primaryStage.show();
     }
 
-    final static TriangleMesh dieMesh = new TriangleMesh();
-    final static double dieScale = 40;
+    public final static TriangleMesh dieMesh = new TriangleMesh();
+    public final static double dieScale = 40;
 
     /*      y   Vertices          UV Map
           G-^-----H                 I---J
@@ -204,67 +205,64 @@ public class Viewer extends Application {
                 7,9, 3,13,2,12);    // HDC 2
     }
 
-    public MeshView makeDie(Point3D position, Die die) {
-        // Construct the MeshView from the original mesh
-        MeshView dieMeshView = new MeshView(dieMesh);
+    public class DieModel extends MeshView {
+        public DieModel(Point3D position, Die die) {
+            super(dieMesh);
 
-        // Apply the die texture to the mesh
-        dieMeshView.setMaterial(die.isDieWhite() ? whiteMaterial : blackMaterial);
+            // Apply the die texture to the mesh
+            setMaterial(die.isWhite() ? whiteMaterial : blackMaterial);
 
-        // Reposition and scale the mesh
-        dieMeshView.setTranslateX(position.getX());
-        dieMeshView.setTranslateY(position.getY());
-        dieMeshView.setTranslateZ(position.getZ());
-        dieMeshView.setScaleX(dieScale);
-        dieMeshView.setScaleY(dieScale);
-        dieMeshView.setScaleZ(dieScale);
+            // Reposition and scale the mesh
+            setTranslateX(position.getX());
+            setTranslateY(position.getY());
+            setTranslateZ(position.getZ());
+            setScaleX(dieScale);
+            setScaleY(dieScale);
+            setScaleZ(dieScale);
 
-        // Rotate the mesh to show the correct numbers
-        rotateToLookLike(dieMeshView, die);
+            // Rotate the mesh to show the correct numbers
+            rotateToLookLike(die);
+        }
 
-        return dieMeshView;
-    }
+        public void spin(double degrees) {
+            getTransforms().add(new Rotate(degrees, new Point3D(0, 1, 0)));
+        }
 
-    public void rotateToLookLike(MeshView meshView, Die die) {
-        Rotate rollLeft = new Rotate(90, new Point3D(0, 0, 1));
-        Rotate rollRight = new Rotate(-90, new Point3D(0, 0, 1));
-        Rotate rollUp = new Rotate(90, new Point3D(1, 0, 0));
-        Rotate rollDown = new Rotate(-90, new Point3D(1, 0, 0));
-        Rotate roll180 = new Rotate(180, new Point3D(0, 0, 1));
-        Rotate spinLeft = new Rotate(90, new Point3D(0, 1, 0));
-        Rotate spinRight = new Rotate(-90, new Point3D(0, 1, 0));
-        Rotate spin180 = new Rotate(180, new Point3D(0, 1, 0));
-        switch (die.getTop()) {
-            case 1: switch(die.getSide(Direction.DOWN)) {
-                case 2: meshView.getTransforms().add(spinRight); break;
-                case 3: meshView.getTransforms().add(spin180); break;
-                case 5: meshView.getTransforms().add(spinLeft); break;
-            } meshView.getTransforms().add(rollLeft); return;
-            case 2: switch(die.getSide(Direction.DOWN)) {
-                case 1: meshView.getTransforms().add(spinLeft); break;
-                case 3: meshView.getTransforms().add(spin180); break;
-                case 6: meshView.getTransforms().add(spinRight); break;
-            } meshView.getTransforms().add(roll180); return;
-            case 3: switch(die.getSide(Direction.DOWN)) {
-                case 1: meshView.getTransforms().add(spinRight); break;
-                case 2: meshView.getTransforms().add(spin180); break;
-                case 6: meshView.getTransforms().add(spinLeft); break;
-            } meshView.getTransforms().add(rollUp); return;
-            case 4: switch(die.getSide(Direction.DOWN)) {
-                case 1: meshView.getTransforms().add(spinRight); break;
-                case 5: meshView.getTransforms().add(spin180); break;
-                case 6: meshView.getTransforms().add(spinLeft); break;
-            } meshView.getTransforms().add(rollDown); return;
-            case 5: switch(die.getSide(Direction.DOWN)) {
-                case 1: meshView.getTransforms().add(spinRight); break;
-                case 3: meshView.getTransforms().add(spin180); break;
-                case 6: meshView.getTransforms().add(spinLeft); break;
-            } return;
-            case 6: switch(die.getSide(Direction.DOWN)) {
-                case 2: meshView.getTransforms().add(spinLeft); break;
-                case 3: meshView.getTransforms().add(spin180); break;
-                case 5: meshView.getTransforms().add(spinRight); break;
-            } meshView.getTransforms().add(rollRight); return;
+        public void pitch(double degrees) {
+            getTransforms().add(new Rotate(degrees, new Point3D(0, 0, 1)));
+        }
+
+        public void roll(double degrees) {
+            getTransforms().add(new Rotate(degrees, new Point3D(1, 0, 0)));
+        }
+
+        public void rotateToLookLike(Die die) {
+            // Convert from the number on the back face of the die back to the relative number from the placement string
+            int relativeBackNumber = die.getBack();
+            if (die.getBack() > die.getTop()) relativeBackNumber--;
+            if (die.getBack() > 7 - die.getTop()) relativeBackNumber--;
+
+            // When the top of the die is an even number, the front and back faces will be swapped
+            // Additionally, when the top number is 2 or 6, the numbers are reversed, due to chirality
+            if (die.getTop() % 2 == 0) {
+                if (die.getTop() != 4) relativeBackNumber = 5 - relativeBackNumber;
+                if (relativeBackNumber == 2) relativeBackNumber = 3;
+                else if (relativeBackNumber == 3) relativeBackNumber = 2;
+            }
+
+            switch(relativeBackNumber) {
+                case 1: spin( 90); break;
+                case 2: spin(180); break;
+                case 4: spin(-90); break;
+            }
+
+            switch(die.getTop()) {
+                case 1: pitch(-90); break;
+                case 2: pitch(180); break;
+                case 3:  roll( 90); break;
+                case 4:  roll(-90); break;
+                case 6: pitch( 90); break;
+            }
         }
     }
 
@@ -274,15 +272,14 @@ public class Viewer extends Application {
     final static PhongMaterial blackTileMaterial = new PhongMaterial();
 
     public static void createMaterials() {
-        Image whiteTexture = new Image(new File(URI_BASE + "whitedie.png").toURI().toString());
-        Image blackTexture = new Image(new File(URI_BASE + "blackdie.png").toURI().toString());
-        whiteMaterial.setDiffuseMap(whiteTexture);
-        blackMaterial.setDiffuseMap(blackTexture);
+        whiteMaterial.setDiffuseMap(makeTextureFromAsset("whitedie.png"));
+        blackMaterial.setDiffuseMap(makeTextureFromAsset("blackdie.png"));
+        whiteTileMaterial.setDiffuseMap(makeTextureFromAsset("whitetile.png"));
+        blackTileMaterial.setDiffuseMap(makeTextureFromAsset("blacktile.png"));
+    }
 
-        Image whiteTileTexture = new Image(new File(URI_BASE + "whitetile.png").toURI().toString());
-        Image blackTileTexture = new Image(new File(URI_BASE + "blacktile.png").toURI().toString());
-        whiteTileMaterial.setDiffuseMap(whiteTileTexture);
-        blackTileMaterial.setDiffuseMap(blackTileTexture);
+    public static Image makeTextureFromAsset(String path) {
+        return new Image(new File(URI_BASE + path).toURI().toString());
     }
 
     public Box makeTile(int x, int y) {
