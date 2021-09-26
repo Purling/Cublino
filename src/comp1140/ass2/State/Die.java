@@ -1,16 +1,16 @@
 package comp1140.ass2.State;
 
-import java.util.Comparator;
-
-import static comp1140.ass2.State.Direction.*;
-import static comp1140.ass2.State.Direction.DOWN;
+import java.util.Arrays;
 
 public class Die {
-    /** x and y represents the coordinate of the dice on a board */
+    /**
+     * x and y represents the coordinate of the dice on a board
+     */
     private int x;
     private int y;
-    /** the value on each side of a dice
-    * values will vary when the position/ orientation of the dice changes
+    /**
+     * the value on each side of a dice
+     * values will vary when the position/ orientation of the dice changes
      */
     private int top;
     private int down; // Shouldn't this be called bottom?
@@ -18,26 +18,14 @@ public class Die {
     private int back;
     private int left;
     private int right;
-    private boolean isWhite;
+    private Players player;
 
-    static class SortByColour implements Comparator<Die> {
 
-        @Override
-        public int compare(Die dieA, Die dieB) {
-            int a = (dieA.getX() + dieA.getY()) * Boards.BOARD_DIMENSION;
-            int b = (dieB.getX() + dieB.getY()) * Boards.BOARD_DIMENSION;
-
-            if(a == b) {
-                return Integer.signum(dieA.getX() - dieB.getX());
-            } else {
-                return (a > b) ? 1 : -1;
-            }
-        }
-    }
-
-    /** Given the coordinates, the values of the dice on each side, and the owner of the dice,
-    * construct the corresponding dice.*/
-    public Die(int top, int down, int front, int back, int left, int right, int x, int y, boolean isWhite) {
+    /**
+     * Given the coordinates, the values of the dice on each side, and the owner of the dice,
+     * construct the corresponding dice.
+     */
+    public Die(int top, int down, int front, int back, int left, int right, int x, int y, Players player) {
         this.top = top;
         this.down = down;
         this.front = front;
@@ -46,24 +34,24 @@ public class Die {
         this.right = right;
         this.x = x;
         this.y = y;
-        this.isWhite = isWhite;
+        this.player = player;
     }
 
     public Die(String placement, Players whitePlayer, Players blackPlayer) {
         assert placement.length() == 3;
         int orientation = placement.charAt(0);
         if (Character.isLowerCase(orientation)) {
-            isWhite = false;
+            this.player = blackPlayer;
             orientation -= 97;
         } else {
-            isWhite = true;
+            this.player = whitePlayer;
             orientation -= 65;
         }
         assert 0 <= orientation && orientation < 24;
 
         // All 24 orientations in the order {top}{front}{left},
         // manually determined by yours truly
-        int[][] orientations = new int[][] {
+        int[][] orientations = new int[][]{
                 {1, 2, 3},
                 {1, 3, 5},
                 {1, 4, 2},
@@ -105,65 +93,77 @@ public class Die {
      * Obtain the value on the top of the dice
      * The value will vary when the orientation of dice changes
      */
-    public int getTop() {return this.top;}
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Die die = (Die) o;
-        return x == die.x && y == die.y && top == die.top && down == die.down && front == die.front && back == die.back
-                && left == die.left && right == die.right && isWhite == die.isWhite;
+    public int getTop() {
+        return this.top;
     }
 
     /**
      * Get the value of the die on a particular side
+     *
      * @param d The side of the die the value is on
      * @return The int value on the particular side of the die or -1 if not valid
      */
-    public int getSide(Direction d){
-        return switch (d) {
-            case UP -> back;
-            case DOWN -> front;
-            case LEFT -> left;
-            case RIGHT -> right;
-        };
+    public int getSide(Direction d) {
+        switch (d) {
+            case UP:
+                return back;
+            case DOWN:
+                return front;
+            case LEFT:
+                return left;
+            case RIGHT:
+                return right;
+            default:
+                return -1;
+        }
+    }
+
+    /**
+     * Get the current player that is making moves
+     *
+     * @return Player
+     */
+    public Players getPlayer() {
+        return player;
     }
 
     @Override
     public String toString() {
-        return (isWhite ? "White" : "Black") + " (" + getX() + "," + getY() + ")";
+        return player.toString() + " (" + getX() + "," + getY() + ")";
     }
+
+    /** Obtain the direction of the next desired movement
+     * @param move
+     * @return Direction
+     */
+
 
     /**
      * Get the current position of the dice in the form of a string
+     *
      * @return string x+""+y
      */
-    public String getPosition(){
+    public String getPosition() {
         return x + "" + y;
     }
 
-    public String getFaces(){
-        return "Top: " + top +
-                " Down: " + down +
-                " Front: " + front +
-                " Back: " + back +
-                " Left: " + left +
-                " Right: " + right;
-    }
-
-    public void setPosition(int x, int y){
+    public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public void setPosition(String position){
-        this.x = Integer.parseInt(position.substring(0,1));
+    public void setPosition(String position) {
+        this.x = Integer.parseInt(position.substring(0, 1));
         this.y = Integer.parseInt(position.substring(1));
     }
 
-    public int getX() {return x;}
-    public int getY() {return y;}
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
 
     public boolean isWhiteDieFinished() {
         return getY() == 6;
@@ -173,75 +173,61 @@ public class Die {
         return getY() == 0;
     }
 
-    public boolean isWhite() {
-        return isWhite;
+    public boolean isDieWhite() {
+        return player.isWhite();
     }
 
     /**
      * Returns whether the current instance of dice is adjacent to another given dice
+     *
      * @param other A die
      * @return True if dice are adjacent, false otherwise
      */
-    public boolean isAdjacent(Die other){
-        return Boards.getManhattanDistance(other.getPosition(),getPosition()) == 1;
+    public boolean isAdjacent(Die other) {
+        return false;
     }
 
     /**
      * Tip the dice in a given direction the orientation and position of the dice will change accordingly
+     *
      * @param direction The direction the die will roll in
      */
-    public void tip(Direction direction){
+    public void tip(Direction direction) {
 
         switch (direction) {
             case UP -> {
-                int temp = getTop();
+                int top = getTop();
                 setTop(getBack());
                 setBack(getDown());
                 setDown(getFront());
-                setFront(temp);
+                setFront(top);
                 setPosition(getX(), getY() - 1);
             }
             case DOWN -> {
-                int temp = getTop();
+                int top1 = getTop();
                 setTop(getFront());
                 setFront(getDown());
                 setDown(getBack());
-                setBack(temp);
+                setBack(top1);
                 setPosition(getX(), getY() + 1);
             }
             case LEFT -> {
-                int temp = getLeft();
+                int left = getLeft();
                 setLeft(getTop());
                 setTop(getRight());
                 setRight(getDown());
-                setDown(temp);
+                setDown(left);
                 setPosition(getX() - 1, getY());
             }
             case RIGHT -> {
-                int temp = getLeft();
+                int left1 = getLeft();
                 setLeft(getDown());
                 setDown(getRight());
                 setRight(getTop());
-                setTop(temp);
+                setDown(left1);
                 setPosition(getX() + 1, getY());
             }
         }
-    }
-
-    public Direction getDirection(String endPosition) {
-
-        Boards.Positions end = new Boards.Positions(endPosition);
-
-        if(getX() > end.getX()){
-            return LEFT;
-        } else if(getX() < end.getX()) {
-            return RIGHT;
-        } else if(getY() < end.getY()) {
-            return UP;
-        } else if(getY() > end.getY()) {
-            return DOWN;
-        }
-        return null;
     }
 
     public void setTop(int top) {
@@ -287,4 +273,78 @@ public class Die {
     public void setRight(int right) {
         this.right = right;
     }
-}
+
+    /**
+     * Lets the dice jump in a given direction. Only the position of the dice will change.
+     *
+     * @param direction The direction the dice will jump in
+     */
+    public void jump(Direction direction) {
+        switch (direction) {
+            case UP -> {
+                setPosition(getX(), getY() - 2);
+            }
+            case DOWN -> {
+                setPosition(getX(), getY() + 2);
+            }
+            case LEFT -> {
+                setPosition(getX() - 2, getY());
+            }
+            case RIGHT -> {
+                setPosition(getX() + 2, getY());
+            }
+        }
+    }
+
+
+    public static String dieToEnc(Die die) {
+        int[][] orientations = new int[][]{
+                {1, 2, 3},
+                {1, 3, 5},
+                {1, 4, 2},
+                {1, 5, 4},
+                {2, 1, 4},
+                {2, 3, 1},
+                {2, 4, 6},
+                {2, 6, 3},
+                {3, 1, 2},
+                {3, 2, 6},
+                {3, 5, 1},
+                {3, 6, 5},
+                {4, 1, 5},
+                {4, 2, 1},
+                {4, 5, 6},
+                {4, 6, 2},
+                {5, 1, 3},
+                {5, 3, 6},
+                {5, 4, 1},
+                {5, 6, 4},
+                {6, 2, 4},
+                {6, 3, 2},
+                {6, 4, 5},
+                {6, 5, 3}
+        };
+        char zero;
+        char one;
+        char two;
+        int[] current = {die.getTop(), die.getFront(), die.getLeft()};
+        int index = -1;
+        for (int i = 0; i < orientations.length; i++) {
+            if (Arrays.equals(orientations[i], current)) {
+                index = i;
+            }
+        }
+            if (die.isDieWhite()) {
+                zero = (char) (index + 65);
+            } else {
+                zero = (char) (index + 97);
+            }
+            //String z = current.toString();
+
+            one = (char) (die.getX() + 'a');
+            two = (char) (die.getY() + '1');
+
+            return "" + zero + one + two;
+        }
+    }
+
