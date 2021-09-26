@@ -18,6 +18,7 @@ import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -84,8 +85,13 @@ public class Viewer extends Application {
                 if (boards == null) continue;
                 Die die = boards.getAt(x, y);
                 if (die == null) continue;
-                Point3D position = new Point3D(125 * (x-3), 0, 125 * (y-3));
-                boardGroup.getChildren().add(new DieModel(position, die));
+                DieModel dieModel = new DieModel(die);
+                dieModel.setScaleX(dieScale);
+                dieModel.setScaleY(dieScale);
+                dieModel.setScaleZ(dieScale);
+                dieModel.setTranslateX(125 * (x-3));
+                dieModel.setTranslateZ(125 * (y-3));
+                boardGroup.getChildren().add(dieModel);
             }
         }
 
@@ -205,38 +211,47 @@ public class Viewer extends Application {
                 7,9, 3,13,2,12);    // HDC 2
     }
 
-    public class DieModel extends MeshView {
-        public DieModel(Point3D position, Die die) {
+    public static class DieModel extends MeshView {
+
+        Die die;
+
+        public DieModel(Die die) {
             super(dieMesh);
+
+            this.die = die;
 
             // Apply the die texture to the mesh
             setMaterial(die.isWhite() ? whiteMaterial : blackMaterial);
 
-            // Reposition and scale the mesh
-            setTranslateX(position.getX());
-            setTranslateY(position.getY());
-            setTranslateZ(position.getZ());
-            setScaleX(dieScale);
-            setScaleY(dieScale);
-            setScaleZ(dieScale);
-
             // Rotate the mesh to show the correct numbers
-            rotateToLookLike(die);
+            getTransforms().add(necessaryRotations());
         }
 
         public void spin(double degrees) {
-            getTransforms().add(new Rotate(degrees, new Point3D(0, 1, 0)));
+            getTransforms().add(spinTransform(degrees));
         }
 
         public void pitch(double degrees) {
-            getTransforms().add(new Rotate(degrees, new Point3D(0, 0, 1)));
+            getTransforms().add(pitchTransform(degrees));
         }
 
         public void roll(double degrees) {
-            getTransforms().add(new Rotate(degrees, new Point3D(1, 0, 0)));
+            getTransforms().add(rollTransform(degrees));
         }
 
-        public void rotateToLookLike(Die die) {
+        public Rotate spinTransform(double degrees) {
+            return new Rotate(degrees, new Point3D(0, 1, 0));
+        }
+
+        public Rotate pitchTransform(double degrees) {
+            return new Rotate(degrees, new Point3D(0, 0, 1));
+        }
+
+        public Rotate rollTransform(double degrees) {
+            return new Rotate(degrees, new Point3D(1, 0, 0));
+        }
+
+        public Transform necessaryRotations() {
             // Convert from the number on the back face of the die back to the relative number from the placement string
             int relativeBackNumber = die.getBack();
             if (die.getBack() > die.getTop()) relativeBackNumber--;
@@ -250,19 +265,31 @@ public class Viewer extends Application {
                 else if (relativeBackNumber == 3) relativeBackNumber = 2;
             }
 
-            switch(relativeBackNumber) {
-                case 1: spin( 90); break;
-                case 2: spin(180); break;
-                case 4: spin(-90); break;
-            }
+            Transform rotation = transformForBackFace(relativeBackNumber)
+                    .createConcatenation(transformForTopFace(die.getTop()));
+            return rotation;
+        }
 
-            switch(die.getTop()) {
-                case 1: pitch(-90); break;
-                case 2: pitch(180); break;
-                case 3:  roll( 90); break;
-                case 4:  roll(-90); break;
-                case 6: pitch( 90); break;
+        public Rotate transformForBackFace(int relativeBackFace) {
+            switch(relativeBackFace) {
+                case 1: return spinTransform( 90);
+                case 2: return spinTransform(180);
+                case 3: return new Rotate();
+                case 4: return spinTransform(-90);
             }
+            return new Rotate();
+        }
+
+        public Rotate transformForTopFace(int topFace) {
+            switch(topFace) {
+                case 1: return pitchTransform(-90);
+                case 2: return pitchTransform(180);
+                case 3: return rollTransform(  90);
+                case 4: return rollTransform( -90);
+                case 5: return new Rotate();
+                case 6: return pitchTransform( 90);
+            }
+            return new Rotate();
         }
     }
 
