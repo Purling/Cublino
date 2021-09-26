@@ -210,7 +210,7 @@ public class Viewer extends Application {
             super(dieMesh);
 
             // Apply the die texture to the mesh
-            setMaterial(die.isDieWhite() ? whiteMaterial : blackMaterial);
+            setMaterial(die.isWhite() ? whiteMaterial : blackMaterial);
 
             // Reposition and scale the mesh
             setTranslateX(position.getX());

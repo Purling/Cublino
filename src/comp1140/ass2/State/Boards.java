@@ -50,7 +50,7 @@ public class Boards {
         assert encodedState.length() % 3 == 1;
         for (int i = 1; i < encodedState.length(); i += 3) {
             Die d = new Die(encodedState.substring(i, i+3), whitePlayer, blackPlayer);
-            if (d.getPlayer().equals(whitePlayer)) whitePlayer.myDice.add(d);
+            if (d.isWhite() == whitePlayer.isWhite) whitePlayer.myDice.add(d);
             else blackPlayer.myDice.add(d);
             board[d.getY()][d.getX()] = d;
         }
@@ -99,45 +99,6 @@ public class Boards {
             }
         }
         return Arrays.stream(sb.toString().split(twoSplit)).map(Positions::new).collect(Collectors.toList()).toArray(Positions[]::new);
-    }
-
-    public void applyTip(Die initial, String endPosition) {
-
-        String start = initial.getPosition();
-
-        if(getAt(endPosition) == null) {
-            initial.tip(getDirection(initial, endPosition));
-            initial.setPosition(endPosition);
-            setAt(endPosition, initial);
-            setAt(start,null);
-        }
-    }
-
-    public void applyJump(Die initial, String endPosition) {
-
-        String start = initial.getPosition();
-
-        if(getAt(endPosition) == null) {
-            initial.setPosition(endPosition);
-            setAt(endPosition, initial);
-            setAt(start,null);
-        }
-    }
-
-    public Direction getDirection(Die initial, String endPosition) {
-
-        Positions end = new Positions(endPosition);
-
-        if(initial.getX() > end.getX()){
-            return LEFT;
-        } else if(initial.getX() < end.getX()) {
-            return RIGHT;
-        } else if(initial.getY() < end.getY()) {
-            return UP;
-        } else if(initial.getY() > end.getY()) {
-            return DOWN;
-        }
-        return null;
     }
 
     public static int getPositionX(String x) {
@@ -229,7 +190,7 @@ public class Boards {
 
         for (String dieStr : diceList) {
             Die die = new Die(dieStr, whitePlayer, blackPlayer);
-            if (die.getPlayer().isWhite()){
+            if (die.isWhite()){
                whitePlayer.myDice.add(die);
             }
             else{

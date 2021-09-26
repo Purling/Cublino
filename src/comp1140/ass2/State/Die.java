@@ -1,7 +1,9 @@
 package comp1140.ass2.State;
 
 import java.util.Comparator;
-import java.util.Objects;
+
+import static comp1140.ass2.State.Direction.*;
+import static comp1140.ass2.State.Direction.DOWN;
 
 public class Die {
     /** x and y represents the coordinate of the dice on a board */
@@ -16,12 +18,26 @@ public class Die {
     private int back;
     private int left;
     private int right;
-    private Players player;
+    private boolean isWhite;
 
+    static class SortByColour implements Comparator<Die> {
+
+        @Override
+        public int compare(Die dieA, Die dieB) {
+            int a = (dieA.getX() + dieA.getY()) * Boards.BOARD_DIMENSION;
+            int b = (dieB.getX() + dieB.getY()) * Boards.BOARD_DIMENSION;
+
+            if(a == b) {
+                return Integer.signum(dieA.getX() - dieB.getX());
+            } else {
+                return (a > b) ? 1 : -1;
+            }
+        }
+    }
 
     /** Given the coordinates, the values of the dice on each side, and the owner of the dice,
     * construct the corresponding dice.*/
-    public Die(int top, int down, int front, int back, int left, int right, int x, int y, Players player) {
+    public Die(int top, int down, int front, int back, int left, int right, int x, int y, boolean isWhite) {
         this.top = top;
         this.down = down;
         this.front = front;
@@ -30,17 +46,17 @@ public class Die {
         this.right = right;
         this.x = x;
         this.y = y;
-        this.player = player;
+        this.isWhite = isWhite;
     }
 
     public Die(String placement, Players whitePlayer, Players blackPlayer) {
         assert placement.length() == 3;
         int orientation = placement.charAt(0);
         if (Character.isLowerCase(orientation)) {
-            this.player = blackPlayer;
+            isWhite = false;
             orientation -= 97;
         } else {
-            this.player = whitePlayer;
+            isWhite = true;
             orientation -= 65;
         }
         assert 0 <= orientation && orientation < 24;
@@ -97,7 +113,7 @@ public class Die {
         if (o == null || getClass() != o.getClass()) return false;
         Die die = (Die) o;
         return x == die.x && y == die.y && top == die.top && down == die.down && front == die.front && back == die.back
-                && left == die.left && right == die.right && player.isWhite == die.player.isWhite;
+                && left == die.left && right == die.right && isWhite == die.isWhite;
     }
 
     /**
@@ -113,16 +129,10 @@ public class Die {
             case RIGHT -> right;
         };
     }
-    /** Get the current player that is making moves
-     * @return Player
-     */
-    public Players getPlayer() {
-        return player;
-    }
 
     @Override
     public String toString() {
-        return player.toString() + " (" + getX() + "," + getY() + ")";
+        return (isWhite ? "White" : "Black") + " (" + getX() + "," + getY() + ")";
     }
 
     /**
@@ -163,8 +173,8 @@ public class Die {
         return getY() == 0;
     }
 
-    public boolean isDieWhite() {
-        return player.isWhite();
+    public boolean isWhite() {
+        return isWhite;
     }
 
     /**
@@ -173,7 +183,7 @@ public class Die {
      * @return True if dice are adjacent, false otherwise
      */
     public boolean isAdjacent(Die other){
-        return false;
+        return Boards.getManhattanDistance(other.getPosition(),getPosition()) == 1;
     }
 
     /**
@@ -218,6 +228,22 @@ public class Die {
         }
     }
 
+    public Direction getDirection(String endPosition) {
+
+        Boards.Positions end = new Boards.Positions(endPosition);
+
+        if(getX() > end.getX()){
+            return LEFT;
+        } else if(getX() < end.getX()) {
+            return RIGHT;
+        } else if(getY() < end.getY()) {
+            return UP;
+        } else if(getY() > end.getY()) {
+            return DOWN;
+        }
+        return null;
+    }
+
     public void setTop(int top) {
         this.top = top;
     }
@@ -260,28 +286,5 @@ public class Die {
 
     public void setRight(int right) {
         this.right = right;
-    }
-
-    static class SortByColour implements Comparator<Die> {
-
-        @Override
-        public int compare(Die dieA, Die dieB) {
-            int a = (dieA.getX() + dieA.getY()) * Boards.BOARD_DIMENSION;
-            int b = (dieB.getX() + dieB.getY()) * Boards.BOARD_DIMENSION;
-
-            if(a == b) {
-                return Integer.signum(dieA.getX() - dieB.getX());
-            } else {
-                return (a > b) ? 1 : -1;
-            }
-        }
-    }
-
-    /**
-     * Lets the dice jump in a given direction. Only the position of the dice will change.
-     * @param die A die
-     * @param direction The direction the dice will jump in
-     */
-    public void jump(Die die, Direction direction){
     }
 }

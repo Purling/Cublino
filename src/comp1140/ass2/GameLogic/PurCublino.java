@@ -14,33 +14,35 @@ public class PurCublino extends Game {
         super();
     }
 
-    public PurCublino(boolean isWhite){
-        super(isWhite);
+    public PurCublino(boolean isWhite, Boards board){
+        super(isWhite, board);
     }
 
     @Override
-    public Boards applyStep(Boards board, Die die, String endPosition) {
+    public void applyStep(Die die, String endPosition) {
 
-        if(board.getAt(endPosition) != null) return null;
-        int tipDistance = 1;
-        int jumpDistance = 2;
-        String diePosition = die.getPosition();
+        if(board.getAt(endPosition) != null || die == null){
+            addToStepHistory(new Move(board, MoveType.INVALID));
+        } else {
+            if (getStepHistory().size() == 0) addToStepHistory(new Move(board, MoveType.ORIGIN));
 
-        if(getStepHistory().size() == 0){
-            addToStepHistory(new Move(board, null));
+            int tipDistance = 1;
+            int jumpDistance = 2;
+            String diePosition = die.getPosition();
+            int distance = Boards.getManhattanDistance(diePosition, endPosition);
+            MoveType moveType;
+
+            if (!isMoveBackwards(diePosition, endPosition) && distance == tipDistance) {
+                applyTip(die, endPosition);
+                moveType = MoveType.TIP;
+            } else if (isJumpValid(diePosition, endPosition) && distance == jumpDistance) {
+                applyJump(die, endPosition);
+                moveType = MoveType.JUMP;
+            } else {
+                moveType = MoveType.INVALID;
+            }
+            addToStepHistory(new Move(board, moveType));
         }
-
-        if(!isMoveBackwards(diePosition, endPosition) && Boards.getManhattanDistance(diePosition, endPosition) == tipDistance) {
-            board.applyTip(die, endPosition);
-            addToStepHistory(new Move(board, moveType.TIP));
-            return board;
-        } else if(!isMoveBackwards(diePosition, endPosition) && board.getAt(Boards.getMiddlePosition(diePosition, endPosition)) != null
-                && Boards.getManhattanDistance(diePosition, endPosition) == jumpDistance) {
-            board.applyJump(die, endPosition);
-            addToStepHistory(new Move(board, moveType.JUMP));
-            return board;
-        }
-        return null;
     }
 
     @Override
@@ -57,7 +59,7 @@ public class PurCublino extends Game {
         return white.stream().allMatch(Die::isWhiteDieFinished) && black.stream().allMatch(Die::isBlackDieFinished);
     }
 
-    public boolean isJumpValid(Boards board,String startPosition, String endPosition) {
+    public boolean isJumpValid(String startPosition, String endPosition) {
 
         String middle = Boards.getMiddlePosition(startPosition, endPosition);
 
@@ -66,11 +68,22 @@ public class PurCublino extends Game {
                 && (Boards.sameAxis(startPosition, endPosition));
     }
 
+    public void applyJump(Die initial, String endPosition) {
+
+        String start = initial.getPosition();
+
+        if(board.getAt(endPosition) == null) {
+            initial.setPosition(endPosition);
+            board.setAt(endPosition, initial);
+            board.setAt(start,null);
+        }
+    }
+
     public static Boolean checkPurStepValid(String state, String step) {
 
         int jumpDistance = 2;
-        Boards board = new Boards(state);
-        PurCublino purCublino = new PurCublino(Character.isUpperCase(state.charAt(0)));
+        PurCublino purCublino = new PurCublino(Character.isUpperCase(state.charAt(0)), new Boards(state));
+        Boards board = purCublino.getBoard();
         Boards.Positions[] positions = Boards.moveToPositions(step);
         String start = positions[0].toString();
         String end = positions[positions.length - 1].toString();
@@ -80,7 +93,7 @@ public class PurCublino extends Game {
         if (board.isAdjacent(start, end)) {
             return !purCublino.isMoveBackwards(start,end);
         } else if (Boards.getManhattanDistance(start,end) == jumpDistance) {
-            return purCublino.isJumpValid(board, start, end);
+            return purCublino.isJumpValid(start, end);
         } else {
             return false;
         }
