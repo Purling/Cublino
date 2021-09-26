@@ -3,6 +3,7 @@ package comp1140.ass2.State;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static comp1140.ass2.State.Die.dieToEnc;
 import static comp1140.ass2.State.Direction.*;
 
 public class Boards {
@@ -98,6 +99,7 @@ public class Boards {
     public Boards() {
     }
 
+
     @Deprecated
     public Positions stepToPositions(String encodedPosition) {
         int even = 2;
@@ -161,7 +163,7 @@ public class Boards {
         }
     }
 
-    public Direction getDirection(Die initial, String endPosition) {
+    public static Direction getDirection(Die initial, String endPosition) {
 
         Positions end = new Positions(endPosition);
 
@@ -170,9 +172,9 @@ public class Boards {
         } else if(initial.getX() < end.getX()) {
             return RIGHT;
         } else if(initial.getY() > end.getY()) {
-            return UP;
-        } else if(initial.getY() < end.getY()) {
             return DOWN;
+        } else if(initial.getY() < end.getY()) {
+            return UP;
         }
         return null;
     }
@@ -238,6 +240,7 @@ public class Boards {
         return board[y][x];
     }
 
+
     public void setAt(int x, int y, Die die) {
         board[y][x] = die;
     }
@@ -293,4 +296,44 @@ public class Boards {
     public Die[][] getBoard() {
         return board;
     }
+
+    public static String boardToString(Boards board){
+        String[] b = new String[14];
+        int index = 0;
+        for(int x = 0; x < 7; x++){
+            for(int y = 0; y < 7; y++){
+                Die die;
+                if(board.getAt(x,y) != null){
+                    die = board.getAt(x,y);
+                    b[index] = dieToEnc(die);
+                    index++;
+                }
+            }
+        }
+        StringBuffer str = new StringBuffer();
+        for(String r : b) {
+            str.append(r);
+        }
+        return str.toString();
+    }
+
+    public static Boolean isTip(String step){
+        String initial = step.substring(0,2);
+        String end = step.substring(2);
+        int hd = Math.abs(initial.charAt(0)-end.charAt(0));
+        int vd = Math.abs(initial.charAt(1)-end.charAt(1));
+
+        return hd == 0 && vd == 1 || hd == 1 && vd == 0;
+    }
+
+    public static Boolean isJump(String step){
+        String initial = step.substring(0,2);
+        String end = step.substring(2);
+        int hd = Math.abs(initial.charAt(0)-end.charAt(0));
+        int vd = Math.abs(initial.charAt(1)-end.charAt(1));
+
+        return hd == 0 && vd == 2 || hd == 2 && vd == 0;
+    }
+
+
 }
