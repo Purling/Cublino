@@ -6,10 +6,11 @@ import java.util.stream.Collectors;
 import static comp1140.ass2.State.Die.dieToEnc;
 import static comp1140.ass2.State.Direction.*;
 
-public class Boards {
+public class Boards{
     private Players whitePlayer = new Players(true);
     private Players blackPlayer = new Players(false);
     public static final int BOARD_DIMENSION = 7;
+
 
     public static class Positions {
         private String coordinate;
@@ -208,6 +209,7 @@ public class Boards {
         return blackPlayer;
     }
 
+
     public static String boardToString(Boards board){
         String[] b = new String[14];
         int index = 0;
@@ -219,6 +221,22 @@ public class Boards {
                     b[index] = dieToEnc(die);
                     index++;
                 }
+            }
+        }
+        String[] white = new String[7];
+        String[] black = new String[7];
+
+
+        for(String string : b){
+            int w = 0;
+            int bl = 0;
+            if(string.charAt(0) >= 'A' && string.charAt(0) <= 'W'){
+                white[w] = string;
+                w++;
+            }
+            else{
+                black[bl] = string;
+                bl++;
             }
         }
         StringBuffer str = new StringBuffer();

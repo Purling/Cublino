@@ -316,7 +316,20 @@ public class Cublino {
      * @return 1 if player one has won, 2 if player two has won, otherwise 0.
      */
     public static int isGameOverContra(String state) {
-        return -1; // FIXME Task 14a (HD)
+        int numOfDice = (state.length() - 1) /3;
+        int i = 0;
+
+        while (i < numOfDice){
+            String s = state.substring(3*i+1, 3*i+4);
+            if (s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && s.charAt(2) == '7'){
+                return 1;
+            }
+            else if (s.charAt(0) >= 'a' && s.charAt(0) <= 'z' && s.charAt(2) == '1'){
+                return 2;
+            }
+            else i++;
+        }
+        return 0;
     }
 
     /**
