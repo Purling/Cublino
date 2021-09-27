@@ -50,22 +50,9 @@ public class Boards {
         assert encodedState.length() % 3 == 1;
         for (int i = 1; i < encodedState.length(); i += 3) {
             Die d = new Die(encodedState.substring(i, i+3), whitePlayer, blackPlayer);
-            if (d.isWhite() == whitePlayer.isWhite) whitePlayer.myDice.add(d);
-            else blackPlayer.myDice.add(d);
+            if (d.isWhite() == whitePlayer.isWhite) whitePlayer.addToDice(d);
+            else blackPlayer.addToDice(d);
             board[d.getY()][d.getX()] = d;
-        }
-    }
-
-    public Boards(Players whitePlayer, Players blackPlayer) {
-        this.whitePlayer = whitePlayer;
-        this.blackPlayer = blackPlayer;
-
-        for(Die die : whitePlayer.getDice()) {
-            setAt(die.getPosition(), die);
-        }
-
-        for(Die die : blackPlayer.getDice()) {
-            setAt(die.getPosition(), die);
         }
     }
 
@@ -204,10 +191,10 @@ public class Boards {
         for (String dieStr : diceList) {
             Die die = new Die(dieStr, whitePlayer, blackPlayer);
             if (die.isWhite()){
-               whitePlayer.myDice.add(die);
+               whitePlayer.addToDice(die);
             }
             else{
-                blackPlayer.myDice.add(die);
+                blackPlayer.addToDice(die);
             }
         }
     }
