@@ -67,12 +67,10 @@ public class Viewer extends Application {
         // Generic JavaFX window setup
         boardSubscene = new SubScene(subRoot, VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
 
-        Boards boards = null;
+        Boards boards;
         try {
             boards = new Boards(placement);
-        } catch (Exception e) {} // If the user inputs an invalid board state, do not update the display
-
-        if (boards == null) return;
+        } catch (Exception e) {return;} // If the user inputs an invalid board state, do not update the display
 
         // Iterate over every tile in the board
         for (int y = 0; y < 7; y++) {
@@ -206,6 +204,12 @@ public class Viewer extends Application {
 
         Die die;
 
+        /**
+         * Constructs and transforms a die mesh to provide an
+         * accurate visual model of any die.
+         *
+         * @param die the die to show
+         */
         public DieModel(Die die) {
             super(dieMesh);
             this.die = die;
@@ -224,18 +228,11 @@ public class Viewer extends Application {
             setTranslateZ(125 * (die.getY()-3));
         }
 
-        void spin(double degrees) {
-            getTransforms().add(spinTransform(degrees));
-        }
-
-        void pitch(double degrees) {
-            getTransforms().add(pitchTransform(degrees));
-        }
-
-        void roll(double degrees) {
-            getTransforms().add(rollTransform(degrees));
-        }
-
+        /**
+         * Computes a rotation transform along the various axes
+         * @param degrees the side of the rotation, in degrees
+         * @returns the required rotation
+         */
         Rotate spinTransform(double degrees) {
             return new Rotate(degrees, new Point3D(0, 1, 0));
         }
@@ -278,6 +275,11 @@ public class Viewer extends Application {
             return backRotation(relativeBackNumber).createConcatenation(topRotation(die.getTop()));
         }
 
+        /**
+         * Computes the rotation to show a particular
+         * relative number on the back face of the mesh
+         * @returns the required rotation
+         */
         Rotate backRotation(int relativeBackFace) {
             switch(relativeBackFace) {
                 case 1: return spinTransform( 90);
@@ -287,6 +289,11 @@ public class Viewer extends Application {
             }
         }
 
+        /**
+         * Computes the rotation to show a particular
+         * absolute number on the top face of the mesh
+         * @returns the required rotation
+         */
         Rotate topRotation(int topFace) {
             switch(topFace) {
                 case 1: return pitchTransform(-90);
