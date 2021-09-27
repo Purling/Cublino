@@ -1,8 +1,9 @@
 package comp1140.ass2.State;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Players {
+public class Players implements Serializable{
     /**
      * Store the information of the player's dices
      */

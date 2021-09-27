@@ -1,11 +1,12 @@
 package comp1140.ass2.State;
 
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static comp1140.ass2.State.Die.dieToEnc;
 
-public class Boards {
+public class Boards implements Serializable {
     private Players whitePlayer = new Players(true);
     private Players blackPlayer = new Players(false);
     public static final int BOARD_DIMENSION = 7;
@@ -53,6 +54,20 @@ public class Boards {
             if (d.isWhite() == whitePlayer.isWhite) whitePlayer.addToDice(d);
             else blackPlayer.addToDice(d);
             board[d.getY()][d.getX()] = d;
+        }
+    }
+
+    public Boards deepClone() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (Boards) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            return null;
         }
     }
 

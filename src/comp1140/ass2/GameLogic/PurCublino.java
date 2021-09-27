@@ -23,10 +23,12 @@ public class PurCublino extends Game {
     @Override
     public void applyStep(Die die, String endPosition) {
 
+        Boards clone = board.deepClone();
+
         if(board.getAt(endPosition) != null || die == null){
-            addToStepHistory(new Move(board, MoveType.INVALID));
+            addToStepHistory(new Move(clone, MoveType.INVALID));
         } else {
-            if (getStepHistory().size() == 0) addToStepHistory(new Move(board, MoveType.ORIGIN));
+            if (getStepHistory().size() == 0) addToStepHistory(new Move(clone, MoveType.ORIGIN));
 
             int tipDistance = 1;
             int jumpDistance = 2;
@@ -43,7 +45,7 @@ public class PurCublino extends Game {
             } else {
                 moveType = MoveType.INVALID;
             }
-            addToStepHistory(new Move(board, moveType));
+            addToStepHistory(new Move(clone, moveType));
         }
     }
 
