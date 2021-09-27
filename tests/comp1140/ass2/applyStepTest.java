@@ -16,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @Timeout(value = 1000, unit = MILLISECONDS)
 public class applyStepTest {
 
+    int encodedState = 0;
+    int moves = 1;
+
     @Test
     public void testPurGame() {
-
-        int encodedState = 0;
-        int moves = 1;
 
         for (int i = 0; i < ExampleGames.FULL_PUR_GAME.length - 1; i++) {
 
@@ -43,9 +43,6 @@ public class applyStepTest {
     @Test
     public void testStepHistoryNumber() {
 
-        int encodedState = 0;
-        int moves = 1;
-
         for (int i = 0; i < ExampleGames.FULL_PUR_GAME.length - 1; i++) {
 
             String state = ExampleGames.FULL_PUR_GAME[i][encodedState];
@@ -65,9 +62,6 @@ public class applyStepTest {
 
     @Test
     public void testStepHistoryType() {
-
-        int encodedState = 0;
-        int moves = 1;
 
         for (int i = 0; i < ExampleGames.FULL_PUR_GAME.length - 1; i++) {
 
@@ -95,8 +89,6 @@ public class applyStepTest {
 
     @Test
     public void testInvalidMove() {
-        int encodedState = 0;
-        int moves = 1;
 
         for (int i = 0; i < FULL_WRONG_PUR_GAME.length - 1; i++) {
 
@@ -116,10 +108,7 @@ public class applyStepTest {
     }
 
     @Test
-    public void testContainsOriginal() { //FIXME
-
-        int encodedState = 0;
-        int moves = 1;
+    public void testContainsOriginal() {
 
         for (int i = 0; i < ExampleGames.FULL_PUR_GAME.length - 1; i++) {
 
@@ -128,39 +117,56 @@ public class applyStepTest {
             Boards.Positions[] positions = Boards.moveToPositions(ExampleGames.FULL_PUR_GAME[i][moves]);
             PurCublino pur = new PurCublino(Character.isUpperCase(gameMode), new Boards(state));
             Boards board = pur.getBoard();
-            Boards endBoard = new Boards(ExampleGames.FULL_PUR_GAME[i + 1][encodedState]);
 
             for (int j = 1; j < positions.length; j++) {
                 Die die1 = board.getAt(positions[j - 1].toString());
                 pur.applyStep(die1, positions[j].toString());
             }
 
-            assertEquals(endBoard, board, "State \"" + state + "\" with move \"" + Arrays.toString(positions) + "\"");
+            assertEquals(ORIGIN, pur.getStepHistory().get(0).getType(), "State \"" + state + "\" with move \"" + Arrays.toString(positions) + "\"");
+            assertEquals(new Boards(state), pur.getStepHistory().get(0).getBoard(), "State \"" + state + "\" with move \"" + Arrays.toString(positions) + "\"");
         }
     }
 
     @Test
-    public void testTypeCorrect() { //FIXME
+    public void testTypeCorrect() {
 
-        int encodedState = 0;
-        int moves = 1;
+        PurCublino pur;
+        Boards board;
+        Boards.Positions[] positions;
+        Die die;
 
-        for (int i = 0; i < ExampleGames.FULL_PUR_GAME.length - 1; i++) {
+        pur = new PurCublino(Character.isUpperCase('P'), new Boards("PWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7"));
+        board = pur.getBoard();
+        positions = Boards.moveToPositions("d1d2");
+        die = board.getAt(positions[0].toString());
+        pur.applyStep(die, positions[1].toString());
+        assertEquals(ORIGIN, pur.getStepHistory().get(0).getType(), "Type is not as expected");
+        assertEquals(TIP, pur.getStepHistory().get(1).getType(), "Type is not as expected");
 
-            String state = ExampleGames.FULL_PUR_GAME[i][encodedState];
-            char gameMode = state.charAt(0);
-            Boards.Positions[] positions = Boards.moveToPositions(ExampleGames.FULL_PUR_GAME[i][moves]);
-            PurCublino pur = new PurCublino(Character.isUpperCase(gameMode), new Boards(state));
-            Boards board = pur.getBoard();
-            Boards endBoard = new Boards(ExampleGames.FULL_PUR_GAME[i + 1][encodedState]);
+        pur = new PurCublino(Character.isUpperCase('P'), new Boards("PWa1Wb1Wc1We1Wf1Wg1Ld2if6va7vb7vc7vd7ve7vg7"));
+        board = pur.getBoard();
+        positions = Boards.moveToPositions("e1e2c2");
+        die = board.getAt(positions[0].toString());
+        pur.applyStep(die, positions[1].toString());
+        pur.applyStep(die, positions[2].toString());
+        assertEquals(ORIGIN, pur.getStepHistory().get(0).getType(), "Type is not as expected");
+        assertEquals(TIP, pur.getStepHistory().get(1).getType(), "Type is not as expected");
+        assertEquals(JUMP, pur.getStepHistory().get(2).getType(), "Type is not as expected");
 
-            for (int j = 1; j < positions.length; j++) {
-                Die die1 = board.getAt(positions[j - 1].toString());
-                pur.applyStep(die1, positions[j].toString());
-            }
-
-            assertEquals(endBoard, board, "State \"" + state + "\" with move \"" + Arrays.toString(positions) + "\"");
-        }
+        pur = new PurCublino(Character.isUpperCase('p'), new Boards("pWa1Wb1Wc1Wf1Wg1Ld2Bc3id6if6va7vb7vc7ve7vg7"));
+        board = pur.getBoard();
+        positions = Boards.moveToPositions("b7d7f7f5a1");
+        die = board.getAt(positions[0].toString());
+        pur.applyStep(die, positions[1].toString());
+        pur.applyStep(die, positions[2].toString());
+        pur.applyStep(die, positions[3].toString());
+        pur.applyStep(die, positions[4].toString());
+        assertEquals(ORIGIN, pur.getStepHistory().get(0).getType(), "Type is not as expected");
+        assertEquals(JUMP, pur.getStepHistory().get(1).getType(), "Type is not as expected");
+        assertEquals(JUMP, pur.getStepHistory().get(2).getType(), "Type is not as expected");
+        assertEquals(JUMP, pur.getStepHistory().get(3).getType(), "Type is not as expected");
+        assertEquals(INVALID, pur.getStepHistory().get(4).getType(), "Type is not as expected");
     }
 
     public static final String[][] FULL_WRONG_PUR_GAME = {
@@ -180,23 +186,23 @@ public class applyStepTest {
             , new String[]{"pWb1Wc1Ge1Wg1Le2Bc3Bd3ff3if4id6if6va7ve7vg7", "d6d1"}
             , new String[]{"PWb1Wc1Ge1Wg1Le2Bc3Bd3ff3if4cd5if6va7ve7vg7", "c1c4c1"}
             , new String[]{"pWb1Ge1Wg1Le2Bc3Bd3ff3Lc4if4cd5if6va7ve7vg7", "f4e1"}
-};
-//            , new String[]{"PWb1Ge1Wg1Le2Bc3Bd3ff3Lc4qe4cd5if6va7ve7vg7", "d3e3g3"}
-//            , new String[]{"pWb1Ge1Wg1Le2Bc3ff3Rg3Lc4qe4cd5if6va7ve7vg7", "d5d4"}
-//            , new String[]{"PWb1Ge1Wg1Le2Bc3ff3Rg3Lc4pd4qe4if6va7ve7vg7", "c3b3"}
-//            , new String[]{"pWb1Ge1Wg1Le2Fb3ff3Rg3Lc4pd4qe4if6va7ve7vg7", "d4f4"}
-//            , new String[]{"PWb1Ge1Wg1Le2Fb3ff3Rg3Lc4qe4pf4if6va7ve7vg7", "b1c1"}
-//            , new String[]{"pSc1Ge1Wg1Le2Fb3ff3Rg3Lc4qe4pf4if6va7ve7vg7", "f4g4"}
-//            , new String[]{"PSc1Ge1Wg1Le2Fb3ff3Rg3Lc4qe4hg4if6va7ve7vg7", "b3a3"}
-//            , new String[]{"pSc1Ge1Wg1Le2Va3ff3Rg3Lc4qe4hg4if6va7ve7vg7", "g4f4d4"}
-//            , new String[]{"PSc1Ge1Wg1Le2Va3ff3Rg3Lc4pd4qe4if6va7ve7vg7", "e1e3"}
-//            , new String[]{"pSc1Wg1Le2Va3Ge3ff3Rg3Lc4pd4qe4if6va7ve7vg7", "d4f4f2d2"}
-//            , new String[]{"PSc1Wg1pd2Le2Va3Ge3ff3Rg3Lc4qe4if6va7ve7vg7", "c1c2"}
-//            , new String[]{"pWg1Kc2pd2Le2Va3Ge3ff3Rg3Lc4qe4if6va7ve7vg7", "e7e6g6"}
-//            , new String[]{"PWg1Kc2pd2Le2Va3Ge3ff3Rg3Lc4qe4if6ig6va7vg7", "a3a4"}
-//            , new String[]{"pWg1Kc2pd2Le2Ge3ff3Rg3Pa4Lc4qe4if6ig6va7vg7", "g7f7f5"}
-//            , new String[]{"PWg1Kc2pd2Le2Ge3ff3Rg3Pa4Lc4qe4rf5if6ig6va7", "a4a5"}
-//            , new String[]{"pWg1Kc2pd2Le2Ge3ff3Rg3Lc4qe4Ca5rf5if6ig6va7", "g6e6"}
+            , new String[]{"PWb1Ge1Wg1Le2Bc3Bd3ff3Lc4qe4cd5if6va7ve7vg7", "d3e7g4"}
+            , new String[]{"pWb1Ge1Wg1Le2Bc3ff3Rg3Lc4qe4cd5if6va7ve7vg7", "d5d1"}
+            , new String[]{"PWb1Ge1Wg1Le2Bc3ff3Rg3Lc4pd4qe4if6va7ve7vg7", "c3b2"}
+            , new String[]{"pWb1Ge1Wg1Le2Fb3ff3Rg3Lc4pd4qe4if6va7ve7vg7", "d4f3"}
+            , new String[]{"PWb1Ge1Wg1Le2Fb3ff3Rg3Lc4qe4pf4if6va7ve7vg7", "b1c5"}
+            , new String[]{"pSc1Ge1Wg1Le2Fb3ff3Rg3Lc4qe4pf4if6va7ve7vg7", "f4g1"}
+            , new String[]{"PSc1Ge1Wg1Le2Fb3ff3Rg3Lc4qe4hg4if6va7ve7vg7", "b3a7"}
+            , new String[]{"pSc1Ge1Wg1Le2Va3ff3Rg3Lc4qe4hg4if6va7ve7vg7", "g4f1d2"}
+            , new String[]{"PSc1Ge1Wg1Le2Va3ff3Rg3Lc4pd4qe4if6va7ve7vg7", "e1a1"}
+            , new String[]{"pSc1Wg1Le2Va3Ge3ff3Rg3Lc4pd4qe4if6va7ve7vg7", "d4f1f2d2"}
+            , new String[]{"PSc1Wg1pd2Le2Va3Ge3ff3Rg3Lc4qe4if6va7ve7vg7", "c1c5"}
+            , new String[]{"pWg1Kc2pd2Le2Va3Ge3ff3Rg3Lc4qe4if6va7ve7vg7", "e7e1g6"}
+            , new String[]{"PWg1Kc2pd2Le2Va3Ge3ff3Rg3Lc4qe4if6ig6va7vg7", "a3b6"}
+            , new String[]{"pWg1Kc2pd2Le2Ge3ff3Rg3Pa4Lc4qe4if6ig6va7vg7", "g7a7f5"}
+            , new String[]{"PWg1Kc2pd2Le2Ge3ff3Rg3Pa4Lc4qe4rf5if6ig6va7", "a4a1"}
+            , new String[]{"pWg1Kc2pd2Le2Ge3ff3Rg3Lc4qe4Ca5rf5if6ig6va7", "g6b6"}
+    };
 //            , new String[]{"PWg1Kc2pd2Le2Ge3ff3Rg3Lc4qe4Ca5rf5ie6if6va7", "g1f1"}
 //            , new String[]{"pGf1Kc2pd2Le2Ge3ff3Rg3Lc4qe4Ca5rf5ie6if6va7", "e6e5"}
 //            , new String[]{"PGf1Kc2pd2Le2Ge3ff3Rg3Lc4qe4Ca5ce5rf5if6va7", "e2f2f4d4"}
@@ -327,26 +333,5 @@ public class applyStepTest {
 //            , new String[]{"pca1cb1vc1ad1ae1vg1hg2Tc4Oe6Tf6Jc7Dd7Ie7Mf7", "g1f1"}
 //            , new String[]{"Pca1cb1vc1ad1ae1rf1hg2Tc4Oe6Tf6Jc7Dd7Ie7Mf7", "d7b7"}
 //            , new String[]{"pca1cb1vc1ad1ae1rf1hg2Tc4Oe6Tf6Db7Jc7Ie7Mf7", "g2g1"}
-//            , new String[]{"Pca1cb1vc1ad1ae1rf1xg1Tc4Oe6Tf6Db7Jc7Ie7Mf7", null}
 //    };
-
-//    private Boards generateBoard(){
-//
-//        int encodedState = 0;
-//        int moves = 1;
-//
-//        for (int i = 0; i < ExampleGames.FULL_PUR_GAME.length - 1; i++) {
-//
-//            String state = ExampleGames.FULL_PUR_GAME[i][encodedState];
-//            char gameMode = state.charAt(0);
-//            Boards.Positions[] positions = Boards.moveToPositions(ExampleGames.FULL_PUR_GAME[i][moves]);
-//            PurCublino pur = new PurCublino(Character.isUpperCase(gameMode));
-//            Boards board = new Boards(state);
-//
-//            for (int j = 1; j < positions.length; j++) {
-//                Die die1 = board.getAt(positions[j - 1].toString());
-//                board = pur.applyStep(board, die1, positions[j].toString());
-//            }
-//        }
-//    }
 }

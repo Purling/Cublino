@@ -21,11 +21,11 @@ public abstract class Game{
     }
 
     public class Move {
-        Boards board;
+        Boards historicalBoard;
         MoveType type;
 
-        public Move(Boards board, MoveType type) {
-            this.board = board;
+        public Move(Boards historicalBoard, MoveType type) {
+            this.historicalBoard = historicalBoard;
             this.type = type;
         }
 
@@ -34,7 +34,7 @@ public abstract class Game{
         }
 
         public Boards getBoard() {
-            return board;
+            return historicalBoard;
         }
     }
     /**

@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static comp1140.ass2.State.Die.dieToEnc;
-import static comp1140.ass2.State.Direction.*;
 
 public class Boards {
     private Players whitePlayer = new Players(true);
@@ -54,6 +53,19 @@ public class Boards {
             if (d.isWhite() == whitePlayer.isWhite) whitePlayer.myDice.add(d);
             else blackPlayer.myDice.add(d);
             board[d.getY()][d.getX()] = d;
+        }
+    }
+
+    public Boards(Players whitePlayer, Players blackPlayer) {
+        this.whitePlayer = whitePlayer;
+        this.blackPlayer = blackPlayer;
+
+        for(Die die : whitePlayer.getDice()) {
+            setAt(die.getPosition(), die);
+        }
+
+        for(Die die : blackPlayer.getDice()) {
+            setAt(die.getPosition(), die);
         }
     }
 
