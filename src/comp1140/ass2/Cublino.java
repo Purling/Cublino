@@ -6,7 +6,9 @@ import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
 
+import static comp1140.ass2.GameLogic.PurCublino.getWinner;
 import static comp1140.ass2.State.Boards.boardToString;
+import static comp1140.ass2.State.Boards.getManhattanDistance;
 
 public class Cublino {
 
@@ -156,33 +158,7 @@ public class Cublino {
      */
     public static int isGameOverPur(String state) {
         if (state.charAt(0) != 'p' && state.charAt(0)!= 'P') return 0;
-        else {
-            int p1 = 0;
-            int p2 = 0;
-            int p1s = 0;
-            int p2s = 0;
-            int i = 0;
-            while (i < 14){
-                String s = state.substring(3*i+1, 3*i+4);
-                if (s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && s.charAt(2) == '7'){
-                    p1++;
-                    p1s += (s.charAt(0) - 'A')/4 + 1;
-                    i++;
-                }
-                else if (s.charAt(0) >= 'a' && s.charAt(0) <= 'z' && s.charAt(2) == '1'){
-                    p2++;
-                    p2s += (s.charAt(0) - 'a')/4 + 1;
-                    i++;
-                }
-                else i++;
-            }
-                if (p1 == 7 || p2 == 7) {
-                    if (p1s == p2s) return 3;
-                    else if (p1s < p2s) return 2;
-                    else return 1;
-                }
-                else return 0;
-        }
+        else {return getWinner(state);}
     }
 
     /**

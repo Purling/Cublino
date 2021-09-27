@@ -1,16 +1,15 @@
 package comp1140.ass2.State;
 
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static comp1140.ass2.State.Die.dieToEnc;
-import static comp1140.ass2.State.Direction.*;
 
-public class Boards{
+public class Boards implements Serializable {
     private Players whitePlayer = new Players(true);
     private Players blackPlayer = new Players(false);
     public static final int BOARD_DIMENSION = 7;
-
 
     public static class Positions {
         private String coordinate;
@@ -52,9 +51,23 @@ public class Boards{
         assert encodedState.length() % 3 == 1;
         for (int i = 1; i < encodedState.length(); i += 3) {
             Die d = new Die(encodedState.substring(i, i+3), whitePlayer, blackPlayer);
-            if (d.isWhite() == whitePlayer.isWhite) whitePlayer.myDice.add(d);
-            else blackPlayer.myDice.add(d);
+            if (d.isWhite() == whitePlayer.isWhite) whitePlayer.addToDice(d);
+            else blackPlayer.addToDice(d);
             board[d.getY()][d.getX()] = d;
+        }
+    }
+
+    public Boards deepClone() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (Boards) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            return null;
         }
     }
 
@@ -193,10 +206,10 @@ public class Boards{
         for (String dieStr : diceList) {
             Die die = new Die(dieStr, whitePlayer, blackPlayer);
             if (die.isWhite()){
-               whitePlayer.myDice.add(die);
+               whitePlayer.addToDice(die);
             }
             else{
-                blackPlayer.myDice.add(die);
+                blackPlayer.addToDice(die);
             }
         }
     }
@@ -209,7 +222,6 @@ public class Boards{
         return blackPlayer;
     }
 
-
     public static String boardToString(Boards board){
         String[] b = new String[14];
         int index = 0;
@@ -221,22 +233,6 @@ public class Boards{
                     b[index] = dieToEnc(die);
                     index++;
                 }
-            }
-        }
-        String[] white = new String[7];
-        String[] black = new String[7];
-
-
-        for(String string : b){
-            int w = 0;
-            int bl = 0;
-            if(string.charAt(0) >= 'A' && string.charAt(0) <= 'W'){
-                white[w] = string;
-                w++;
-            }
-            else{
-                black[bl] = string;
-                bl++;
             }
         }
         StringBuffer str = new StringBuffer();
