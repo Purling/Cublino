@@ -1,12 +1,13 @@
 package comp1140.ass2.State;
 
+import java.io.*;
 import java.util.Arrays;
 import java.util.Comparator;
 
 import static comp1140.ass2.State.Direction.*;
 import static comp1140.ass2.State.Direction.DOWN;
 
-public class Die {
+public class Die implements Serializable{
     /** x and y represents the coordinate of the dice on a board */
     private int x;
     private int y;
