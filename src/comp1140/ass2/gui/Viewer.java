@@ -52,7 +52,18 @@ public class Viewer extends Application {
 
     double mouseX = 0;
 
+    double mouseDownX = 0;
+    double mouseDownY = 0;
+
+    double mouseCurrentX = 0;
+    double mouseCurrentY = 0;
+
     public DieModel selectedDie = null;
+
+    int selectedDieTileX;
+    int selectedDieTileY;
+
+    BoardTile[][] boardTiles;
 
     /**
      * Draw a placement in the window, removing any previously drawn one
@@ -71,6 +82,8 @@ public class Viewer extends Application {
         // Generic JavaFX window setup
         boardSubscene = new SubScene(subRoot, VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
 
+        boardTiles = new BoardTile[7][7];
+
         Boards boards;
         try {
             boards = new Boards(placement);
@@ -80,7 +93,8 @@ public class Viewer extends Application {
         for (int y = 0; y < 7; y++) {
             for (int x = 0; x < 7; x++) {
                 // Construct the checkerboard tile
-                boardGroup.getChildren().add(makeTile(x, y));
+                boardTiles[x][y] = new BoardTile(x, y);
+                boardGroup.getChildren().add(boardTiles[x][y]);
 
                 // If the game state contains a die at the current position, construct it as well
                 Die die = boards.getAt(x, y);
@@ -206,6 +220,17 @@ public class Viewer extends Application {
                 7,9, 3,13,2,12);    // HDC 2
     }
 
+    public void dieSelected(int x, int y) {
+        selectedDieTileX = x;
+        selectedDieTileY = y;
+        boardTiles[x][y].setSelected();
+    }
+
+    public void dieUnselected() {
+        boardTiles[selectedDieTileX][selectedDieTileY].setUnselected();
+        selectedDie = null;
+    }
+
     public static class DieModel extends MeshView {
 
         Die die;
@@ -239,19 +264,30 @@ public class Viewer extends Application {
             setTranslateZ(125 * (die.getY()-3));
 
             this.setOnMousePressed(event -> {
-                //this.setTranslateY(-50);
                 viewer.selectedDie = this;
+                viewer.mouseDownX = event.getScreenX();
+                viewer.mouseDownY = event.getScreenY();
+                viewer.mouseCurrentX = viewer.mouseDownX;
+                viewer.mouseCurrentY = viewer.mouseDownY;
+                viewer.dieSelected(die.getX(), die.getY());
+            });
+
+            this.setOnMouseDragged(event -> {
+                viewer.mouseCurrentX = event.getScreenX();
+                viewer.mouseCurrentY = event.getScreenY();
+                double direction = Math.atan2(viewer.mouseCurrentY - viewer.mouseDownY, viewer.mouseCurrentX - viewer.mouseDownX);
+                direction *= 180/Math.PI;
+                int approxDirection = (((int) Math.round(direction/90)) + 4)%4;
+                System.out.println(approxDirection);
             });
 
             this.setOnMouseReleased(event -> {
-                //this.setTranslateY(0);
-                viewer.selectedDie = null;
+                viewer.dieUnselected();
             });
 
             AnimationTimer animation = new AnimationTimer() {
                 @Override
                 public void handle(long l) {
-                    System.out.println(0);
                     setTranslateY(lerp(getTranslateY(), viewer.selectedDie == me ? -50 : 0, 0.2));
                 }
             };
@@ -345,25 +381,43 @@ public class Viewer extends Application {
     final static PhongMaterial blackMaterial = new PhongMaterial();
     final static PhongMaterial whiteTileMaterial = new PhongMaterial();
     final static PhongMaterial blackTileMaterial = new PhongMaterial();
+    final static PhongMaterial selectedTileMaterial = new PhongMaterial();
 
     static void createMaterials() {
         whiteMaterial.setDiffuseMap(makeTextureFromAsset("whitedie.png"));
         blackMaterial.setDiffuseMap(makeTextureFromAsset("blackdie.png"));
         whiteTileMaterial.setDiffuseMap(makeTextureFromAsset("whitetile.png"));
         blackTileMaterial.setDiffuseMap(makeTextureFromAsset("blacktile.png"));
+        selectedTileMaterial.setDiffuseMap(makeTextureFromAsset("selectedtile.png"));
     }
 
     static Image makeTextureFromAsset(String path) {
         return new Image(new File(URI_BASE + path).toURI().toString());
     }
 
-    Box makeTile(int x, int y) {
-        Box box = new Box(125, 20, 125);
-        box.setTranslateX(125*(x-3));
-        box.setTranslateY(50);
-        box.setTranslateZ(125*(y-3));
-        box.setMaterial((x+y)%2 == 0 ? whiteTileMaterial : blackTileMaterial);
-        box.toBack();
-        return box;
+    class BoardTile extends Box {
+        int x;
+        int y;
+
+        public BoardTile(int x, int y) {
+            super(125, 20, 125);
+            setTranslateX(125*(x-3));
+            setTranslateY(50);
+
+            this.x = x;
+            this.y = y;
+
+            setTranslateZ(125*(y-3));
+            setUnselected();
+            toBack();
+        }
+
+        public void setSelected() {
+            setMaterial(selectedTileMaterial);
+        }
+
+        public void setUnselected() {
+            setMaterial((x+y)%2 == 0 ? whiteTileMaterial : blackTileMaterial);
+        }
     }
 }
