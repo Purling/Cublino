@@ -15,11 +15,12 @@ public class ContraCublino extends Game {
 
     @Override
     protected void applyStep(Die die, String endPosition) {
-            }
+    }
 
     @Override
     public boolean isDiceAmountCorrect(Boards board){
-        return (board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() <= 2 * Boards.BOARD_DIMENSION);
+        return (board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() <= 2 * Boards.BOARD_DIMENSION
+        && board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() >= 2);
     }
 
     @Override

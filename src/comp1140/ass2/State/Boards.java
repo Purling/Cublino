@@ -1,11 +1,12 @@
 package comp1140.ass2.State;
 
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static comp1140.ass2.State.Die.dieToEnc;
 
-public class Boards {
+public class Boards implements Serializable{
     private Players whitePlayer = new Players(true);
     private Players blackPlayer = new Players(false);
     public static final int BOARD_DIMENSION = 7;
@@ -50,24 +51,26 @@ public class Boards {
         assert encodedState.length() % 3 == 1;
         for (int i = 1; i < encodedState.length(); i += 3) {
             Die d = new Die(encodedState.substring(i, i+3), whitePlayer, blackPlayer);
-            if (d.isWhite() == whitePlayer.isWhite) whitePlayer.myDice.add(d);
-            else blackPlayer.myDice.add(d);
+            if (d.isWhite() == whitePlayer.isWhite) whitePlayer.addToDice(d);
+            else blackPlayer.addToDice(d);
             board[d.getY()][d.getX()] = d;
         }
     }
 
-    public Boards(Players whitePlayer, Players blackPlayer) {
-        this.whitePlayer = whitePlayer;
-        this.blackPlayer = blackPlayer;
+    public Boards deepClone() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
 
-        for(Die die : whitePlayer.getDice()) {
-            setAt(die.getPosition(), die);
-        }
-
-        for(Die die : blackPlayer.getDice()) {
-            setAt(die.getPosition(), die);
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (Boards) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            return null;
         }
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -149,6 +152,26 @@ public class Boards {
         return getManhattanDistance(startPosition, endPosition) == 1;
     }
 
+    public Die[] getAdjacentDie(Die die) {
+        ArrayList<Die> allDice = new ArrayList<>();
+        ArrayList<Die> adjacentDice = new ArrayList<>();
+        for(int x = 0; x < 7; x++) {
+            for (int y = 0; y < 7; y++) {
+                Die d;
+                if (this.getAt(x, y) != null) {
+                    d = this.getAt(x, y);
+                    allDice.add(d);
+                }
+            }
+        }
+        for(Die di : allDice){
+            if(die.isAdjacent(di)){
+                adjacentDice.add(di);
+            }
+        }
+        return (Die[]) adjacentDice.toArray();
+    }
+
     /**
      * Returns whether two positions are horizontal or vertical to each other
      * @param position1 Position on board
@@ -204,10 +227,10 @@ public class Boards {
         for (String dieStr : diceList) {
             Die die = new Die(dieStr, whitePlayer, blackPlayer);
             if (die.isWhite()){
-               whitePlayer.myDice.add(die);
+               whitePlayer.addToDice(die);
             }
             else{
-                blackPlayer.myDice.add(die);
+                blackPlayer.addToDice(die);
             }
         }
     }
@@ -233,12 +256,30 @@ public class Boards {
                 }
             }
         }
+        Arrays.sort(b, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                int a = o1.charAt(2) - o2.charAt(2);
+                if(a != 0){
+                    return a;
+                }
+                int b = o1.charAt(1) - o2.charAt(1);
+                if(b != 0){
+                    return b;
+                }
+                int c = o1.charAt(0) - o2.charAt(0);
+                return c;
+            }
+        });
+
         StringBuffer str = new StringBuffer();
         for(String r : b) {
             str.append(r);
         }
+
         return str.toString();
     }
+
 
     @Override
     public String toString() {

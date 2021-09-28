@@ -6,7 +6,9 @@ import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
 
+import static comp1140.ass2.GameLogic.PurCublino.getWinner;
 import static comp1140.ass2.State.Boards.boardToString;
+import static comp1140.ass2.State.Boards.getManhattanDistance;
 
 public class Cublino {
 
@@ -156,33 +158,7 @@ public class Cublino {
      */
     public static int isGameOverPur(String state) {
         if (state.charAt(0) != 'p' && state.charAt(0)!= 'P') return 0;
-        else {
-            int p1 = 0;
-            int p2 = 0;
-            int p1s = 0;
-            int p2s = 0;
-            int i = 0;
-            while (i < 14){
-                String s = state.substring(3*i+1, 3*i+4);
-                if (s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && s.charAt(2) == '7'){
-                    p1++;
-                    p1s += (s.charAt(0) - 'A')/4 + 1;
-                    i++;
-                }
-                else if (s.charAt(0) >= 'a' && s.charAt(0) <= 'z' && s.charAt(2) == '1'){
-                    p2++;
-                    p2s += (s.charAt(0) - 'a')/4 + 1;
-                    i++;
-                }
-                else i++;
-            }
-                if (p1 == 7 || p2 == 7) {
-                    if (p1s == p2s) return 3;
-                    else if (p1s < p2s) return 2;
-                    else return 1;
-                }
-                else return 0;
-        }
+        else {return getWinner(state);}
     }
 
     /**
@@ -274,6 +250,7 @@ public class Cublino {
             Boards board = new Boards(state);
             PurCublino pur = new PurCublino(Character.isUpperCase(state.charAt(0)), board);
             Boards.Positions[] stepPositions = Boards.moveToPositions(move);
+            Die d = board.getAt(stepPositions[0].toString());
             char p;
             if(state.charAt(0) == 'p') p = 'P';
             else p = 'p';
@@ -282,7 +259,8 @@ public class Cublino {
                 Die die = board.getAt(stepPositions[i - 1].toString());
                 pur.applyStep(die, stepPositions[i].toString());
             }
-            return p+boardToString(board);}// FIXME Task 9 (P)
+
+            return p+ boardToString(board);}
     }
 
     /**
@@ -316,7 +294,20 @@ public class Cublino {
      * @return 1 if player one has won, 2 if player two has won, otherwise 0.
      */
     public static int isGameOverContra(String state) {
-        return -1; // FIXME Task 14a (HD)
+        int numOfDice = (state.length() - 1) /3;
+        int i = 0;
+
+        while (i < numOfDice){
+            String s = state.substring(3*i+1, 3*i+4);
+            if (s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && s.charAt(2) == '7'){
+                return 1;
+            }
+            else if (s.charAt(0) >= 'a' && s.charAt(0) <= 'z' && s.charAt(2) == '1'){
+                return 2;
+            }
+            else i++;
+        }
+        return 0;
     }
 
     /**
