@@ -44,6 +44,9 @@ public class Viewer extends Application {
 
     private static final String URI_BASE = "assets/";
 
+    // When the mouse is moved less than this amount, the die will be left in place
+    private static final double MOUSE_NULLSPOT = 40;
+
     private final Group root = new Group();
     private final Group controls = new Group();
     private TextField textField;
@@ -52,16 +55,7 @@ public class Viewer extends Application {
 
     double mouseX = 0;
 
-    double mouseDownX = 0;
-    double mouseDownY = 0;
-
-    double mouseCurrentX = 0;
-    double mouseCurrentY = 0;
-
     public DieModel selectedDie = null;
-
-    int selectedDieTileX;
-    int selectedDieTileY;
 
     BoardTile[][] boardTiles;
 
@@ -250,6 +244,11 @@ public class Viewer extends Application {
         Viewer viewer;
         DieModel me;
 
+        double mouseDownX;
+        double mouseDownY;
+        double mouseCurrentX;
+        double mouseCurrentY;
+
         /**
          * Constructs and transforms a die mesh to provide an
          * accurate visual model of any die.
@@ -278,25 +277,27 @@ public class Viewer extends Application {
 
             this.setOnMousePressed(event -> {
                 viewer.selectedDie = this;
-                viewer.mouseDownX = event.getScreenX();
-                viewer.mouseDownY = event.getScreenY();
-                viewer.mouseCurrentX = viewer.mouseDownX;
-                viewer.mouseCurrentY = viewer.mouseDownY;
-                viewer.selectedDieTileX = die.getX();
-                viewer.selectedDieTileY = die.getY();
+                mouseDownX = event.getScreenX();
+                mouseDownY = event.getScreenY();
+                mouseCurrentX = mouseDownX;
+                mouseCurrentY = mouseDownY;
                 viewer.selectedDie = this;
                 viewer.selectTile(die.getX(), die.getY());
             });
 
             this.setOnMouseDragged(event -> {
-                viewer.mouseCurrentX = event.getScreenX();
-                viewer.mouseCurrentY = event.getScreenY();
-                double direction = Math.atan2(viewer.mouseCurrentY - viewer.mouseDownY, viewer.mouseCurrentX - viewer.mouseDownX);
-                direction *= 180/Math.PI;
-                direction -= viewer.getBoardRotation();
-                int approxDirection = (((int) Math.round(direction/90)) + 8)%4;
+                mouseCurrentX = event.getScreenX();
+                mouseCurrentY = event.getScreenY();
+
                 viewer.deselectEverything();
                 viewer.selectTile(die.getX(), die.getY());
+
+                if (magnitude(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX) < MOUSE_NULLSPOT) return;
+
+                double direction = Math.atan2(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX)*180/Math.PI;
+                direction -= viewer.getBoardRotation();
+                int approxDirection = (((int) Math.round(direction/90)) + 8)%4;
+
                 switch(approxDirection) {
                     case 0: viewer.selectTile(die.getX()+1, die.getY()); return;
                     case 1: viewer.selectTile(die.getX(), die.getY()-1); return;
@@ -400,6 +401,10 @@ public class Viewer extends Application {
                 case 6: return pitchTransform( 90);
                 default: return new Rotate(); // 5 is the default top face
             }
+        }
+
+        public double magnitude(double x, double y) {
+            return Math.sqrt(x*x+y*y);
         }
     }
 
