@@ -65,6 +65,8 @@ public class Viewer extends Application {
 
     BoardTile[][] boardTiles;
 
+    Group boardGroup;
+
     /**
      * Draw a placement in the window, removing any previously drawn one
      *
@@ -75,7 +77,7 @@ public class Viewer extends Application {
         createMaterials();
 
         Group subRoot = new Group();
-        Group boardGroup = new Group();
+        boardGroup = new Group();
 
         root.getChildren().remove(boardSubscene);
 
@@ -129,6 +131,12 @@ public class Viewer extends Application {
         root.getChildren().add(boardSubscene);
 
         ArrayList<DieModel> diceModels = new ArrayList<>();
+    }
+
+    public double getBoardRotation() {
+        double result = boardGroup.getRotate();
+        while (result < 0) result += 360;
+        return result % 360;
     }
 
     /**
@@ -220,15 +228,20 @@ public class Viewer extends Application {
                 7,9, 3,13,2,12);    // HDC 2
     }
 
-    public void dieSelected(int x, int y) {
-        selectedDieTileX = x;
-        selectedDieTileY = y;
-        boardTiles[x][y].setSelected();
+    public void selectTile(int x, int y) {
+        try {
+            boardTiles[x][y].setSelected();
+        } catch (Exception e) {
+            return;
+        }
     }
 
-    public void dieUnselected() {
-        boardTiles[selectedDieTileX][selectedDieTileY].setUnselected();
-        selectedDie = null;
+    public void deselectEverything() {
+        for (int x = 0; x < 7; x++) {
+            for (int y = 0; y < 7; y++) {
+                boardTiles[y][x].setUnselected();
+            }
+        }
     }
 
     public static class DieModel extends MeshView {
@@ -269,7 +282,10 @@ public class Viewer extends Application {
                 viewer.mouseDownY = event.getScreenY();
                 viewer.mouseCurrentX = viewer.mouseDownX;
                 viewer.mouseCurrentY = viewer.mouseDownY;
-                viewer.dieSelected(die.getX(), die.getY());
+                viewer.selectedDieTileX = die.getX();
+                viewer.selectedDieTileY = die.getY();
+                viewer.selectedDie = this;
+                viewer.selectTile(die.getX(), die.getY());
             });
 
             this.setOnMouseDragged(event -> {
@@ -277,12 +293,22 @@ public class Viewer extends Application {
                 viewer.mouseCurrentY = event.getScreenY();
                 double direction = Math.atan2(viewer.mouseCurrentY - viewer.mouseDownY, viewer.mouseCurrentX - viewer.mouseDownX);
                 direction *= 180/Math.PI;
-                int approxDirection = (((int) Math.round(direction/90)) + 4)%4;
-                System.out.println(approxDirection);
+                direction -= viewer.getBoardRotation();
+                int approxDirection = (((int) Math.round(direction/90)) + 8)%4;
+                viewer.deselectEverything();
+                viewer.selectTile(die.getX(), die.getY());
+                switch(approxDirection) {
+                    case 0: viewer.selectTile(die.getX()+1, die.getY()); return;
+                    case 1: viewer.selectTile(die.getX(), die.getY()-1); return;
+                    case 2: viewer.selectTile(die.getX()-1, die.getY()); return;
+                    case 3: viewer.selectTile(die.getX(), die.getY()+1); return;
+                    default: return;
+                }
             });
 
             this.setOnMouseReleased(event -> {
-                viewer.dieUnselected();
+                viewer.deselectEverything();
+                viewer.selectedDie = null;
             });
 
             AnimationTimer animation = new AnimationTimer() {
