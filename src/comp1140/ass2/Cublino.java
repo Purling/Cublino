@@ -250,6 +250,7 @@ public class Cublino {
             Boards board = new Boards(state);
             PurCublino pur = new PurCublino(Character.isUpperCase(state.charAt(0)), board);
             Boards.Positions[] stepPositions = Boards.moveToPositions(move);
+            Die d = board.getAt(stepPositions[0].toString());
             char p;
             if(state.charAt(0) == 'p') p = 'P';
             else p = 'p';
@@ -258,7 +259,8 @@ public class Cublino {
                 Die die = board.getAt(stepPositions[i - 1].toString());
                 pur.applyStep(die, stepPositions[i].toString());
             }
-            return p+boardToString(board);}// FIXME Task 9 (P)
+
+            return p+ boardToString(board);}
     }
 
     /**

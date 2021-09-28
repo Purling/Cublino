@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import static comp1140.ass2.State.Die.dieToEnc;
 
-public class Boards implements Serializable {
+public class Boards implements Serializable{
     private Players whitePlayer = new Players(true);
     private Players blackPlayer = new Players(false);
     public static final int BOARD_DIMENSION = 7;
@@ -70,6 +70,7 @@ public class Boards implements Serializable {
             return null;
         }
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -149,6 +150,26 @@ public class Boards implements Serializable {
 
     public boolean isAdjacent(String startPosition, String endPosition) {
         return getManhattanDistance(startPosition, endPosition) == 1;
+    }
+
+    public Die[] getAdjacentDie(Die die) {
+        ArrayList<Die> allDice = new ArrayList<>();
+        ArrayList<Die> adjacentDice = new ArrayList<>();
+        for(int x = 0; x < 7; x++) {
+            for (int y = 0; y < 7; y++) {
+                Die d;
+                if (this.getAt(x, y) != null) {
+                    d = this.getAt(x, y);
+                    allDice.add(d);
+                }
+            }
+        }
+        for(Die di : allDice){
+            if(die.isAdjacent(di)){
+                adjacentDice.add(di);
+            }
+        }
+        return (Die[]) adjacentDice.toArray();
     }
 
     /**
@@ -235,12 +256,30 @@ public class Boards implements Serializable {
                 }
             }
         }
+        Arrays.sort(b, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                int a = o1.charAt(2) - o2.charAt(2);
+                if(a != 0){
+                    return a;
+                }
+                int b = o1.charAt(1) - o2.charAt(1);
+                if(b != 0){
+                    return b;
+                }
+                int c = o1.charAt(0) - o2.charAt(0);
+                return c;
+            }
+        });
+
         StringBuffer str = new StringBuffer();
         for(String r : b) {
             str.append(r);
         }
+
         return str.toString();
     }
+
 
     @Override
     public String toString() {

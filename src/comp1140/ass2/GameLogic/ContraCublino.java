@@ -15,7 +15,7 @@ public class ContraCublino extends Game {
 
     @Override
     protected void applyStep(Die die, String endPosition) {
-            }
+    }
 
     @Override
     public boolean isDiceAmountCorrect(Boards board){
