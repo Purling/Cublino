@@ -249,6 +249,8 @@ public class Viewer extends Application {
         double mouseCurrentX;
         double mouseCurrentY;
 
+        int indicatorDirection;
+
         /**
          * Constructs and transforms a die mesh to provide an
          * accurate visual model of any die.
@@ -292,13 +294,13 @@ public class Viewer extends Application {
                 viewer.deselectEverything();
                 viewer.selectTile(die.getX(), die.getY());
 
-                if (magnitude(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX) < MOUSE_NULLSPOT) return;
+                if (inNullSpot()) return;
 
                 double direction = Math.atan2(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX)*180/Math.PI;
                 direction -= viewer.getBoardRotation();
-                int approxDirection = (((int) Math.round(direction/90)) + 8)%4;
+                indicatorDirection = (((int) Math.round(direction/90)) + 8)%4;
 
-                switch(approxDirection) {
+                switch(indicatorDirection) {
                     case 0: viewer.selectTile(die.getX()+1, die.getY()); return;
                     case 1: viewer.selectTile(die.getX(), die.getY()-1); return;
                     case 2: viewer.selectTile(die.getX()-1, die.getY()); return;
@@ -308,6 +310,10 @@ public class Viewer extends Application {
             });
 
             this.setOnMouseReleased(event -> {
+                if (!inNullSpot()) {
+                    //System.out.println(indicatorDirection);
+                }
+
                 viewer.deselectEverything();
                 viewer.selectedDie = null;
             });
@@ -405,6 +411,10 @@ public class Viewer extends Application {
 
         public double magnitude(double x, double y) {
             return Math.sqrt(x*x+y*y);
+        }
+
+        boolean inNullSpot() {
+            return magnitude(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX) < MOUSE_NULLSPOT;
         }
     }
 
