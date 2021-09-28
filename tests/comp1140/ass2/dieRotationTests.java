@@ -33,7 +33,7 @@ class dieRotationTests {
                     // Construct the die and its model
                     String placementString = "" + o + x + y;
                     Die d = new Die(placementString, null, null);
-                    t = new Viewer.DieModel(d).necessaryRotations();
+                    t = new Viewer.DieModel(d, null).necessaryRotations();
 
                     // Make sure every face on the model is positioned where the die class suggests it should be
                     makeRotationAssertion(d.getTop(), up, "top");

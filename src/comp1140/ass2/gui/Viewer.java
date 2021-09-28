@@ -2,6 +2,7 @@ package comp1140.ass2.gui;
 
 import comp1140.ass2.State.Die;
 import comp1140.ass2.State.Direction;
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
@@ -22,6 +23,7 @@ import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import comp1140.ass2.State.Boards;
 
@@ -49,6 +51,8 @@ public class Viewer extends Application {
     private SubScene boardSubscene = new SubScene(new Group(), VIEWER_WIDTH, VIEWER_HEIGHT);
 
     double mouseX = 0;
+
+    public DieModel selectedDie = null;
 
     /**
      * Draw a placement in the window, removing any previously drawn one
@@ -80,7 +84,7 @@ public class Viewer extends Application {
 
                 // If the game state contains a die at the current position, construct it as well
                 Die die = boards.getAt(x, y);
-                if (die != null) boardGroup.getChildren().add(new DieModel(die));
+                if (die != null) boardGroup.getChildren().add(new DieModel(die, this));
             }
         }
 
@@ -90,7 +94,7 @@ public class Viewer extends Application {
             mouseX = e.getSceneX();
         });
         boardGroup.setOnMouseDragged(e -> {
-            boardGroup.setRotate(boardGroup.getRotate() + (mouseX - e.getSceneX())/10);
+            if (selectedDie == null) boardGroup.setRotate(boardGroup.getRotate() + (mouseX - e.getSceneX())/10);
             mouseX = e.getSceneX();
         });
 
@@ -109,6 +113,8 @@ public class Viewer extends Application {
 
         subRoot.getChildren().add(boardGroup);
         root.getChildren().add(boardSubscene);
+
+        ArrayList<DieModel> diceModels = new ArrayList<>();
     }
 
     /**
@@ -203,6 +209,8 @@ public class Viewer extends Application {
     public static class DieModel extends MeshView {
 
         Die die;
+        Viewer viewer;
+        DieModel me;
 
         /**
          * Constructs and transforms a die mesh to provide an
@@ -210,9 +218,12 @@ public class Viewer extends Application {
          *
          * @param die the die to show
          */
-        public DieModel(Die die) {
+        public DieModel(Die die, Viewer viewer) {
             super(dieMesh);
             this.die = die;
+            this.viewer = viewer;
+
+            this.me = this;
 
             // Apply the die texture to the mesh
             setMaterial(die.isWhite() ? whiteMaterial : blackMaterial);
@@ -226,6 +237,30 @@ public class Viewer extends Application {
             setScaleZ(dieScale);
             setTranslateX(125 * (die.getX()-3));
             setTranslateZ(125 * (die.getY()-3));
+
+            this.setOnMousePressed(event -> {
+                //this.setTranslateY(-50);
+                viewer.selectedDie = this;
+            });
+
+            this.setOnMouseReleased(event -> {
+                //this.setTranslateY(0);
+                viewer.selectedDie = null;
+            });
+
+            AnimationTimer animation = new AnimationTimer() {
+                @Override
+                public void handle(long l) {
+                    System.out.println(0);
+                    setTranslateY(lerp(getTranslateY(), viewer.selectedDie == me ? -50 : 0, 0.2));
+                }
+            };
+
+            animation.start();
+        }
+
+        double lerp(double start, double end, double amount) {
+            return start + (end-start)*amount;
         }
 
         /**
