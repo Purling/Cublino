@@ -38,10 +38,10 @@ collaboration:
 #
 # Add as many "url+licence+comment" entries as necessary
 # (or remove it altogether if you haven't used any external code)
-code:
-  - comment:
-    url:
-    licence:
+code: 
+  - comment: Used to deep copy objects
+    url: https://stackoverflow.com/a/7596565
+    licence: CC BY-SA 3.0
 
 # Use this to list any assets (artwork, sound, etc) that you used.
 # Provide a comment explaining your use of that asset and the URL
@@ -58,8 +58,8 @@ assets:
 # Sign *your* name and uids here. (Remove entries if you have fewer
 # than three members.)
 signatures:
-  - name:
-    uid:
+  - name: Ziling Ouyang
+    uid: u7312578
   - name:
     uid:
   - name:
