@@ -42,6 +42,10 @@ code:
   - comment: Used to deep copy objects
     url: https://stackoverflow.com/a/7596565
     licence: CC BY-SA 3.0
+  - comment: Used to sort the array
+    url: https://stackoverflow.com/revisions/369867/5
+    licence: CC BY-SA 3.0
+
 
 # Use this to list any assets (artwork, sound, etc) that you used.
 # Provide a comment explaining your use of that asset and the URL
@@ -60,7 +64,7 @@ assets:
 signatures:
   - name: Ziling Ouyang
     uid: u7312578
-  - name:
-    uid:
+  - name: Yuechen Liu
+    uid: u7227895
   - name:
     uid:
