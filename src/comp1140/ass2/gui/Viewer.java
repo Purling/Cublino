@@ -33,6 +33,8 @@ import javafx.scene.*;
  * NOTE: This class is separate from your main game class.  This
  * class does not play a game, it just illustrates various piece
  * placements.
+ *
+ * @author Zane Gates
  */
 public class Viewer extends Application {
 
