@@ -3,6 +3,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Ziling Ouyang, Zane Gates
+ */
 public class Players implements Serializable{
     /**
      * Store the information of the player's dices

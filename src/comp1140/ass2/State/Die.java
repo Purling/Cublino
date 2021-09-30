@@ -7,6 +7,9 @@ import java.util.Comparator;
 import static comp1140.ass2.State.Direction.*;
 import static comp1140.ass2.State.Direction.DOWN;
 
+/**
+ * @author Whole group
+ */
 public class Die implements Serializable{
     /** x and y represents the coordinate of the dice on a board */
     private int x;
@@ -15,7 +18,7 @@ public class Die implements Serializable{
     * values will vary when the position/ orientation of the dice changes
      */
     private int top;
-    private int down; // Shouldn't this be called bottom?
+    private int down;
     private int front;
     private int back;
     private int left;

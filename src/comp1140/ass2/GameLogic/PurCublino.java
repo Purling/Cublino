@@ -5,10 +5,10 @@ import comp1140.ass2.State.Die;
 
 import java.util.List;
 
-import static comp1140.ass2.Cublino.isValidMovePur;
-
-/** A type of cublino
- /* extends from Game class*/
+/** A gamemode of Cublino that extends from the Game class
+ *
+ * @author Ziling Ouyang, Yuechen Liu
+ */
 
 public class PurCublino extends Game {
 
@@ -80,26 +80,6 @@ public class PurCublino extends Game {
             initial.setPosition(endPosition);
             board.setAt(endPosition, initial);
             board.setAt(start,null);
-        }
-    }
-
-    public static Boolean checkPurStepValid(String state, String step) {
-
-        int jumpDistance = 2;
-        PurCublino purCublino = new PurCublino(Character.isUpperCase(state.charAt(0)), new Boards(state));
-        Boards board = purCublino.getBoard();
-        Boards.Positions[] positions = Boards.moveToPositions(step);
-        String start = positions[0].toString();
-        String end = positions[positions.length - 1].toString();
-
-        if(board.getAtPosition(end) != null) return false;
-
-        if (board.isAdjacent(start, end)) {
-            return !purCublino.isMoveBackwards(start,end);
-        } else if (Boards.getManhattanDistance(start,end) == jumpDistance) {
-            return purCublino.isJumpValid(start, end);
-        } else {
-            return false;
         }
     }
 

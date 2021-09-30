@@ -12,6 +12,8 @@ import java.util.List;
 /**
  * The player will be allowed to decide which version of cublino he or she wants to play.
  * Option includes PurCublino and ContraCublino
+ *
+ * @author Ziling Ouyang
  */
 
 public abstract class Game{

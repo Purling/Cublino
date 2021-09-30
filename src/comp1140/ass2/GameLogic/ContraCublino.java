@@ -5,9 +5,10 @@ import comp1140.ass2.State.Die;
 
 import java.util.List;
 
-/** A type of cublino
- /* extends from Game class*/
-
+/** A gamemode of Cublino extends from Game class
+ *
+ * @author Ziling Ouyang, Yuechen Liu
+ */
 public class ContraCublino extends Game {
 
     public ContraCublino(){

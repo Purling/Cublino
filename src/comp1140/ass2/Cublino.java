@@ -8,8 +8,10 @@ import comp1140.ass2.State.Die;
 
 import static comp1140.ass2.GameLogic.PurCublino.getWinner;
 import static comp1140.ass2.State.Boards.boardToString;
-import static comp1140.ass2.State.Boards.getManhattanDistance;
 
+/**
+ * @author Ziling Ouyang, Yuechen Liu
+ */
 public class Cublino {
 
     // Dice orientation
@@ -183,7 +185,23 @@ public class Cublino {
      * @return true if the step is valid for the given state, otherwise false
      */
     public static Boolean isValidStepPur(String state, String step) {
-        return PurCublino.checkPurStepValid(state, step);
+
+        int jumpDistance = 2;
+        PurCublino purCublino = new PurCublino(Character.isUpperCase(state.charAt(0)), new Boards(state));
+        Boards board = purCublino.getBoard();
+        Boards.Positions[] positions = Boards.moveToPositions(step);
+        String start = positions[0].toString();
+        String end = positions[positions.length - 1].toString();
+
+        if(board.getAtPosition(end) != null) return false;
+
+        if (board.isAdjacent(start, end)) {
+            return !purCublino.isMoveBackwards(start,end);
+        } else if (Boards.getManhattanDistance(start,end) == jumpDistance) {
+            return purCublino.isJumpValid(start, end);
+        } else {
+            return false;
+        }
     }
 
     /**

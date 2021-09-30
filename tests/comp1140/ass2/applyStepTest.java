@@ -13,6 +13,10 @@ import static comp1140.ass2.GameLogic.Game.MoveType.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @author Ziling Ouyang
+ */
+
 @Timeout(value = 1000, unit = MILLISECONDS)
 public class applyStepTest {
 
@@ -32,8 +36,8 @@ public class applyStepTest {
             Boards endBoard = new Boards(ExampleGames.FULL_PUR_GAME[i + 1][encodedState]);
 
             for (int j = 1; j < positions.length; j++) {
-                Die die1 = board.getAt(positions[j - 1].toString());
-                pur.applyStep(die1, positions[j].toString());
+                Die die = board.getAt(positions[j - 1].toString());
+                pur.applyStep(die, positions[j].toString());
             }
 
             assertEquals(endBoard, board, "State \"" + state + "\" with move \"" + Arrays.toString(positions) + "\"");
@@ -52,8 +56,8 @@ public class applyStepTest {
             Boards board = pur.getBoard();
 
             for (int j = 1; j < positions.length; j++) {
-                Die die1 = board.getAt(positions[j - 1].toString());
-                pur.applyStep(die1, positions[j].toString());
+                Die die = board.getAt(positions[j - 1].toString());
+                pur.applyStep(die, positions[j].toString());
             }
 
             assertEquals(positions.length, pur.getStepHistory().size(), "State \"" + state + "\" with move \"" + Arrays.toString(positions) + "\"");
@@ -72,8 +76,8 @@ public class applyStepTest {
             Boards board = pur.getBoard();
 
             for (int j = 1; j < positions.length; j++) {
-                Die die1 = board.getAt(positions[j - 1].toString());
-                pur.applyStep(die1, positions[j].toString());
+                Die die = board.getAt(positions[j - 1].toString());
+                pur.applyStep(die, positions[j].toString());
             }
 
             assertEquals(ORIGIN, pur.getStepHistory().get(0).getType(), "State \"" + state + "\" with move \"" + Arrays.toString(positions) + "\"");
@@ -99,8 +103,8 @@ public class applyStepTest {
             Boards board = pur.getBoard();
 
             for (int j = 1; j < positions.length; j++) {
-                Die die1 = board.getAt(positions[j - 1].toString());
-                pur.applyStep(die1, positions[j].toString());
+                Die die = board.getAt(positions[j - 1].toString());
+                pur.applyStep(die, positions[j].toString());
             }
 
             assertTrue(pur.getStepHistory().stream().anyMatch((x) -> x.getType() == Game.MoveType.INVALID), "State \"" + state + "\" with move \"" + Arrays.toString(positions) + "\"");
@@ -119,8 +123,8 @@ public class applyStepTest {
             Boards board = pur.getBoard();
 
             for (int j = 1; j < positions.length; j++) {
-                Die die1 = board.getAt(positions[j - 1].toString());
-                pur.applyStep(die1, positions[j].toString());
+                Die die = board.getAt(positions[j - 1].toString());
+                pur.applyStep(die, positions[j].toString());
             }
 
             assertEquals(ORIGIN, pur.getStepHistory().get(0).getType(), "State \"" + state + "\" with move \"" + Arrays.toString(positions) + "\"");

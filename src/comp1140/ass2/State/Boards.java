@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 
 import static comp1140.ass2.State.Die.dieToEnc;
 
+/**
+ * @author Whole group
+ */
 public class Boards implements Serializable{
     private Players whitePlayer = new Players(true);
     private Players blackPlayer = new Players(false);
