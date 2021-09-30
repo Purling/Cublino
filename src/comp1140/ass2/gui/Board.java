@@ -1,27 +1,451 @@
 package comp1140.ass2.gui;
 
-import comp1140.ass2.State.Boards;
-
 import comp1140.ass2.State.Die;
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Point3D;
-import javafx.scene.*;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Box;
+import javafx.scene.shape.MeshView;
+import javafx.scene.shape.TriangleMesh;
+import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.ArrayList;
 
+import comp1140.ass2.State.Boards;
+
+import javafx.scene.*;
+
+/**
+ * A very simple board for piece placements in the Cublino game.
+ * <p>
+ * NOTE: This class is separate from your main game class.  This
+ * class does not play a game, it just illustrates various piece
+ * placements.
+ *
+ * @author Zane Gates
+ */
 public class Board extends Application {
-    private static final int BOARD_WIDTH = 933;
-    private static final int BOARD_HEIGHT = 700;
+
+    /* board layout */
+    private static final int board_WIDTH = 933;
+    private static final int board_HEIGHT = 700;
+
+    private static final String URI_BASE = "assets/";
+
+    // When the mouse is moved less than this amount, the die will be left in place
+    private static final double MOUSE_NULLSPOT = 40;
 
     private final Group root = new Group();
+    private final Group controls = new Group();
+    private TextField textField;
 
-    //  FIXME Task 9 (CR): Implement a basic playable Cublino game in JavaFX that only allows valid moves to be played
+    private SubScene boardSubscene = new SubScene(new Group(), board_WIDTH, board_HEIGHT);
 
-    @Override
-    public void start(Stage stage) {
+    double mouseX = 0;
 
+    public DieModel selectedDie = null;
+
+    BoardTile[][] boardTiles;
+
+    Group boardGroup;
+
+    /**
+     * Draw a placement in the window, removing any previously drawn one
+     *
+     * @param placement A valid placement string
+     */
+    void makePlacement(String placement) {
+        createDieMesh();
+        createMaterials();
+
+        Group subRoot = new Group();
+        boardGroup = new Group();
+
+        root.getChildren().remove(boardSubscene);
+
+        // Generic JavaFX window setup
+        boardSubscene = new SubScene(subRoot, board_WIDTH, board_HEIGHT, true, SceneAntialiasing.BALANCED);
+
+        boardTiles = new BoardTile[7][7];
+
+        Boards boards;
+        try {
+            boards = new Boards(placement);
+        } catch (Exception e) {return;} // If the user inputs an invalid board state, do not update the display
+
+        // Iterate over every tile in the board
+        for (int y = 0; y < 7; y++) {
+            for (int x = 0; x < 7; x++) {
+                // Construct the checkerboard tile
+                boardTiles[x][y] = new BoardTile(x, y);
+                boardGroup.getChildren().add(boardTiles[x][y]);
+
+                // If the game state contains a die at the current position, construct it as well
+                Die die = boards.getAt(x, y);
+                if (die != null) boardGroup.getChildren().add(new DieModel(die, this));
+            }
+        }
+
+        // ALlow the board group to be rotated as the mouse is dragged
+        boardGroup.setRotationAxis(new Point3D(0, 1, 0));
+        boardGroup.setOnMousePressed(e -> {
+            mouseX = e.getSceneX();
+        });
+        boardGroup.setOnMouseDragged(e -> {
+            if (selectedDie == null) boardGroup.setRotate(boardGroup.getRotate() + (mouseX - e.getSceneX())/10);
+            mouseX = e.getSceneX();
+        });
+
+        // Establish, position and rotate camera
+        PerspectiveCamera camera = new PerspectiveCamera();
+        camera.setRotationAxis(new Point3D(1, 0, 0));
+        camera.setTranslateY(100-board_HEIGHT*3/4);
+        camera.setTranslateZ(-250);
+        camera.setTranslateX(-board_WIDTH/2);
+        camera.setRotate(-30);
+        boardSubscene.setCamera(camera);
+
+        // Establish soft white lighting to remove shading and shadows
+        AmbientLight light = new AmbientLight(Color.WHITE);
+        boardGroup.getChildren().add(light);
+
+        subRoot.getChildren().add(boardGroup);
+        root.getChildren().add(boardSubscene);
+
+        ArrayList<DieModel> diceModels = new ArrayList<>();
     }
 
+    public double getBoardRotation() {
+        double result = boardGroup.getRotate();
+        while (result < 0) result += 360;
+        return result % 360;
+    }
 
+    /**
+     * Create a basic text field for input and a refresh button.
+     */
+    private void makeControls() {
+        makePlacement("PWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7");
+
+        Label instructions = new Label("Drag the mouse horizontally to rotate view");
+        instructions.setLayoutX(10);
+        instructions.setLayoutY(10);
+        controls.getChildren().add(instructions);
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        primaryStage.setTitle("Cublino board");
+        Scene scene = new Scene(root, board_WIDTH, board_HEIGHT);
+        root.getChildren().add(controls);
+
+        makeControls();
+
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public final static TriangleMesh dieMesh = new TriangleMesh();
+    final static double dieScale = 40;
+
+    /*      y   Vertices          UV Map
+          G-^-----H                 I---J
+       z  |\|     |\                | 5 |
+        ^ | C-------D           K---L---M---N---O
+         \| |     | |           | 6 | 3 | 1 | 4 |
+          E-|-----F |           P---Q---R---S---T
+           \|      \|               | 2 |
+            A-------B-->x           U---V                   */
+
+    public static void createDieMesh() {
+        dieMesh.getPoints().addAll(
+                -1,-1,-1, // A 0
+                1,-1,-1,         // B 1
+                -1, 1,-1,        // C 2
+                1, 1,-1,         // D 3
+                -1, -1, 1,       // E 4
+                1,-1, 1,         // F 5
+                -1, 1, 1,        // G 6
+                1, 1, 1);        // H 7
+        dieMesh.getTexCoords().addAll(
+                0.25f, 0, // I 0
+                0.5f, 0,         // J 1
+                0, 0.25f,        // K 2
+                0.25f, 0.25f,    // L 3
+                0.5f, 0.25f,     // M 4
+                0.75f, 0.25f,    // N 5
+                1, 0.25f,        // O 6
+                0, 0.5f,         // P 7
+                0.25f, 0.5f,     // Q 8
+                0.5f, 0.5f,      // R 9
+                0.75f, 0.5f,     // S 10
+                1, 0.5f,         // T 11
+                0.25f, 0.75f,    // U 12
+                0.5f, 0.75f);    // V 13
+        dieMesh.getFaces().addAll(
+                1,1, 4,3, 0,0, // BEA 5
+                1,1, 5,4, 4,3,      // BFE 5
+                4,3, 2,7, 0,2,      // ECA 6
+                4,3, 6,8, 2,7,      // EGC 6
+                5,4, 6,8, 4,3,      // FGE 3
+                5,4, 7,9, 6,8,      // FHG 3
+                1,5, 7,9, 5,4,      // BHF 1
+                1,5, 3,10,7,9,      // BDH 1
+                0,6, 3,10,1,5,      // ADB 4
+                0,6, 2,11,3,10,     // ACD 4
+                7,9, 2,12,6,8,      // HCG 2
+                7,9, 3,13,2,12);    // HDC 2
+    }
+
+    public void selectTile(int x, int y) {
+        try {
+            boardTiles[x][y].setSelected();
+        } catch (Exception e) {
+            return;
+        }
+    }
+
+    public void deselectEverything() {
+        for (int x = 0; x < 7; x++) {
+            for (int y = 0; y < 7; y++) {
+                boardTiles[y][x].setUnselected();
+            }
+        }
+    }
+
+    public static class DieModel extends MeshView {
+
+        Die die;
+        Board board;
+        DieModel me;
+
+        double mouseDownX;
+        double mouseDownY;
+        double mouseCurrentX;
+        double mouseCurrentY;
+
+        int indicatorDirection;
+
+        /**
+         * Constructs and transforms a die mesh to provide an
+         * accurate visual model of any die.
+         *
+         * @param die the die to show
+         */
+        public DieModel(Die die, Board board) {
+            super(dieMesh);
+            this.die = die;
+            this.board = board;
+
+            this.me = this;
+
+            // Apply the die texture to the mesh
+            setMaterial(die.isWhite() ? whiteMaterial : blackMaterial);
+
+            // Rotate the mesh to show the correct numbers
+            getTransforms().add(necessaryRotations());
+
+            // Position and scale the mesh
+            setScaleX(dieScale);
+            setScaleY(dieScale);
+            setScaleZ(dieScale);
+            setTranslateX(125 * (die.getX()-3));
+            setTranslateZ(125 * (die.getY()-3));
+
+            this.setOnMousePressed(event -> {
+                board.selectedDie = this;
+                mouseDownX = event.getScreenX();
+                mouseDownY = event.getScreenY();
+                mouseCurrentX = mouseDownX;
+                mouseCurrentY = mouseDownY;
+                board.selectedDie = this;
+                board.selectTile(die.getX(), die.getY());
+            });
+
+            this.setOnMouseDragged(event -> {
+                mouseCurrentX = event.getScreenX();
+                mouseCurrentY = event.getScreenY();
+
+                board.deselectEverything();
+                board.selectTile(die.getX(), die.getY());
+
+                if (inNullSpot()) return;
+
+                double direction = Math.atan2(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX)*180/Math.PI;
+                direction -= board.getBoardRotation();
+                indicatorDirection = (((int) Math.round(direction/90)) + 8)%4;
+
+                switch(indicatorDirection) {
+                    case 0: board.selectTile(die.getX()+1, die.getY()); return;
+                    case 1: board.selectTile(die.getX(), die.getY()-1); return;
+                    case 2: board.selectTile(die.getX()-1, die.getY()); return;
+                    case 3: board.selectTile(die.getX(), die.getY()+1); return;
+                    default: return;
+                }
+            });
+
+            this.setOnMouseReleased(event -> {
+                if (!inNullSpot()) {
+                    //System.out.println(indicatorDirection);
+                }
+
+                board.deselectEverything();
+                board.selectedDie = null;
+            });
+
+            AnimationTimer animation = new AnimationTimer() {
+                @Override
+                public void handle(long l) {
+                    setTranslateY(lerp(getTranslateY(), board.selectedDie == me ? -50 : 0, 0.2));
+                }
+            };
+
+            animation.start();
+        }
+
+        double lerp(double start, double end, double amount) {
+            return start + (end-start)*amount;
+        }
+
+        /**
+         * Computes a rotation transform along the various axes
+         * @param degrees the side of the rotation, in degrees
+         * @returns the required rotation
+         */
+        Rotate spinTransform(double degrees) {
+            return new Rotate(degrees, new Point3D(0, 1, 0));
+        }
+
+        Rotate pitchTransform(double degrees) {
+            return new Rotate(degrees, new Point3D(0, 0, 1));
+        }
+
+        Rotate rollTransform(double degrees) {
+            return new Rotate(degrees, new Point3D(1, 0, 0));
+        }
+
+        /**
+         * Computes the necessary rotation that,
+         * when applied to the default die, orients
+         * it in alignment with the source die
+         *
+         * @returns the required rotation
+         */
+        public Transform necessaryRotations() {
+            // Convert from the number on the back face of the die back to the relative number. For example,
+            // if the top face shows a 5 and the back face shows a 4, this is the third possible back face
+            // since 2 is impossible as it must be on the bottom. Hence the relativeBackNumber would be 3.
+            int relativeBackNumber = die.getBack();
+            // Decrement the relative index for each number that it cannot be - namely the top and bottom faces
+            if (die.getBack() > die.getTop()) relativeBackNumber--;
+            if (die.getBack() > 7 - die.getTop()) relativeBackNumber--;
+
+            // When the top number is 2 or 6, the numbers are reversed, due to chirality
+            if (die.getTop() == 2 || die.getTop() == 6) relativeBackNumber = 5 - relativeBackNumber;
+
+            // When the top of the die is an even number, the front and back faces will be swapped
+            if (die.getTop() % 2 == 0) {
+                if (relativeBackNumber == 2) relativeBackNumber = 3;
+                else if (relativeBackNumber == 3) relativeBackNumber = 2;
+            }
+
+            // Apply the rotations one after another to correctly position both faces
+            // If the top and back faces are positioned correctly, the other four must be as well
+            return backRotation(relativeBackNumber).createConcatenation(topRotation(die.getTop()));
+        }
+
+        /**
+         * Computes the rotation to show a particular
+         * relative number on the back face of the mesh
+         * @returns the required rotation
+         */
+        Rotate backRotation(int relativeBackFace) {
+            switch(relativeBackFace) {
+                case 1: return spinTransform( 90);
+                case 2: return spinTransform(180);
+                case 4: return spinTransform(-90);
+                default: return new Rotate(); // 4 (which has a relative index of 3) is the default back face
+            }
+        }
+
+        /**
+         * Computes the rotation to show a particular
+         * absolute number on the top face of the mesh
+         * @returns the required rotation
+         */
+        Rotate topRotation(int topFace) {
+            switch(topFace) {
+                case 1: return pitchTransform(-90);
+                case 2: return pitchTransform(180);
+                case 3: return rollTransform(  90);
+                case 4: return rollTransform( -90);
+                case 6: return pitchTransform( 90);
+                default: return new Rotate(); // 5 is the default top face
+            }
+        }
+
+        public double magnitude(double x, double y) {
+            return Math.sqrt(x*x+y*y);
+        }
+
+        boolean inNullSpot() {
+            return magnitude(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX) < MOUSE_NULLSPOT;
+        }
+    }
+
+    final static PhongMaterial whiteMaterial = new PhongMaterial();
+    final static PhongMaterial blackMaterial = new PhongMaterial();
+    final static PhongMaterial whiteTileMaterial = new PhongMaterial();
+    final static PhongMaterial blackTileMaterial = new PhongMaterial();
+    final static PhongMaterial selectedTileMaterial = new PhongMaterial();
+
+    static void createMaterials() {
+        whiteMaterial.setDiffuseMap(makeTextureFromAsset("whitedie.png"));
+        blackMaterial.setDiffuseMap(makeTextureFromAsset("blackdie.png"));
+        whiteTileMaterial.setDiffuseMap(makeTextureFromAsset("whitetile.png"));
+        blackTileMaterial.setDiffuseMap(makeTextureFromAsset("blacktile.png"));
+        selectedTileMaterial.setDiffuseMap(makeTextureFromAsset("selectedtile.png"));
+    }
+
+    static Image makeTextureFromAsset(String path) {
+        return new Image(new File(URI_BASE + path).toURI().toString());
+    }
+
+    class BoardTile extends Box {
+        int x;
+        int y;
+
+        public BoardTile(int x, int y) {
+            super(125, 20, 125);
+            setTranslateX(125*(x-3));
+            setTranslateY(50);
+
+            this.x = x;
+            this.y = y;
+
+            setTranslateZ(125*(y-3));
+            setUnselected();
+            toBack();
+        }
+
+        public void setSelected() {
+            setMaterial(selectedTileMaterial);
+        }
+
+        public void setUnselected() {
+            setMaterial((x+y)%2 == 0 ? whiteTileMaterial : blackTileMaterial);
+        }
+    }
 }
