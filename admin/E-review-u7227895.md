@@ -1,8 +1,8 @@
 ## Code Review
 
-Reviewed by: <Yuechen Liu>, <u7227895>
+Reviewed by: Yuechen Liu, u7227895
 
-Reviewing code written by: <Zane Gates> <u7334218>
+Reviewing code written by: Zane Gates u7334218
 
 Component: 
 [makePlacement(String placement)](https://gitlab.cecs.anu.edu.au/u7312578/comp1140-ass2-tue12s/-/blob/master/src/comp1140/ass2/gui/Viewer.java#L69-128) 
