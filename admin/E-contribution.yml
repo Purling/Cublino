@@ -10,17 +10,17 @@ declaration: >-
 contributions:
   - uid: u7312578
     contribution: 33
-  - uid:
-    contribution:
-  - uid:
-    contribution:
+  - uid: u7227895
+    contribution: 33
+  - uid: u7334218
+    contribution: 33
 
 # Sign *your* name and uids here. (Remove entries if you have fewer
 # than three members)
 signatures:
   - name: Ziling Ouyang
     uid: u7312578
-  - name:
-    uid:
+  - name: Yuechen Liu
+    uid: u7227895
   - name:
     uid:
