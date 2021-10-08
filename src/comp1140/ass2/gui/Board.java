@@ -24,6 +24,8 @@ public class Board extends Application {
     private static final int VIEWER_WIDTH = 933;
     private static final int VIEWER_HEIGHT = 700;
 
+    BoardConstructor game;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Cubilino");
@@ -32,7 +34,21 @@ public class Board extends Application {
 
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
 
-        root.getChildren().add(new BoardConstructor("PWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", true));
+        game = new BoardConstructor("PWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", true);
+
+        root.getChildren().add(game);
+
+        Label turnDisplayer = new Label("White");
+        turnDisplayer.setTranslateX(200);
+        root.getChildren().add(turnDisplayer);
+
+
+        Button refresh = new Button("End Turn");
+        refresh.setOnAction(actionEvent -> {
+            game.game.endTurn();
+            turnDisplayer.setText(game.game.getCurrentPlayer().isWhite() ? "White" : "Black");
+        });
+        root.getChildren().add(refresh);
 
         primaryStage.setScene(scene);
         primaryStage.show();

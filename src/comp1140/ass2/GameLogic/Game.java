@@ -14,7 +14,7 @@ import java.util.List;
  * The player will be allowed to decide which version of cublino he or she wants to play.
  * Option includes PurCublino and ContraCublino
  *
- * @author Ziling Ouyang
+ * @author Ziling Ouyang, minor edits by Zane Gates
  */
 
 public abstract class Game{
@@ -163,6 +163,7 @@ public abstract class Game{
         otherPlayer = temp;
         stepHistory.clear();
         turnHistory.add(this.deepClone());
+        currentMoveDie = null;
     }
 
     /**

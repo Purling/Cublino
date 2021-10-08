@@ -292,10 +292,10 @@ public class BoardConstructor extends SubScene {
             public Position(int x, int y) {
                 this.x = x;
                 this.y = y;
-                if (x < 0) x = 0;
-                if (x >= 7) x = 6;
-                if (y < 0) y = 0;
-                if (y >= 7) y = 6;
+                if (x < 0) this.x = 0;
+                if (x >= 7) this.x = 6;
+                if (y < 0) this.y = 0;
+                if (y >= 7) this.y = 6;
             }
 
             @Override
