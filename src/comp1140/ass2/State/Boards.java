@@ -60,6 +60,10 @@ public class Boards implements Serializable{
         }
     }
 
+    /**
+     * Creates a deep copy of the board
+     * @return A deep copy the board
+     */
     public Boards deepClone() {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -259,19 +263,18 @@ public class Boards implements Serializable{
                 }
             }
         }
-        Arrays.sort(b, new Comparator<String>() {
+        Arrays.sort(b, new Comparator<>() {
             @Override
             public int compare(String o1, String o2) {
                 int a = o1.charAt(2) - o2.charAt(2);
-                if(a != 0){
+                if (a != 0) {
                     return a;
                 }
                 int b = o1.charAt(1) - o2.charAt(1);
-                if(b != 0){
+                if (b != 0) {
                     return b;
                 }
-                int c = o1.charAt(0) - o2.charAt(0);
-                return c;
+                return o1.charAt(0) - o2.charAt(0);
             }
         });
 
