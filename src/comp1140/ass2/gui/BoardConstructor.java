@@ -395,11 +395,15 @@ public class BoardConstructor extends SubScene {
         }
 
         boolean inNullSpot() {
-            return magnitude(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX) < MOUSE_NULLSPOT;
+            return mouseMagnitude() < MOUSE_NULLSPOT;
         }
 
         boolean inSmallMoveSpot() {
-            return magnitude(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX) < MOUSE_SMALLMOVESPOT;
+            return mouseMagnitude() < MOUSE_SMALLMOVESPOT;
+        }
+
+        double mouseMagnitude() {
+            magnitude(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX);
         }
     }
 
