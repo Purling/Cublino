@@ -243,10 +243,7 @@ public class Cublino {
                 if(pur.getStepHistory().stream().anyMatch((x) -> x.getType() == Game.MoveType.INVALID)) return false;
             }
         }
-
-        if(pur.getStepHistory().size() == 0) return false;
-        pur.getStepHistory().remove(firstStepIndex);
-        return pur.getStepHistory().stream().noneMatch((x) -> x.getType() == Game.MoveType.TIP);
+        return (pur.getStepHistory().size() != 0);
     }
 
     /**
