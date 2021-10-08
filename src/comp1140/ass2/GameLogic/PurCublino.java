@@ -30,21 +30,22 @@ public class PurCublino extends Game {
      * @param endPosition The coordinates to move the die to
      */
     @Override
-    public void applyStep(Die die, String endPosition) {
+    public void applyStep(Die die, String endPosition) { //TODO Implement a deep copy of the currentMove into Move array
         Boards clone = board.deepClone();
+        int historySize = getStepHistory().size();
 
         if (board.getAt(endPosition) != null || die == null) {
             addToStepHistory(new Move(clone, MoveType.INVALID));
             return;
         }
 
-        if (getStepHistory().size() == 0) addToStepHistory(new Move(clone, MoveType.ORIGIN));
+        if (historySize == 0) addToStepHistory(new Move(clone, MoveType.ORIGIN));
         String diePosition = die.getPosition();
         int distance = Boards.getManhattanDistance(diePosition, endPosition);
         MoveType moveType;
         boolean correctDie = isDieCorrect(die);
 
-        if (!isMoveBackwards(diePosition, endPosition) && distance == TIP_DISTANCE && correctDie) {
+        if (!isMoveBackwards(diePosition, endPosition) && distance == TIP_DISTANCE && correctDie && historySize == 0) {
             applyTip(die, endPosition);
             setCurrentMoveDie(die);
             moveType = MoveType.TIP;
