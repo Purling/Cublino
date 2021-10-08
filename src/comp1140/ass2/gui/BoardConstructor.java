@@ -39,6 +39,7 @@ public class BoardConstructor extends SubScene {
 
     // When the mouse is moved less than this amount, the die will be left in place
     private static final double MOUSE_NULLSPOT = 40;
+    private static final double MOUSE_SMALLMOVESPOT = 120;
 
     private final Group root = new Group();
 
@@ -194,6 +195,7 @@ public class BoardConstructor extends SubScene {
         double mouseCurrentY;
 
         int indicatorDirection;
+        int indicatorDistance;
 
         /**
          * Constructs and transforms a die mesh to provide an
@@ -241,6 +243,7 @@ public class BoardConstructor extends SubScene {
 
                 if (inNullSpot()) {
                     indicatorDirection = -1;
+                    indicatorDistance = 0;
                     return;
                 }
 
@@ -248,19 +251,16 @@ public class BoardConstructor extends SubScene {
                 direction -= viewer.getBoardRotation();
                 indicatorDirection = (((int) Math.round(direction/90)) + 8)%4;
 
-                switch(indicatorDirection) {
-                    case 0: viewer.selectTile(die.getX()+1, die.getY()); return;
-                    case 1: viewer.selectTile(die.getX(), die.getY()-1); return;
-                    case 2: viewer.selectTile(die.getX()-1, die.getY()); return;
-                    case 3: viewer.selectTile(die.getX(), die.getY()+1); return;
-                    default: return;
-                }
+                indicatorDistance = inSmallMoveSpot() ? 1 : 2;
+
+                Position positionToHighlight = new Position(die.getX(), die.getY()).positionIn(indicatorDirection, indicatorDistance);
+                viewer.selectTile(positionToHighlight.x, positionToHighlight.y);
             });
 
             this.setOnMouseReleased(event -> {
                 if (indicatorDirection != -1) {
-                    viewer.tryToMakeMove(this.die,
-                                 "" + new Position(die.getX(), die.getY()).adjacentIn(indicatorDirection));
+                    viewer.tryToMakeMove(this.die, "" + new Position(die.getX(), die.getY())
+                         .positionIn(indicatorDirection, indicatorDistance));
                     setTranslateX(125 * (die.getX()-3));
                     setTranslateZ(125 * (die.getY()-3));
                     getTransforms().set(0, necessaryRotations());
@@ -286,6 +286,10 @@ public class BoardConstructor extends SubScene {
             public Position(int x, int y) {
                 this.x = x;
                 this.y = y;
+                if (x < 0) x = 0;
+                if (x >= 7) x = 6;
+                if (y < 0) y = 0;
+                if (y >= 7) y = 6;
             }
 
             @Override
@@ -293,12 +297,12 @@ public class BoardConstructor extends SubScene {
                 return "" + x + "" + y;
             }
 
-            public Position adjacentIn(int direction) {
+            public Position positionIn(int direction, int distance) {
                 switch(direction) {
-                    case 0: return new Position(x+1, y);
-                    case 1: return new Position(x, y-1);
-                    case 2: return new Position(x-1, y);
-                    case 3: return new Position(x, y+1);
+                    case 0: return new Position(x+distance, y);
+                    case 1: return new Position(x, y-distance);
+                    case 2: return new Position(x-distance, y);
+                    case 3: return new Position(x, y+distance);
                     default: return new Position(x, y);
                 }
             }
@@ -392,6 +396,10 @@ public class BoardConstructor extends SubScene {
 
         boolean inNullSpot() {
             return magnitude(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX) < MOUSE_NULLSPOT;
+        }
+
+        boolean inSmallMoveSpot() {
+            return magnitude(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX) < MOUSE_SMALLMOVESPOT;
         }
     }
 
