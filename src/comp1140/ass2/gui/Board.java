@@ -32,7 +32,7 @@ public class Board extends Application {
 
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
 
-        root.getChildren().add(new BoardConstructor("PWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7"));
+        root.getChildren().add(new BoardConstructor("PWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", true));
 
         primaryStage.setScene(scene);
         primaryStage.show();

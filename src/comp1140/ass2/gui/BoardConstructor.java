@@ -51,22 +51,26 @@ public class BoardConstructor extends SubScene {
 
     PurCublino game;
 
+    boolean permitsMoveMaking;
+
     /**
      * Draw a placement in the window, removing any previously drawn one
      *
      * @param placement A valid placement string
      */
-    public BoardConstructor(String placement) {
+    public BoardConstructor(String placement, boolean permitsMoveMaking) {
         super(new Group(), VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
         createDieMesh();
         createMaterials();
+
+        this.permitsMoveMaking = permitsMoveMaking;
 
         this.setRoot(root);
         boardTiles = new BoardConstructor.BoardTile[7][7];
 
         try {
             game = new PurCublino(true, new Boards(placement));
-        } catch (Exception e) {return;} // If the user inputs an invalid board state, do not update the display
+        } catch (Exception e) {System.out.println(e); return;} // If the user inputs an invalid board state, do not update the display
 
         // Iterate over every tile in the board
         for (int y = 0; y < 7; y++) {
@@ -222,6 +226,8 @@ public class BoardConstructor extends SubScene {
             setScaleZ(dieScale);
             setTranslateX(125 * (die.getX()-3));
             setTranslateZ(125 * (die.getY()-3));
+
+            if (!viewer.permitsMoveMaking) return;
 
             this.setOnMousePressed(event -> {
                 viewer.selectedDie = this;
