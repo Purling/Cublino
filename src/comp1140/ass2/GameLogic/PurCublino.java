@@ -31,6 +31,8 @@ public class PurCublino extends Game {
      */
     @Override
     public void applyStep(Die die, String endPosition) { //TODO Implement a deep copy of the currentMove into Move array
+        if (die.isWhite() != getCurrentPlayer().isWhite()) return;
+
         Boards clone = board.deepClone();
         int historySize = getStepHistory().size();
 
