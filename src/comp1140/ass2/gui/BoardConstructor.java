@@ -38,8 +38,8 @@ public class BoardConstructor extends SubScene {
     private static final String URI_BASE = "assets/";
 
     // When the mouse is moved less than this amount, the die will be left in place
-    private static final double MOUSE_NULLSPOT = 40;
-    private static final double MOUSE_SMALLMOVESPOT = 120;
+    private static final double MOUSE_NULL_SPOT = 40;
+    private static final double MOUSE_SMALL_MOVE_SPOT = 120;
 
     private final Group root = new Group();
 
@@ -75,7 +75,7 @@ public class BoardConstructor extends SubScene {
         for (int y = 0; y < 7; y++) {
             for (int x = 0; x < 7; x++) {
                 // Construct the checkerboard tile
-                boardTiles[x][y] = new BoardTile(x, y);
+                boardTiles[x][y] = new BoardTile(new Position(x, y));
                 root.getChildren().add(boardTiles[x][y]);
 
                 // If the game state contains a die at the current position, construct it as well
@@ -97,9 +97,9 @@ public class BoardConstructor extends SubScene {
         // Establish, position and rotate camera
         PerspectiveCamera camera = new PerspectiveCamera();
         camera.setRotationAxis(new Point3D(1, 0, 0));
-        camera.setTranslateY(100-VIEWER_HEIGHT*3/4);
+        camera.setTranslateY(100-VIEWER_HEIGHT*0.75);
         camera.setTranslateZ(-250);
-        camera.setTranslateX(-VIEWER_WIDTH/2);
+        camera.setTranslateX(-VIEWER_WIDTH*0.5);
         camera.setRotate(-30);
         setCamera(camera);
 
@@ -165,12 +165,10 @@ public class BoardConstructor extends SubScene {
                 7,9, 3,13,2,12);    // HDC 2
     }
 
-    public void selectTile(DieModel.Position p) {
+    public void selectTile(Position p) {
         try {
             boardTiles[p.x][p.y].setSelected();
-        } catch (Exception e) {
-            return;
-        }
+        } catch (Exception ignored) { }
     }
 
     public void deselectEverything() {
@@ -242,11 +240,11 @@ public class BoardConstructor extends SubScene {
                 viewer.deselectEverything();
                 viewer.selectTile(diePosition);
 
-                if (mouseMagnitude() < MOUSE_NULLSPOT) {
+                if (mouseMagnitude() < MOUSE_NULL_SPOT) {
                     indicatorDistance = 0;
                 } else {
                     indicatorDirection = (((int) Math.round((mouseDirection() - viewer.getBoardRotation()) / 90)) + 8) % 4;
-                    indicatorDistance = mouseMagnitude() < MOUSE_SMALLMOVESPOT ? 1 : 2;
+                    indicatorDistance = mouseMagnitude() < MOUSE_SMALL_MOVE_SPOT ? 1 : 2;
 
                     viewer.selectTile(diePosition.positionIn(indicatorDirection, indicatorDistance));
                 }
@@ -267,46 +265,17 @@ public class BoardConstructor extends SubScene {
             AnimationTimer animation = new AnimationTimer() {
                 @Override
                 public void handle(long l) {
-                    setTranslateY(getTranslateY() + (getTranslateY() - (viewer.selectedDie == thisModel ? -50 : 0))*0.2);
+                    setTranslateY(getTranslateY() + ((viewer.selectedDie == thisModel ? -50 : 0) - getTranslateY())*0.2);
                 }
             };
 
             animation.start();
         }
 
-        class Position {
-            public int x;
-            public int y;
-
-            public Position(int x, int y) {
-                this.x = x;
-                this.y = y;
-                if (x < 0) this.x = 0;
-                if (x >= 7) this.x = 6;
-                if (y < 0) this.y = 0;
-                if (y >= 7) this.y = 6;
-            }
-
-            @Override
-            public String toString() {
-                return "" + x + "" + y;
-            }
-
-            public Position positionIn(int direction, int distance) {
-                switch(direction) {
-                    case 0: return new Position(x+distance, y);
-                    case 1: return new Position(x, y-distance);
-                    case 2: return new Position(x-distance, y);
-                    case 3: return new Position(x, y+distance);
-                    default: return new Position(x, y);
-                }
-            }
-        }
-
         /**
          * Computes a rotation transform along the various axes
          * @param degrees the side of the rotation, in degrees
-         * @returns the required rotation
+         * @return the required rotation
          */
         Rotate spinTransform(double degrees) {
             return new Rotate(degrees, new Point3D(0, 1, 0));
@@ -325,7 +294,7 @@ public class BoardConstructor extends SubScene {
          * when applied to the default die, orients
          * it in alignment with the source die
          *
-         * @returns the required rotation
+         * @return the required rotation
          */
         public Transform necessaryRotations() {
             // Convert from the number on the back face of the die back to the relative number. For example,
@@ -353,31 +322,31 @@ public class BoardConstructor extends SubScene {
         /**
          * Computes the rotation to show a particular
          * relative number on the back face of the mesh
-         * @returns the required rotation
+         * @return the required rotation
          */
         Rotate backRotation(int relativeBackFace) {
-            switch(relativeBackFace) {
-                case 1: return spinTransform( 90);
-                case 2: return spinTransform(180);
-                case 4: return spinTransform(-90);
-                default: return new Rotate(); // 4 (which has a relative index of 3) is the default back face
-            }
+            return switch (relativeBackFace) {
+                case 1 -> spinTransform(90);
+                case 2 -> spinTransform(180);
+                case 4 -> spinTransform(-90);
+                default -> new Rotate(); // 4 (which has a relative index of 3) is the default back face
+            };
         }
 
         /**
          * Computes the rotation to show a particular
          * absolute number on the top face of the mesh
-         * @returns the required rotation
+         * @return the required rotation
          */
         Rotate topRotation(int topFace) {
-            switch(topFace) {
-                case 1: return pitchTransform(-90);
-                case 2: return pitchTransform(180);
-                case 3: return rollTransform(  90);
-                case 4: return rollTransform( -90);
-                case 6: return pitchTransform( 90);
-                default: return new Rotate(); // 5 is the default top face
-            }
+            return switch (topFace) {
+                case 1 -> pitchTransform(-90);
+                case 2 -> pitchTransform(180);
+                case 3 -> rollTransform(90);
+                case 4 -> rollTransform(-90);
+                case 6 -> pitchTransform(90);
+                default -> new Rotate(); // 5 is the default top face
+            };
         }
 
         double mouseMagnitude() {
@@ -406,18 +375,16 @@ public class BoardConstructor extends SubScene {
         return result;
     }
 
-    class BoardTile extends Box {
-        int x;
-        int y;
+    static class BoardTile extends Box {
+        Position position;
 
-        public BoardTile(int x, int y) {
+        public BoardTile(Position p) {
             super(125, 20, 125);
-            setTranslateX(125*(x-3));
+            setTranslateX(125*(p.x-3));
             setTranslateY(50);
-            setTranslateZ(125*(y-3));
+            setTranslateZ(125*(p.y-3));
 
-            this.x = x;
-            this.y = y;
+            this.position = new Position(p.x, p.y);
 
             setUnselected();
             toBack();
@@ -428,7 +395,36 @@ public class BoardConstructor extends SubScene {
         }
 
         public void setUnselected() {
-            setMaterial((x+y)%2 == 0 ? whiteTileMaterial : blackTileMaterial);
+            setMaterial((position.x + position.y)%2 == 0 ? whiteTileMaterial : blackTileMaterial);
+        }
+    }
+
+    static class Position {
+        public int x;
+        public int y;
+
+        public Position(int x, int y) {
+            this.x = x;
+            this.y = y;
+            if (x < 0) this.x = 0;
+            if (x >= 7) this.x = 6;
+            if (y < 0) this.y = 0;
+            if (y >= 7) this.y = 6;
+        }
+
+        @Override
+        public String toString() {
+            return "" + x + "" + y;
+        }
+
+        public Position positionIn(int direction, int distance) {
+            return switch (direction) {
+                case 0 -> new Position(x + distance, y);
+                case 1 -> new Position(x, y - distance);
+                case 2 -> new Position(x - distance, y);
+                case 3 -> new Position(x, y + distance);
+                default -> new Position(x, y);
+            };
         }
     }
 }
