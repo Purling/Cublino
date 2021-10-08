@@ -61,7 +61,6 @@ public class BoardConstructor extends SubScene {
     public BoardConstructor(String placement, boolean permitsMoveMaking) {
         super(new Group(), VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
         createDieMesh();
-        createMaterials();
 
         this.permitsMoveMaking = permitsMoveMaking;
 
@@ -70,7 +69,7 @@ public class BoardConstructor extends SubScene {
 
         try {
             game = new PurCublino(true, new Boards(placement));
-        } catch (Exception e) {System.out.println(e); return;} // If the user inputs an invalid board state, do not update the display
+        } catch (Exception e) {return;} // If the user inputs an invalid board state, do not update the display
 
         // Iterate over every tile in the board
         for (int y = 0; y < 7; y++) {
@@ -105,8 +104,7 @@ public class BoardConstructor extends SubScene {
         setCamera(camera);
 
         // Establish soft white lighting to remove shading and shadows
-        AmbientLight light = new AmbientLight(Color.WHITE);
-        root.getChildren().add(light);
+        root.getChildren().add(new AmbientLight(Color.WHITE));
     }
 
     public double getBoardRotation() {
@@ -167,9 +165,9 @@ public class BoardConstructor extends SubScene {
                 7,9, 3,13,2,12);    // HDC 2
     }
 
-    public void selectTile(int x, int y) {
+    public void selectTile(DieModel.Position p) {
         try {
-            boardTiles[x][y].setSelected();
+            boardTiles[p.x][p.y].setSelected();
         } catch (Exception e) {
             return;
         }
@@ -191,7 +189,6 @@ public class BoardConstructor extends SubScene {
 
         Die die;
         BoardConstructor viewer;
-        DieModel me;
 
         double mouseDownX;
         double mouseDownY;
@@ -212,8 +209,6 @@ public class BoardConstructor extends SubScene {
             this.die = die;
             this.viewer = viewer;
 
-            this.me = this;
-
             // Apply the die texture to the mesh
             setMaterial(die.isWhite() ? whiteMaterial : blackMaterial);
 
@@ -224,8 +219,7 @@ public class BoardConstructor extends SubScene {
             setScaleX(dieScale);
             setScaleY(dieScale);
             setScaleZ(dieScale);
-            setTranslateX(125 * (die.getX()-3));
-            setTranslateZ(125 * (die.getY()-3));
+            setTranslationFromDie();
 
             if (!viewer.permitsMoveMaking) return;
 
@@ -235,50 +229,45 @@ public class BoardConstructor extends SubScene {
                 mouseDownY = event.getScreenY();
                 mouseCurrentX = mouseDownX;
                 mouseCurrentY = mouseDownY;
-                viewer.selectedDie = this;
-                indicatorDirection = -1;
-                viewer.selectTile(die.getX(), die.getY());
+                indicatorDistance = 0;
+                viewer.selectTile(new Position(die.getX(), die.getY()));
             });
 
             this.setOnMouseDragged(event -> {
                 mouseCurrentX = event.getScreenX();
                 mouseCurrentY = event.getScreenY();
 
+                Position diePosition = new Position(die.getX(), die.getY());
+
                 viewer.deselectEverything();
-                viewer.selectTile(die.getX(), die.getY());
+                viewer.selectTile(diePosition);
 
-                if (inNullSpot()) {
-                    indicatorDirection = -1;
+                if (mouseMagnitude() < MOUSE_NULLSPOT) {
                     indicatorDistance = 0;
-                    return;
+                } else {
+                    indicatorDirection = (((int) Math.round((mouseDirection() - viewer.getBoardRotation()) / 90)) + 8) % 4;
+                    indicatorDistance = mouseMagnitude() < MOUSE_SMALLMOVESPOT ? 1 : 2;
+
+                    viewer.selectTile(diePosition.positionIn(indicatorDirection, indicatorDistance));
                 }
-
-                double direction = Math.atan2(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX)*180/Math.PI;
-                direction -= viewer.getBoardRotation();
-                indicatorDirection = (((int) Math.round(direction/90)) + 8)%4;
-
-                indicatorDistance = inSmallMoveSpot() ? 1 : 2;
-
-                Position positionToHighlight = new Position(die.getX(), die.getY()).positionIn(indicatorDirection, indicatorDistance);
-                viewer.selectTile(positionToHighlight.x, positionToHighlight.y);
             });
 
             this.setOnMouseReleased(event -> {
-                if (indicatorDirection != -1) {
+                if (indicatorDistance != 0) {
                     viewer.tryToMakeMove(this.die, "" + new Position(die.getX(), die.getY())
                          .positionIn(indicatorDirection, indicatorDistance));
-                    setTranslateX(125 * (die.getX()-3));
-                    setTranslateZ(125 * (die.getY()-3));
+                    setTranslationFromDie();
                     getTransforms().set(0, necessaryRotations());
                 }
                 viewer.deselectEverything();
                 viewer.selectedDie = null;
             });
 
+            DieModel thisModel = this;
             AnimationTimer animation = new AnimationTimer() {
                 @Override
                 public void handle(long l) {
-                    setTranslateY(lerp(getTranslateY(), viewer.selectedDie == me ? -50 : 0, 0.2));
+                    setTranslateY(getTranslateY() + (getTranslateY() - (viewer.selectedDie == thisModel ? -50 : 0))*0.2);
                 }
             };
 
@@ -312,11 +301,6 @@ public class BoardConstructor extends SubScene {
                     default: return new Position(x, y);
                 }
             }
-        }
-
-
-        double lerp(double start, double end, double amount) {
-            return start + (end-start)*amount;
         }
 
         /**
@@ -396,39 +380,30 @@ public class BoardConstructor extends SubScene {
             }
         }
 
-        public double magnitude(double x, double y) {
-            return Math.sqrt(x*x+y*y);
-        }
-
-        boolean inNullSpot() {
-            return mouseMagnitude() < MOUSE_NULLSPOT;
-        }
-
-        boolean inSmallMoveSpot() {
-            return mouseMagnitude() < MOUSE_SMALLMOVESPOT;
-        }
-
         double mouseMagnitude() {
-            return magnitude(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX);
+            return Math.sqrt(Math.pow(mouseCurrentY - mouseDownY, 2) + Math.pow(mouseCurrentX - mouseDownX, 2));
+        }
+
+        double mouseDirection() {
+            return Math.atan2(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX)*180/Math.PI;
+        }
+
+        void setTranslationFromDie() {
+            setTranslateX(125 * (die.getX()-3));
+            setTranslateZ(125 * (die.getY()-3));
         }
     }
 
-    final static PhongMaterial whiteMaterial = new PhongMaterial();
-    final static PhongMaterial blackMaterial = new PhongMaterial();
-    final static PhongMaterial whiteTileMaterial = new PhongMaterial();
-    final static PhongMaterial blackTileMaterial = new PhongMaterial();
-    final static PhongMaterial selectedTileMaterial = new PhongMaterial();
+    final static PhongMaterial whiteMaterial = makePhongFromAsset("whitedie.png");
+    final static PhongMaterial blackMaterial = makePhongFromAsset("blackdie.png");
+    final static PhongMaterial whiteTileMaterial = makePhongFromAsset("whitetile.png");
+    final static PhongMaterial blackTileMaterial = makePhongFromAsset("blacktile.png");
+    final static PhongMaterial selectedTileMaterial = makePhongFromAsset("selectedtile.png");
 
-    static void createMaterials() {
-        whiteMaterial.setDiffuseMap(makeTextureFromAsset("whitedie.png"));
-        blackMaterial.setDiffuseMap(makeTextureFromAsset("blackdie.png"));
-        whiteTileMaterial.setDiffuseMap(makeTextureFromAsset("whitetile.png"));
-        blackTileMaterial.setDiffuseMap(makeTextureFromAsset("blacktile.png"));
-        selectedTileMaterial.setDiffuseMap(makeTextureFromAsset("selectedtile.png"));
-    }
-
-    static Image makeTextureFromAsset(String path) {
-        return new Image(new File(URI_BASE + path).toURI().toString());
+    static PhongMaterial makePhongFromAsset(String path) {
+        PhongMaterial result = new PhongMaterial();
+        result.setDiffuseMap(new Image(new File(URI_BASE + path).toURI().toString()));
+        return result;
     }
 
     class BoardTile extends Box {
