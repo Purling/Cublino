@@ -12,6 +12,8 @@ import java.util.List;
 
 public class PurCublino extends Game {
 
+    private static final int JUMP_DISTANCE = 2;
+
     public PurCublino(){
         super();
     }
@@ -20,35 +22,47 @@ public class PurCublino extends Game {
         super(isWhite, board);
     }
 
+    /**
+     * Given a valid die, moves the die to the valid position give. It stores the step that has been applied to the die in the stepHistory
+     * variable. If the move is invalid, that is also stored in stepHistory under MoveType INVALID.
+     *
+     * @param die The die to be moved
+     * @param endPosition The coordinates to move the die to
+     */
     @Override
     public void applyStep(Die die, String endPosition) {
-
         Boards clone = board.deepClone();
 
-        if(board.getAt(endPosition) != null || die == null){
+        if (board.getAt(endPosition) != null || die == null) {
             addToStepHistory(new Move(clone, MoveType.INVALID));
-        } else {
-            if (getStepHistory().size() == 0) addToStepHistory(new Move(clone, MoveType.ORIGIN));
-
-            int tipDistance = 1;
-            int jumpDistance = 2;
-            String diePosition = die.getPosition();
-            int distance = Boards.getManhattanDistance(diePosition, endPosition);
-            MoveType moveType;
-
-            if (!isMoveBackwards(diePosition, endPosition) && distance == tipDistance) {
-                applyTip(die, endPosition);
-                moveType = MoveType.TIP;
-            } else if (isJumpValid(diePosition, endPosition) && distance == jumpDistance) {
-                applyJump(die, endPosition);
-                moveType = MoveType.JUMP;
-            } else {
-                moveType = MoveType.INVALID;
-            }
-            addToStepHistory(new Move(clone, moveType));
+            return;
         }
+
+        if (getStepHistory().size() == 0) addToStepHistory(new Move(clone, MoveType.ORIGIN));
+        String diePosition = die.getPosition();
+        int distance = Boards.getManhattanDistance(diePosition, endPosition);
+        MoveType moveType;
+        boolean correctDie = isDieCorrect(die);
+
+        if (!isMoveBackwards(diePosition, endPosition) && distance == TIP_DISTANCE && correctDie) {
+            applyTip(die, endPosition);
+            setCurrentMoveDie(die);
+            moveType = MoveType.TIP;
+        } else if (isJumpValid(diePosition, endPosition) && distance == JUMP_DISTANCE && correctDie) {
+            applyJump(die, endPosition);
+            setCurrentMoveDie(die);
+            moveType = MoveType.JUMP;
+        } else {
+            moveType = MoveType.INVALID;
+        }
+        addToStepHistory(new Move(clone, moveType));
     }
 
+    /**
+     *  A boolean function to evaluate if the correct number of dice is on the board.
+     * @param board The current board that is being played on
+     * @return True if the board contains 14 dice
+     */
     @Override
     public boolean isDiceAmountCorrect(Boards board){
         return (board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() == 2 * Boards.BOARD_DIMENSION);

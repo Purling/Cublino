@@ -6,6 +6,7 @@ import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.State.Die;
 import comp1140.ass2.State.Players;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +45,10 @@ public abstract class Game{
      */
     Boards board;
 
+    public static final int TIP_DISTANCE = 1;
+
     private List<Move> stepHistory = new ArrayList<>();
-    private Game[] turnHistory;
+    private List<Game> turnHistory = new ArrayList<>();
 
     /**
      * store the current player that is making his moves
@@ -53,9 +56,14 @@ public abstract class Game{
     private Players currentPlayer;
 
     /**
+     * store the player who is not making a move
+     */
+    private Players otherPlayer;
+
+    /**
      * The die that is currently selected to be moved
      */
-    Die currentMoveDie;
+    private Die currentMoveDie;
 
     /**
      * the status of the two players
@@ -93,14 +101,33 @@ public abstract class Game{
     }
 
     /**
+     * Setter for currentMoveDie
+     */
+    public void setCurrentMoveDie(Die currentMoveDie) {
+        this.currentMoveDie = currentMoveDie;
+    }
+
+    /**
+     * Getter for currentMoveDie
+     */
+    public Die getCurrentMoveDie() {
+        return currentMoveDie;
+    }
+
+    /**
      * Constructor for Game which takes in a value for isWhite
      */
     public Game(boolean isWhite){
         this.currentPlayer = new Players(isWhite);
     }
 
+    /**
+     * Constructor for Game which takes in current player colour and the current board
+     */
     public Game(boolean isWhite, Boards board){
-        this.currentPlayer = new Players(isWhite);
+
+        this.currentPlayer = (isWhite) ? board.getWhitePlayer() : board.getBlackPlayer();
+        this.otherPlayer = (isWhite) ? board.getBlackPlayer() : board.getWhitePlayer();
         this.board = board;
     }
 
@@ -116,12 +143,44 @@ public abstract class Game{
         }
     }
 
+    /**
+     * Returns if the move is always being performed on one die
+     * @return True if the die is the one chosen to be moved already or the currentMoveDie is null
+     */
+    public boolean isDieCorrect(Die chosenDie) {
+        if(currentMoveDie == null) return true;
+        return chosenDie.equals(currentMoveDie) && chosenDie.isWhite() == currentPlayer.isWhite();
+    }
+
     abstract public void applyStep(Die die, String endPosition);
 
     /**
-     * End the player's turn when there is no more legal moves or the player is desired to
+     * End the player's turn
      */
-    public void endTurn(){
+    public void endTurn() {
+        Players temp = currentPlayer;
+        currentPlayer = otherPlayer;
+        otherPlayer = temp;
+        stepHistory.clear();
+        turnHistory.add(this.deepClone());
+    }
+
+    /**
+     * Creates a deep copy of the game
+     * @return A deep copy the game
+     */
+    public Game deepClone() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (Game) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            return null;
+        }
     }
 
     public void applyTip(Die initial, String endPosition) {
@@ -136,8 +195,20 @@ public abstract class Game{
         }
     }
 
+    /**
+     * Adds a move to the record of moves within one player's turn
+     * @param move The move to be recorded
+     */
     public void addToStepHistory(Move move) {
         stepHistory.add(move);
+    }
+
+    /**
+     * Adds a turn to the record of player turns
+     * @param game The gamestate at the end of a player's turn
+     */
+    public void addToTurnHistory(Game game) {
+        turnHistory.add(game);
     }
 
     public List<Move> getStepHistory() {
