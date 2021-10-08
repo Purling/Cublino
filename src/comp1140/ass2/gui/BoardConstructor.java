@@ -403,7 +403,7 @@ public class BoardConstructor extends SubScene {
         }
 
         double mouseMagnitude() {
-            magnitude(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX);
+            return magnitude(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX);
         }
     }
 
@@ -433,11 +433,11 @@ public class BoardConstructor extends SubScene {
             super(125, 20, 125);
             setTranslateX(125*(x-3));
             setTranslateY(50);
+            setTranslateZ(125*(y-3));
 
             this.x = x;
             this.y = y;
 
-            setTranslateZ(125*(y-3));
             setUnselected();
             toBack();
         }
