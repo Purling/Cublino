@@ -15,7 +15,7 @@ public class ContraCublino extends Game {
     }
 
     @Override
-    protected void applyStep(Die die, String endPosition) {
+    public void applyStep(Die die, String endPosition) {
     }
 
     @Override

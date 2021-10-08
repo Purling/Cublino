@@ -1,7 +1,7 @@
 package comp1140.ass2;
 
 import comp1140.ass2.State.Die;
-import comp1140.ass2.gui.Viewer;
+import comp1140.ass2.gui.BoardConstructor;
 import javafx.geometry.Point3D;
 import javafx.scene.transform.Transform;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ class dieRotationTests {
                     // Construct the die and its model
                     String placementString = "" + o + x + y;
                     Die d = new Die(placementString, null, null);
-                    t = new Viewer.DieModel(d, null).necessaryRotations();
+                    t = new BoardConstructor.DieModel(d, null).necessaryRotations();
 
                     // Make sure every face on the model is positioned where the die class suggests it should be
                     makeRotationAssertion(d.getTop(), up, "top");

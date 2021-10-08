@@ -1,6 +1,6 @@
 package comp1140.ass2;
 
-import comp1140.ass2.gui.Viewer;
+import comp1140.ass2.gui.BoardConstructor;
 import javafx.beans.Observable;
 import javafx.collections.ObservableFloatArray;
 import org.junit.jupiter.api.Test;
@@ -14,9 +14,9 @@ class dieMeshTests {
 
     @Test
     public void meshVertexValidityTest() {
-        Viewer.createDieMesh();
-        float[] vertices = new float[Viewer.dieMesh.getPoints().size()];
-        Viewer.dieMesh.getPoints().toArray(vertices);
+        BoardConstructor.createDieMesh();
+        float[] vertices = new float[BoardConstructor.dieMesh.getPoints().size()];
+        BoardConstructor.dieMesh.getPoints().toArray(vertices);
         assertEquals(8*3, vertices.length,
                 "The vertex array must contain 3 points per vertex for 8 vertices");
         boolean[] hasSeen = new boolean[8];
@@ -34,8 +34,8 @@ class dieMeshTests {
 
     @Test
     public void meshUvsValidityTest() {
-        float[] uvs = new float[Viewer.dieMesh.getTexCoords().size()];
-        Viewer.dieMesh.getTexCoords().toArray(uvs);
+        float[] uvs = new float[BoardConstructor.dieMesh.getTexCoords().size()];
+        BoardConstructor.dieMesh.getTexCoords().toArray(uvs);
 
         assertTrue(uvs.length % 2 == 0,
                 "UV array should have an even length");
@@ -68,8 +68,8 @@ class dieMeshTests {
 
     @Test
     public void meshFacesValidityTest() {
-        int[] faces = new int[Viewer.dieMesh.getFaces().size()];
-        Viewer.dieMesh.getFaces().toArray(faces);
+        int[] faces = new int[BoardConstructor.dieMesh.getFaces().size()];
+        BoardConstructor.dieMesh.getFaces().toArray(faces);
         assertEquals((3+3)*2*6, faces.length,
                 "The face array must contain (3 vertices + 3 UVs) per vertex for 2 triangles for 6 faces");
         for (int point = 0; point < 72; point += 6) {

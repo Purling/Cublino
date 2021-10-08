@@ -116,7 +116,7 @@ public abstract class Game{
         }
     }
 
-    abstract protected void applyStep(Die die, String endPosition);
+    abstract public void applyStep(Die die, String endPosition);
 
     /**
      * End the player's turn when there is no more legal moves or the player is desired to
