@@ -240,6 +240,7 @@ public class BoardConstructor extends SubScene {
                                 .positionIn(indicatorDirection, indicatorDistance));
                         if (viewer.game.getStepHistory().isEmpty()) return;
                         if (viewer.game.getStepHistory().get(viewer.game.getStepHistory().size()-1).getType() == Game.MoveType.INVALID) return;
+                        if (viewer.game.getStepHistory().get(viewer.game.getStepHistory().size()-1).getType() == Game.MoveType.ORIGIN) return;
                         setTranslationFromDie();
                         getTransforms().set(0, necessaryRotations());
                     }
@@ -276,7 +277,7 @@ public class BoardConstructor extends SubScene {
             this.setOnMouseReleased(event -> {
                 if (event.getButton() == MouseButton.PRIMARY) {
                     viewer.selectedDie = null;
-                    if (viewer.game.getStepHistory().size() > 0) {
+                    if (viewer.game.getStepHistory().size() > 1) {
                         viewer.game.endTurn();
                         if (viewer.turnLabel != null) {
                             viewer.turnLabel.setText(viewer.game.getCurrentPlayer().isWhite() ? "White" : "Black");
