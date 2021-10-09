@@ -61,10 +61,9 @@ public class PurCublino extends Game {
         } else {
             moveType = MoveType.INVALID;
         }
-        if (moveType != MoveType.INVALID) {
-            if (firstEntry) addToStepHistory(new Move(clone, MoveType.ORIGIN));
-            addToStepHistory(new Move(clone, moveType));
-        }
+
+        if (firstEntry) addToStepHistory(new Move(clone, MoveType.ORIGIN));
+        addToStepHistory(new Move(clone, moveType));
     }
 
     /**
