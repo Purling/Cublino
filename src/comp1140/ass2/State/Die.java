@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import static comp1140.ass2.State.Boards.BOARD_DIMENSION;
 import static comp1140.ass2.State.Direction.*;
 import static comp1140.ass2.State.Direction.DOWN;
 
@@ -249,6 +250,20 @@ public class Die implements Serializable{
                 setPosition(getX() + 1, getY());
             }
         }
+    }
+
+    /**
+     * Returns the position that is one over in whichever direction specified
+     * @param direction The direction specified
+     * @return The position which is one position over
+     */
+    public String getPositionOneOver(Direction direction) {
+        return switch (direction) {
+            case RIGHT -> Integer.toString(getX() + 1) + getY();
+            case LEFT -> Integer.toString(getX() - 1) + getY();
+            case UP -> getX() + Integer.toString(getY() + 1);
+            case DOWN -> getX() + Integer.toString(getY() - 1);
+        };
     }
 
     public Direction getDirection(String endPosition) {

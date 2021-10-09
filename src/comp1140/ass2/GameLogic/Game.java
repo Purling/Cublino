@@ -17,7 +17,7 @@ import java.util.List;
  * @author Ziling Ouyang, minor edits by Zane Gates
  */
 
-public abstract class Game{
+public abstract class Game implements Serializable{
 
     public enum MoveType {
         TIP, JUMP, ORIGIN, INVALID
@@ -125,7 +125,6 @@ public abstract class Game{
      * Constructor for Game which takes in current player colour and the current board
      */
     public Game(boolean isWhite, Boards board){
-
         this.currentPlayer = (isWhite) ? board.getWhitePlayer() : board.getBlackPlayer();
         this.otherPlayer = (isWhite) ? board.getBlackPlayer() : board.getWhitePlayer();
         this.board = board;

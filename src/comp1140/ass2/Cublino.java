@@ -340,17 +340,17 @@ public class Cublino {
      * @return the resulting state after the move has been applied
      */
     public static String applyMoveContra(String state, String move) {
-            Boards board = new Boards(state);
-            ContraCublino contra = new ContraCublino(Character.isUpperCase(state.charAt(0)), board);
-            Boards.Positions[] stepPositions = Boards.moveToPositions(move);
+        Boards board = new Boards(state);
+        ContraCublino contra = new ContraCublino(Character.isUpperCase(state.charAt(0)), board);
+        Boards.Positions[] stepPositions = Boards.moveToPositions(move);
 
-            for(int i = 1; i < stepPositions.length; i++){
-                Die die = board.getAt(stepPositions[i - 1].toString());
-                contra.applyStep(die, stepPositions[i].toString());
-            }
+        for(int i = 1; i < stepPositions.length; i++){
+            Die die = board.getAt(stepPositions[i - 1].toString());
+            contra.applyStep(die, stepPositions[i].toString());
+        }
 
-            return ((Character.isLowerCase(state.charAt(0))) ? String.valueOf(Character.toUpperCase(state.charAt(0))) : Character.toLowerCase(state.charAt(0)))
-                    + boardToString(board);
+        return ((Character.isLowerCase(state.charAt(0))) ? String.valueOf(Character.toUpperCase(state.charAt(0))) : Character.toLowerCase(state.charAt(0)))
+            + boardToString(board);
     }
 
     /**
@@ -364,7 +364,10 @@ public class Cublino {
      * @return a move for the current game state.
      */
     public static String generateMoveContra(String state) {
-        return null; // FIXME Task 14c (HD)
+        Boards board = new Boards(state);
+        ContraCublino contra = new ContraCublino(Character.isUpperCase(state.charAt(0)), board);
+
+        return contra.generateLegalMoves()[0].getEncodedMove();
     }
 
 }
