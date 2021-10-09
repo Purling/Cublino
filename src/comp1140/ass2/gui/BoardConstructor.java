@@ -99,27 +99,29 @@ public class BoardConstructor extends SubScene {
 
         setEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
             mouseX = e.getSceneX();
-            if (e.isPrimaryButtonDown() && e.isSecondaryButtonDown()) {
-                game.applyStep(selectedDie.die, mouseOverTile.toString());
-                selectedTiles.add(new Position(selectedDie.die.getX(), selectedDie.die.getY()));
-                selectedDie.setTranslationFromDie();
-                newTileSelected();
-                selectedDie.getTransforms().set(0, selectedDie.necessaryRotations());
-            } else if (e.isPrimaryButtonDown()) {
-                selectedDie = null;
-                selectedTiles.clear();
-                selectedTiles.add(mouseOverTile);
-                mouseDown = true;
-                for (DieModel m : dieModels) {
-                    if (m.die.getPosition().equals(mouseOverTile.toString())
-                            && m.die.isWhite() == game.getCurrentPlayer().isWhite()) {
-                        selectedDie = m;
-                        break;
+            if (permitsMoveMaking) {
+                if (e.isPrimaryButtonDown() && e.isSecondaryButtonDown()) {
+                    game.applyStep(selectedDie.die, mouseOverTile.toString());
+                    selectedTiles.add(new Position(selectedDie.die.getX(), selectedDie.die.getY()));
+                    selectedDie.setTranslationFromDie();
+                    newTileSelected();
+                    selectedDie.getTransforms().set(0, selectedDie.necessaryRotations());
+                } else if (e.isPrimaryButtonDown()) {
+                    selectedDie = null;
+                    selectedTiles.clear();
+                    selectedTiles.add(mouseOverTile);
+                    mouseDown = true;
+                    for (DieModel m : dieModels) {
+                        if (m.die.getPosition().equals(mouseOverTile.toString())
+                                && m.die.isWhite() == game.getCurrentPlayer().isWhite()) {
+                            selectedDie = m;
+                            break;
+                        }
                     }
                 }
-            }
 
-            newTileSelected();
+                newTileSelected();
+            }
         });
 
         setEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
@@ -128,27 +130,29 @@ public class BoardConstructor extends SubScene {
         });
 
         setEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
-            if (!e.isPrimaryButtonDown()) {
-                selectedDie = null;
+            if (permitsMoveMaking) {
+                if (!e.isPrimaryButtonDown()) {
+                    selectedDie = null;
 
-                boolean moveExecuted = false;
-                for (Game.Move m : game.getStepHistory()) {
-                    if (m.getType() == Game.MoveType.JUMP || m.getType() == Game.MoveType.TIP) {
-                        moveExecuted = true;
-                        break;
+                    boolean moveExecuted = false;
+                    for (Game.Move m : game.getStepHistory()) {
+                        if (m.getType() == Game.MoveType.JUMP || m.getType() == Game.MoveType.TIP) {
+                            moveExecuted = true;
+                            break;
+                        }
                     }
-                }
 
-                if (moveExecuted) {
-                    game.endTurn();
-                    if (turnLabel != null) {
-                        turnLabel.setText(game.getCurrentPlayer().isWhite() ? "White" : "Black");
+                    if (moveExecuted) {
+                        game.endTurn();
+                        if (turnLabel != null) {
+                            turnLabel.setText(game.getCurrentPlayer().isWhite() ? "White" : "Black");
+                        }
                     }
-                }
 
-                mouseDown = false;
-                selectedTiles.clear();
-                newTileSelected();
+                    mouseDown = false;
+                    selectedTiles.clear();
+                    newTileSelected();
+                }
             }
         });
 
@@ -375,12 +379,14 @@ public class BoardConstructor extends SubScene {
     List<Position> selectedTiles = new ArrayList<>();
 
     void newTileSelected() {
-        deselectEverything();
-        if (mouseDown && selectedDie == null) return;
-        for (Position p : selectedTiles) {
-            selectTile(p, SelectionType.PREVIOUS);
+        if (permitsMoveMaking) {
+            deselectEverything();
+            if (mouseDown && selectedDie == null) return;
+            for (Position p : selectedTiles) {
+                selectTile(p, SelectionType.PREVIOUS);
+            }
+            if (mouseOverTile != null) selectTile(mouseOverTile, SelectionType.CURRENT);
         }
-        if (mouseOverTile != null) selectTile(mouseOverTile, SelectionType.CURRENT);
     }
 
     static class BoardTile extends Box {
