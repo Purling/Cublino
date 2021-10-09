@@ -2,16 +2,34 @@ package comp1140.ass2.GameLogic;
 
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
+import comp1140.ass2.State.Direction;
 
+import java.io.*;
 import java.util.*;
 
 import static comp1140.ass2.GameLogic.Game.MoveType.TIP;
+import static comp1140.ass2.State.Boards.BOARD_DIMENSION;
+import static comp1140.ass2.State.Direction.*;
 
 /** A gamemode of Cublino extends from Game class
  *
  * @author Ziling Ouyang, Yuechen Liu
  */
-public class ContraCublino extends Game {
+public class ContraCublino extends Game implements Serializable {
+
+    public class ContraMove {
+        ContraCublino possibleState;
+        String encodedMove;
+
+        public ContraMove(ContraCublino possibleState, String encodedMove) {
+            this.possibleState = possibleState;
+            this.encodedMove = encodedMove;
+        }
+
+        public String getEncodedMove() {
+            return encodedMove;
+        }
+    }
 
     public ContraCublino(){
     }
@@ -25,7 +43,7 @@ public class ContraCublino extends Game {
 
     @Override
     public boolean isDiceAmountCorrect(Boards board){
-        return (board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() <= 2 * Boards.BOARD_DIMENSION
+        return (board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() <= 2 * BOARD_DIMENSION
         && board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() >= 2);
     }
 
@@ -90,6 +108,88 @@ public class ContraCublino extends Game {
         eliminate.forEach(this::removeDie);
     }
 
+    /**
+     * Returns any legal moves that can be made by the current player given the game up to that point
+     * @return An array of games which represent each possible move that can be made by the player
+     */
+    public ContraMove[] generateLegalMoves() { // Can probably be abstracted
+        List<Die> possibleDie = getCurrentPlayer().getDice();
+        List<ContraMove> possibleMoves = new ArrayList<>();
+
+        for (Die die : possibleDie) {
+            if (isDirectionClear(RIGHT, die)) {
+                ContraCublino clone = deepClone();
+                Die dieClone = die.deepClone();
+                clone.applyStep(dieClone, dieClone.getPositionOneOver(RIGHT));
+                ContraMove move = new ContraMove(clone, Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1));
+                possibleMoves.add(move);
+            }
+
+            if (isDirectionClear(LEFT, die)) {
+                ContraCublino clone = deepClone();
+                Die dieClone = die.deepClone();
+                clone.applyStep(dieClone, dieClone.getPositionOneOver(LEFT));
+                ContraMove move = new ContraMove(clone, Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1));
+                possibleMoves.add(move);
+            }
+
+            if (isDirectionClear(DOWN, die)) {
+                ContraCublino clone = deepClone();
+                Die dieClone = die.deepClone();
+                clone.applyStep(dieClone, dieClone.getPositionOneOver(DOWN));
+                ContraMove move = new ContraMove(clone, Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1));
+                possibleMoves.add(move);
+            }
+
+            if (isDirectionClear(UP, die)) {
+                ContraCublino clone = deepClone();
+                Die dieClone = die.deepClone();
+                clone.applyStep(dieClone, dieClone.getPositionOneOver(UP));
+                ContraMove move = new ContraMove(clone, Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1));
+                possibleMoves.add(move);
+            }
+        }
+        return possibleMoves.toArray(ContraMove[]::new);
+    }
+
+    /**
+     * Creates a deep copy of the ContraCublino
+     * @return A deep copy the ContraCublino
+     */
+    public ContraCublino deepClone() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (ContraCublino) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Method which evaluates if the space directly ahead in the specified direction (Manhattan distance of 1) is clear
+     * @param direction The direction which needs to be checked
+     * @param die The die from which the origin is based
+     * @return True if the space is clear, false otherwise
+     */
+    public boolean isDirectionClear(Direction direction, Die die) {
+        return switch (direction) {
+            case RIGHT -> ((die.getX() + 1) < BOARD_DIMENSION && (board.getAt(die.getX() + 1, die.getY()) == null));
+            case LEFT -> ((die.getX()) > 0 && (board.getAt(die.getX() - 1, die.getY()) == null));
+            case UP -> (die.isWhite() && (die.getY() + 1) < BOARD_DIMENSION && (board.getAt(die.getX(), die.getY() + 1) == null));
+            case DOWN -> (die.isWhite() && (die.getY()) > 0 && (board.getAt(die.getX(), die.getY() - 1) == null));
+        };
+    }
+
+    /**
+     * Evaluates whether the game is valid i.e. It has an appropriate amount of dice and has not reached an invalid state
+     * @param board The board to be evaluated
+     * @return True if the game is valid, false otherwise
+     */
     public boolean isGameValid(Boards board){
         return (isDiceAmountCorrect(board) && !hasBothWon(board));
     }
