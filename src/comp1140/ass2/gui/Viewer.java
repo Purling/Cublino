@@ -69,7 +69,7 @@ public class Viewer extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("Cubilino Viewer");
+        primaryStage.setTitle("Cublino Viewer");
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
         root.getChildren().add(controls);
 

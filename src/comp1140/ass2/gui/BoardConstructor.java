@@ -8,7 +8,7 @@ import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
@@ -18,6 +18,8 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import comp1140.ass2.State.Boards;
 
@@ -39,11 +41,6 @@ public class BoardConstructor extends SubScene {
     private static final int VIEWER_HEIGHT = 700;
 
     private static final String URI_BASE = "assets/";
-
-    // When the mouse is moved less than this amount, the die will be left in place
-    private static final double MOUSE_NULL_SPOT = 40;
-    private static final double MOUSE_SMALL_MOVE_SPOT = 120;
-
     private final Group root = new Group();
 
     double mouseX = 0;
@@ -57,6 +54,8 @@ public class BoardConstructor extends SubScene {
     boolean permitsMoveMaking;
 
     Label turnLabel;
+
+    List<DieModel> dieModels = new ArrayList<>();
 
     /**
      * Draw a placement in the window, removing any previously drawn one
@@ -87,18 +86,70 @@ public class BoardConstructor extends SubScene {
 
                 // If the game state contains a die at the current position, construct it as well
                 Die die = game.getBoard().getAt(x, y);
-                if (die != null) root.getChildren().add(new DieModel(die, this));
+                if (die != null) {
+                    DieModel m = new DieModel(die, this);
+                    root.getChildren().add(m);
+                    dieModels.add(m);
+                }
             }
         }
 
-        // ALlow the board group to be rotated as the mouse is dragged
+        // Allow the board group to be rotated as the mouse is dragged
         root.setRotationAxis(new Point3D(0, 1, 0));
-        root.setOnMousePressed(e -> {
+
+        setEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
             mouseX = e.getSceneX();
+            if (e.isPrimaryButtonDown() && e.isSecondaryButtonDown()) {
+                game.applyStep(selectedDie.die, mouseOverTile.toString());
+                selectedTiles.add(new Position(selectedDie.die.getX(), selectedDie.die.getY()));
+                selectedDie.setTranslationFromDie();
+                newTileSelected();
+                selectedDie.getTransforms().set(0, selectedDie.necessaryRotations());
+            } else if (e.isPrimaryButtonDown()) {
+                selectedDie = null;
+                selectedTiles.clear();
+                selectedTiles.add(mouseOverTile);
+                mouseDown = true;
+                for (DieModel m : dieModels) {
+                    if (m.die.getPosition().equals(mouseOverTile.toString())
+                            && m.die.isWhite() == game.getCurrentPlayer().isWhite()) {
+                        selectedDie = m;
+                        break;
+                    }
+                }
+            }
+
+            newTileSelected();
         });
-        root.setOnMouseDragged(e -> {
+
+        setEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
             if (selectedDie == null) root.setRotate(root.getRotate() + (mouseX - e.getSceneX())/10);
             mouseX = e.getSceneX();
+        });
+
+        setEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
+            if (!e.isPrimaryButtonDown()) {
+                selectedDie = null;
+
+                boolean moveExecuted = false;
+                for (Game.Move m : game.getStepHistory()) {
+                    if (m.getType() == Game.MoveType.JUMP || m.getType() == Game.MoveType.TIP) {
+                        moveExecuted = true;
+                        break;
+                    }
+                }
+
+                if (moveExecuted) {
+                    game.endTurn();
+                    if (turnLabel != null) {
+                        turnLabel.setText(game.getCurrentPlayer().isWhite() ? "White" : "Black");
+                    }
+                }
+
+                mouseDown = false;
+                selectedTiles.clear();
+                newTileSelected();
+            }
         });
 
         // Establish, position and rotate camera
@@ -112,12 +163,8 @@ public class BoardConstructor extends SubScene {
 
         // Establish soft white lighting to remove shading and shadows
         root.getChildren().add(new AmbientLight(Color.WHITE));
-    }
 
-    public double getBoardRotation() {
-        double result = root.getRotate();
-        while (result < 0) result += 360;
-        return result % 360;
+        setOnDragDetected(e -> startFullDrag());
     }
 
     public final static TriangleMesh dieMesh = new TriangleMesh();
@@ -172,36 +219,24 @@ public class BoardConstructor extends SubScene {
                 7,9, 3,13,2,12);    // HDC 2
     }
 
-    public void selectTile(Position p) {
+    public void selectTile(Position p, SelectionType s) {
         try {
-            boardTiles[p.x][p.y].setSelected();
+            boardTiles[p.x][p.y].setSelected(s);
         } catch (Exception ignored) { }
     }
 
     public void deselectEverything() {
         for (int x = 0; x < 7; x++) {
             for (int y = 0; y < 7; y++) {
-                boardTiles[y][x].setUnselected();
+                boardTiles[y][x].setSelected(SelectionType.UNSELECTED);
             }
         }
-    }
-
-    public void tryToMakeMove(Die movingDie, String move) {
-        game.applyStep(movingDie, move);
     }
 
     public static class DieModel extends MeshView {
 
         Die die;
         BoardConstructor viewer;
-
-        double mouseDownX;
-        double mouseDownY;
-        double mouseCurrentX;
-        double mouseCurrentY;
-
-        int indicatorDirection;
-        int indicatorDistance;
 
         /**
          * Constructs and transforms a die mesh to provide an
@@ -226,66 +261,7 @@ public class BoardConstructor extends SubScene {
             setScaleZ(dieScale);
             setTranslationFromDie();
 
-            if (!viewer.permitsMoveMaking) return;
-
-            this.setOnMousePressed(event -> {
-
-                if (event.getButton() == MouseButton.PRIMARY)  {
-                    if (viewer.game.getCurrentPlayer().isWhite() != die.isWhite()) return;
-                    viewer.selectedDie = this;
-                    indicatorDistance = 0;
-                } else {
-                    if (viewer.selectedDie == this & indicatorDistance != 0) {
-                        viewer.tryToMakeMove(this.die, "" + new Position(die.getX(), die.getY())
-                                .positionIn(indicatorDirection, indicatorDistance));
-                        if (viewer.game.getStepHistory().isEmpty()) return;
-                        if (viewer.game.getStepHistory().get(viewer.game.getStepHistory().size()-1).getType() == Game.MoveType.INVALID) return;
-                        if (viewer.game.getStepHistory().get(viewer.game.getStepHistory().size()-1).getType() == Game.MoveType.ORIGIN) return;
-                        setTranslationFromDie();
-                        getTransforms().set(0, necessaryRotations());
-                    }
-                }
-                mouseDownX = event.getScreenX();
-                mouseDownY = event.getScreenY();
-                mouseCurrentX = mouseDownX;
-                mouseCurrentY = mouseDownY;
-                viewer.deselectEverything();
-                viewer.selectTile(new Position(die.getX(), die.getY()));
-            });
-
-            this.setOnMouseDragged(event -> {
-                if (viewer.selectedDie == this) {
-                    mouseCurrentX = event.getScreenX();
-                    mouseCurrentY = event.getScreenY();
-
-                    Position diePosition = new Position(die.getX(), die.getY());
-
-                    viewer.deselectEverything();
-                    viewer.selectTile(diePosition);
-
-                    if (mouseMagnitude() < MOUSE_NULL_SPOT) {
-                        indicatorDistance = 0;
-                    } else {
-                        indicatorDirection = (((int) Math.round((mouseDirection() - viewer.getBoardRotation()) / 90)) + 8) % 4;
-                        indicatorDistance = mouseMagnitude() < MOUSE_SMALL_MOVE_SPOT ? 1 : 2;
-
-                        viewer.selectTile(diePosition.positionIn(indicatorDirection, indicatorDistance));
-                    }
-                }
-            });
-
-            this.setOnMouseReleased(event -> {
-                if (event.getButton() == MouseButton.PRIMARY) {
-                    viewer.selectedDie = null;
-                    if (viewer.game.getStepHistory().size() > 1) {
-                        viewer.game.endTurn();
-                        if (viewer.turnLabel != null) {
-                            viewer.turnLabel.setText(viewer.game.getCurrentPlayer().isWhite() ? "White" : "Black");
-                        }
-                    }
-                    viewer.deselectEverything();
-                }
-            });
+            setMouseTransparent(true);
 
             DieModel thisModel = this;
             AnimationTimer animation = new AnimationTimer() {
@@ -375,14 +351,6 @@ public class BoardConstructor extends SubScene {
             };
         }
 
-        double mouseMagnitude() {
-            return Math.sqrt(Math.pow(mouseCurrentY - mouseDownY, 2) + Math.pow(mouseCurrentX - mouseDownX, 2));
-        }
-
-        double mouseDirection() {
-            return Math.atan2(mouseCurrentY - mouseDownY, mouseCurrentX - mouseDownX)*180/Math.PI;
-        }
-
         void setTranslationFromDie() {
             setTranslateX(125 * (die.getX()-3));
             setTranslateZ(125 * (die.getY()-3));
@@ -393,7 +361,8 @@ public class BoardConstructor extends SubScene {
     final static PhongMaterial blackMaterial = makePhongFromAsset("blackdie.png");
     final static PhongMaterial whiteTileMaterial = makePhongFromAsset("whitetile.png");
     final static PhongMaterial blackTileMaterial = makePhongFromAsset("blacktile.png");
-    final static PhongMaterial selectedTileMaterial = makePhongFromAsset("selectedtile.png");
+    final static PhongMaterial darkRedTileMaterial = makePhongFromAsset("previousselectedtile.png");
+    final static PhongMaterial redTileMaterial = makePhongFromAsset("selectedtile.png");
 
     static PhongMaterial makePhongFromAsset(String path) {
         PhongMaterial result = new PhongMaterial();
@@ -401,7 +370,20 @@ public class BoardConstructor extends SubScene {
         return result;
     }
 
-    class BoardTile extends Box {
+    boolean mouseDown = false;
+    Position mouseOverTile;
+    List<Position> selectedTiles = new ArrayList<>();
+
+    void newTileSelected() {
+        deselectEverything();
+        if (mouseDown && selectedDie == null) return;
+        for (Position p : selectedTiles) {
+            selectTile(p, SelectionType.PREVIOUS);
+        }
+        if (mouseOverTile != null) selectTile(mouseOverTile, SelectionType.CURRENT);
+    }
+
+    static class BoardTile extends Box {
         Position position;
         BoardConstructor viewer;
 
@@ -415,18 +397,40 @@ public class BoardConstructor extends SubScene {
 
             this.viewer = viewer;
 
-            setUnselected();
+            setSelected(SelectionType.UNSELECTED);
             toBack();
+
+            setOnMouseEntered(event -> {
+                viewer.mouseOverTile = position;
+                viewer.newTileSelected();
+            });
+
+            setOnMouseDragEntered(event -> {
+                viewer.mouseOverTile = position;
+                viewer.newTileSelected();
+            });
+
+            setOnMouseExited(event -> {
+                if (viewer.mouseOverTile.equals(position)) viewer.mouseOverTile = null;
+                viewer.newTileSelected();
+            });
+
+            setOnDragExited(event -> {
+                if (viewer.mouseOverTile.equals(position)) viewer.mouseOverTile = null;
+                viewer.newTileSelected();
+            });
         }
 
-        public void setSelected() {
-            setMaterial(selectedTileMaterial);
-        }
-
-        public void setUnselected() {
-            setMaterial((position.x + position.y)%2 == 0 ? whiteTileMaterial : blackTileMaterial);
+        public void setSelected(SelectionType s) {
+            switch (s) {
+                case UNSELECTED -> setMaterial((position.x + position.y) % 2 == 0 ? whiteTileMaterial : blackTileMaterial);
+                case PREVIOUS -> setMaterial(darkRedTileMaterial);
+                case CURRENT -> setMaterial(redTileMaterial);
+            }
         }
     }
+
+    public enum SelectionType {UNSELECTED, PREVIOUS, CURRENT}
 
     static class Position {
         public int x;
@@ -444,16 +448,6 @@ public class BoardConstructor extends SubScene {
         @Override
         public String toString() {
             return "" + x + "" + y;
-        }
-
-        public Position positionIn(int direction, int distance) {
-            return switch (direction) {
-                case 0 -> new Position(x + distance, y);
-                case 1 -> new Position(x, y - distance);
-                case 2 -> new Position(x - distance, y);
-                case 3 -> new Position(x, y + distance);
-                default -> new Position(x, y);
-            };
         }
     }
 }
