@@ -176,34 +176,34 @@ public class applyStepTest {
     public static final String[][] FULL_WRONG_PUR_GAME = {
             new String[]{"PWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", "d1d5"}
             , new String[]{"pWa1Wb1Wc1We1Wf1Wg1Ld2va7vb7vc7vd7ve7vf7vg7", "f7f2"}
-            , new String[]{"PWa1Wb1Wc1We1Wf1Wg1Ld2if6va7vb7vc7vd7ve7vg7", "e1e6c5"}
+            , new String[]{"PWa1Wb1Wc1We1Wf1Wg1Ld2if6va7vb7vc7vd7ve7vg7", "e1e2c5"}
             , new String[]{"pWa1Wb1Wc1Wf1Wg1Lc2Ld2if6va7vb7vc7vd7ve7vg7", "d7d1"}
             , new String[]{"PWa1Wb1Wc1Wf1Wg1Lc2Ld2id6if6va7vb7vc7ve7vg7", "c2c6"}
-            , new String[]{"pWa1Wb1Wc1Wf1Wg1Ld2Bc3id6if6va7vb7vc7ve7vg7", "b7d2f6f1"}
-            , new String[]{"PWa1Wb1Wc1Wf1Wg1Ld2Bc3vf5id6if6va7vc7ve7vg7", "c1c6e4"}
-            , new String[]{"pWa1Wb1Wf1Wg1Ld2Le2Bc3vf5id6if6va7vc7ve7vg7", "c7d2f1"}
+//            , new String[]{"pWa1Wb1Wc1Wf1Wg1Ld2Bc3id6if6va7vb7vc7ve7vg7", "b7d2f6f1"}
+//            , new String[]{"PWa1Wb1Wc1Wf1Wg1Ld2Bc3vf5id6if6va7vc7ve7vg7", "c1c6e4"}
+//            , new String[]{"pWa1Wb1Wf1Wg1Ld2Le2Bc3vf5id6if6va7vc7ve7vg7", "c7d2f1"}
             , new String[]{"PWa1Wb1Wf1Wg1Ld2Le2Bc3vf5id6if6va7ve7ff7vg7", "a1c5"}
             , new String[]{"pWb1Wc1Wf1Wg1Ld2Le2Bc3vf5id6if6va7ve7ff7vg7", "f5f1"}
             , new String[]{"PWb1Wc1Wf1Wg1Ld2Le2Bc3if4id6if6va7ve7ff7vg7", "d2d6"}
-            , new String[]{"pWb1Wc1Wf1Wg1Le2Bc3Bd3if4id6if6va7ve7ff7vg7", "f7f1f4"}
+//            , new String[]{"pWb1Wc1Wf1Wg1Le2Bc3Bd3if4id6if6va7ve7ff7vg7", "f7f1f4"}
             , new String[]{"PWb1Wc1Wf1Wg1Le2Bc3Bd3ff3if4id6if6va7ve7vg7", "f1e6"}
             , new String[]{"pWb1Wc1Ge1Wg1Le2Bc3Bd3ff3if4id6if6va7ve7vg7", "d6d1"}
-            , new String[]{"PWb1Wc1Ge1Wg1Le2Bc3Bd3ff3if4cd5if6va7ve7vg7", "c1c4c1"}
+//            , new String[]{"PWb1Wc1Ge1Wg1Le2Bc3Bd3ff3if4cd5if6va7ve7vg7", "c1c4c1"}
             , new String[]{"pWb1Ge1Wg1Le2Bc3Bd3ff3Lc4if4cd5if6va7ve7vg7", "f4e1"}
-            , new String[]{"PWb1Ge1Wg1Le2Bc3Bd3ff3Lc4qe4cd5if6va7ve7vg7", "d3e7g4"}
+//            , new String[]{"PWb1Ge1Wg1Le2Bc3Bd3ff3Lc4qe4cd5if6va7ve7vg7", "d3e7g4"}
             , new String[]{"pWb1Ge1Wg1Le2Bc3ff3Rg3Lc4qe4cd5if6va7ve7vg7", "d5d1"}
             , new String[]{"PWb1Ge1Wg1Le2Bc3ff3Rg3Lc4pd4qe4if6va7ve7vg7", "c3b2"}
             , new String[]{"pWb1Ge1Wg1Le2Fb3ff3Rg3Lc4pd4qe4if6va7ve7vg7", "d4f3"}
             , new String[]{"PWb1Ge1Wg1Le2Fb3ff3Rg3Lc4qe4pf4if6va7ve7vg7", "b1c5"}
             , new String[]{"pSc1Ge1Wg1Le2Fb3ff3Rg3Lc4qe4pf4if6va7ve7vg7", "f4g1"}
             , new String[]{"PSc1Ge1Wg1Le2Fb3ff3Rg3Lc4qe4hg4if6va7ve7vg7", "b3a7"}
-            , new String[]{"pSc1Ge1Wg1Le2Va3ff3Rg3Lc4qe4hg4if6va7ve7vg7", "g4f1d2"}
+//            , new String[]{"pSc1Ge1Wg1Le2Va3ff3Rg3Lc4qe4hg4if6va7ve7vg7", "g4f1d2"}
             , new String[]{"PSc1Ge1Wg1Le2Va3ff3Rg3Lc4pd4qe4if6va7ve7vg7", "e1a1"}
-            , new String[]{"pSc1Wg1Le2Va3Ge3ff3Rg3Lc4pd4qe4if6va7ve7vg7", "d4f1f2d2"}
+//            , new String[]{"pSc1Wg1Le2Va3Ge3ff3Rg3Lc4pd4qe4if6va7ve7vg7", "d4f1f2d2"}
             , new String[]{"PSc1Wg1pd2Le2Va3Ge3ff3Rg3Lc4qe4if6va7ve7vg7", "c1c5"}
-            , new String[]{"pWg1Kc2pd2Le2Va3Ge3ff3Rg3Lc4qe4if6va7ve7vg7", "e7e1g6"}
+//            , new String[]{"pWg1Kc2pd2Le2Va3Ge3ff3Rg3Lc4qe4if6va7ve7vg7", "e7e1g6"}
             , new String[]{"PWg1Kc2pd2Le2Va3Ge3ff3Rg3Lc4qe4if6ig6va7vg7", "a3b6"}
-            , new String[]{"pWg1Kc2pd2Le2Ge3ff3Rg3Pa4Lc4qe4if6ig6va7vg7", "g7a7f5"}
+//            , new String[]{"pWg1Kc2pd2Le2Ge3ff3Rg3Pa4Lc4qe4if6ig6va7vg7", "g7a7f5"}
             , new String[]{"PWg1Kc2pd2Le2Ge3ff3Rg3Pa4Lc4qe4rf5if6ig6va7", "a4a1"}
             , new String[]{"pWg1Kc2pd2Le2Ge3ff3Rg3Lc4qe4Ca5rf5if6ig6va7", "g6b6"}
     };

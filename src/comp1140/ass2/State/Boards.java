@@ -3,6 +3,7 @@ package comp1140.ass2.State;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static comp1140.ass2.State.Die.dieToEnc;
 
@@ -77,7 +78,6 @@ public class Boards implements Serializable{
             return null;
         }
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -155,28 +155,25 @@ public class Boards implements Serializable{
         }
     }
 
+    /**
+     * Evaluates if a coordinate is adjacent to another coordinate
+     * @param startPosition First coordinate
+     * @param endPosition Other coordinate
+     * @return True if adjacent coordinates, false otherwise
+     */
     public boolean isAdjacent(String startPosition, String endPosition) {
         return getManhattanDistance(startPosition, endPosition) == 1;
     }
 
+    /**
+     * Returns any adjacent die
+     * @param die The die from which adjacency is determined
+     * @return Any die which are adjacent to the specified die
+     */
     public Die[] getAdjacentDie(Die die) {
-        ArrayList<Die> allDice = new ArrayList<>();
-        ArrayList<Die> adjacentDice = new ArrayList<>();
-        for(int x = 0; x < 7; x++) {
-            for (int y = 0; y < 7; y++) {
-                Die d;
-                if (this.getAt(x, y) != null) {
-                    d = this.getAt(x, y);
-                    allDice.add(d);
-                }
-            }
-        }
-        for(Die di : allDice){
-            if(die.isAdjacent(di)){
-                adjacentDice.add(di);
-            }
-        }
-        return (Die[]) adjacentDice.toArray();
+        ArrayList<Die> allDice = (ArrayList<Die>) Stream.concat(whitePlayer.getDice().stream(),blackPlayer.getDice().stream()).collect(Collectors.toList());
+        ArrayList<Die> adjacentDice = (ArrayList<Die>) allDice.stream().filter(die::isAdjacent).collect(Collectors.toList());
+        return adjacentDice.toArray(Die[]::new);
     }
 
     /**
@@ -250,42 +247,41 @@ public class Boards implements Serializable{
         return blackPlayer;
     }
 
+    /**
+     * Returns the String representation of a board
+     * @param board The board being played on
+     * @return The String representation of said parameter board
+     */
     public static String boardToString(Boards board){
-        String[] b = new String[14];
-        int index = 0;
+        List<String> b = new ArrayList<>();
         for(int x = 0; x < 7; x++){
             for(int y = 0; y < 7; y++){
                 Die die;
                 if(board.getAt(x,y) != null){
                     die = board.getAt(x,y);
-                    b[index] = dieToEnc(die);
-                    index++;
+                    b.add(dieToEnc(die));
                 }
             }
         }
-        Arrays.sort(b, new Comparator<>() {
-            @Override
-            public int compare(String o1, String o2) {
-                int a = o1.charAt(2) - o2.charAt(2);
-                if (a != 0) {
-                    return a;
-                }
-                int b = o1.charAt(1) - o2.charAt(1);
-                if (b != 0) {
-                    return b;
-                }
-                return o1.charAt(0) - o2.charAt(0);
+        b.sort((o1, o2) -> {
+            int a = o1.charAt(2) - o2.charAt(2);
+            if (a != 0) {
+                return a;
             }
+            int b1 = o1.charAt(1) - o2.charAt(1);
+            if (b1 != 0) {
+                return b1;
+            }
+            return o1.charAt(0) - o2.charAt(0);
         });
 
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         for(String r : b) {
             str.append(r);
         }
 
         return str.toString();
     }
-
 
     @Override
     public String toString() {

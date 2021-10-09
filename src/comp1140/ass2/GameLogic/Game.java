@@ -233,6 +233,16 @@ public abstract class Game{
     }
 
     /**
+     * Removes the specified die from either player
+     * @param remove The die to be removed
+     */
+    public void removeDie (Die remove) {
+        currentPlayer.getDice().remove(remove);
+        otherPlayer.getDice().remove(remove);
+        board.setAt(remove.getPosition(), null);
+    }
+
+    /**
      * determine whether the game is over or not
      * @param b A board
      * @return True if the game is over and false otherwise

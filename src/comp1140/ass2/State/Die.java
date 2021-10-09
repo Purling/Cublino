@@ -167,6 +167,24 @@ public class Die implements Serializable{
         this.y = Integer.parseInt(position.substring(1));
     }
 
+    /**
+     * Creates a deep copy of the die
+     * @return A deep copy the die
+     */
+    public Die deepClone() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (Die) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            return null;
+        }
+    }
+
     public int getX() {return x;}
     public int getY() {return y;}
 

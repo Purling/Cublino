@@ -340,7 +340,17 @@ public class Cublino {
      * @return the resulting state after the move has been applied
      */
     public static String applyMoveContra(String state, String move) {
-        return null; // FIXME Task 14b (HD)
+            Boards board = new Boards(state);
+            ContraCublino contra = new ContraCublino(Character.isUpperCase(state.charAt(0)), board);
+            Boards.Positions[] stepPositions = Boards.moveToPositions(move);
+
+            for(int i = 1; i < stepPositions.length; i++){
+                Die die = board.getAt(stepPositions[i - 1].toString());
+                contra.applyStep(die, stepPositions[i].toString());
+            }
+
+            return ((Character.isLowerCase(state.charAt(0))) ? String.valueOf(Character.toUpperCase(state.charAt(0))) : Character.toLowerCase(state.charAt(0)))
+                    + boardToString(board);
     }
 
     /**

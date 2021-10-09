@@ -34,20 +34,20 @@ public class PurCublino extends Game {
         if (die.isWhite() != getCurrentPlayer().isWhite()) return;
 
         Boards clone = board.deepClone();
-        int historySize = getStepHistory().size();
+        boolean firstEntry = getStepHistory().isEmpty();
 
-        if (board.getAt(endPosition) != null || die == null) {
+        if (board.getAt(endPosition) != null) {
             addToStepHistory(new Move(clone, MoveType.INVALID));
             return;
         }
 
-        if (historySize == 0) addToStepHistory(new Move(clone, MoveType.ORIGIN));
+        if (firstEntry) addToStepHistory(new Move(clone, MoveType.ORIGIN));
         String diePosition = die.getPosition();
         int distance = Boards.getManhattanDistance(diePosition, endPosition);
         MoveType moveType;
         boolean correctDie = isDieCorrect(die);
 
-        if (!isMoveBackwards(diePosition, endPosition) && distance == TIP_DISTANCE && correctDie && historySize == 0) {
+        if (!isMoveBackwards(diePosition, endPosition) && distance == TIP_DISTANCE && correctDie && firstEntry) {
             applyTip(die, endPosition);
             setCurrentMoveDie(die);
             moveType = MoveType.TIP;
