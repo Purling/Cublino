@@ -1,11 +1,14 @@
 package comp1140.ass2.gui;
 
+import comp1140.ass2.GameLogic.Game;
 import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Die;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
@@ -53,12 +56,14 @@ public class BoardConstructor extends SubScene {
 
     boolean permitsMoveMaking;
 
+    Label turnLabel;
+
     /**
      * Draw a placement in the window, removing any previously drawn one
      *
      * @param placement A valid placement string
      */
-    public BoardConstructor(String placement, boolean permitsMoveMaking) {
+    public BoardConstructor(String placement, boolean permitsMoveMaking, Label turnLabel) {
         super(new Group(), VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
         createDieMesh();
 
@@ -66,6 +71,8 @@ public class BoardConstructor extends SubScene {
 
         this.setRoot(root);
         boardTiles = new BoardConstructor.BoardTile[7][7];
+
+        this.turnLabel = turnLabel;
 
         try {
             game = new PurCublino(true, new Boards(placement));
@@ -75,7 +82,7 @@ public class BoardConstructor extends SubScene {
         for (int y = 0; y < 7; y++) {
             for (int x = 0; x < 7; x++) {
                 // Construct the checkerboard tile
-                boardTiles[x][y] = new BoardTile(new Position(x, y));
+                boardTiles[x][y] = new BoardTile(new Position(x, y), this);
                 root.getChildren().add(boardTiles[x][y]);
 
                 // If the game state contains a die at the current position, construct it as well
@@ -222,43 +229,61 @@ public class BoardConstructor extends SubScene {
             if (!viewer.permitsMoveMaking) return;
 
             this.setOnMousePressed(event -> {
-                viewer.selectedDie = this;
+
+                if (event.getButton() == MouseButton.PRIMARY)  {
+                    if (viewer.game.getCurrentPlayer().isWhite() != die.isWhite()) return;
+                    viewer.selectedDie = this;
+                    indicatorDistance = 0;
+                } else {
+                    if (viewer.selectedDie == this & indicatorDistance != 0) {
+                        viewer.tryToMakeMove(this.die, "" + new Position(die.getX(), die.getY())
+                                .positionIn(indicatorDirection, indicatorDistance));
+                        if (viewer.game.getStepHistory().isEmpty()) return;
+                        if (viewer.game.getStepHistory().get(viewer.game.getStepHistory().size()-1).getType() == Game.MoveType.INVALID) return;
+                        setTranslationFromDie();
+                        getTransforms().set(0, necessaryRotations());
+                    }
+                }
                 mouseDownX = event.getScreenX();
                 mouseDownY = event.getScreenY();
                 mouseCurrentX = mouseDownX;
                 mouseCurrentY = mouseDownY;
-                indicatorDistance = 0;
+                viewer.deselectEverything();
                 viewer.selectTile(new Position(die.getX(), die.getY()));
             });
 
             this.setOnMouseDragged(event -> {
-                mouseCurrentX = event.getScreenX();
-                mouseCurrentY = event.getScreenY();
+                if (viewer.selectedDie == this) {
+                    mouseCurrentX = event.getScreenX();
+                    mouseCurrentY = event.getScreenY();
 
-                Position diePosition = new Position(die.getX(), die.getY());
+                    Position diePosition = new Position(die.getX(), die.getY());
 
-                viewer.deselectEverything();
-                viewer.selectTile(diePosition);
+                    viewer.deselectEverything();
+                    viewer.selectTile(diePosition);
 
-                if (mouseMagnitude() < MOUSE_NULL_SPOT) {
-                    indicatorDistance = 0;
-                } else {
-                    indicatorDirection = (((int) Math.round((mouseDirection() - viewer.getBoardRotation()) / 90)) + 8) % 4;
-                    indicatorDistance = mouseMagnitude() < MOUSE_SMALL_MOVE_SPOT ? 1 : 2;
+                    if (mouseMagnitude() < MOUSE_NULL_SPOT) {
+                        indicatorDistance = 0;
+                    } else {
+                        indicatorDirection = (((int) Math.round((mouseDirection() - viewer.getBoardRotation()) / 90)) + 8) % 4;
+                        indicatorDistance = mouseMagnitude() < MOUSE_SMALL_MOVE_SPOT ? 1 : 2;
 
-                    viewer.selectTile(diePosition.positionIn(indicatorDirection, indicatorDistance));
+                        viewer.selectTile(diePosition.positionIn(indicatorDirection, indicatorDistance));
+                    }
                 }
             });
 
             this.setOnMouseReleased(event -> {
-                if (indicatorDistance != 0) {
-                    viewer.tryToMakeMove(this.die, "" + new Position(die.getX(), die.getY())
-                         .positionIn(indicatorDirection, indicatorDistance));
-                    setTranslationFromDie();
-                    getTransforms().set(0, necessaryRotations());
+                if (event.getButton() == MouseButton.PRIMARY) {
+                    viewer.selectedDie = null;
+                    if (viewer.game.getStepHistory().size() > 0) {
+                        viewer.game.endTurn();
+                        if (viewer.turnLabel != null) {
+                            viewer.turnLabel.setText(viewer.game.getCurrentPlayer().isWhite() ? "White" : "Black");
+                        }
+                    }
+                    viewer.deselectEverything();
                 }
-                viewer.deselectEverything();
-                viewer.selectedDie = null;
             });
 
             DieModel thisModel = this;
@@ -375,16 +400,19 @@ public class BoardConstructor extends SubScene {
         return result;
     }
 
-    static class BoardTile extends Box {
+    class BoardTile extends Box {
         Position position;
+        BoardConstructor viewer;
 
-        public BoardTile(Position p) {
+        public BoardTile(Position p, BoardConstructor viewer) {
             super(125, 20, 125);
             setTranslateX(125*(p.x-3));
             setTranslateY(50);
             setTranslateZ(125*(p.y-3));
 
             this.position = new Position(p.x, p.y);
+
+            this.viewer = viewer;
 
             setUnselected();
             toBack();

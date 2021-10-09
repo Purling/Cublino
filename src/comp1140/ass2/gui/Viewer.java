@@ -29,7 +29,7 @@ public class Viewer extends Application {
     private final Group controls = new Group();
     private TextField textField;
 
-    private BoardConstructor boardSubscene = new BoardConstructor("", false);
+    private BoardConstructor boardSubscene = new BoardConstructor("", false, null);
 
     /**
      * Draw a placement in the window, removing any previously drawn one
@@ -38,7 +38,7 @@ public class Viewer extends Application {
      */
     void makePlacement(String placement) {
         root.getChildren().remove(boardSubscene);
-        boardSubscene = new BoardConstructor(placement, false);
+        boardSubscene = new BoardConstructor(placement, false, null);
         root.getChildren().add(boardSubscene);
     }
 

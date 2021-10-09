@@ -34,21 +34,13 @@ public class Board extends Application {
 
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
 
-        game = new BoardConstructor("PWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", true);
-
-        root.getChildren().add(game);
-
         Label turnDisplayer = new Label("White");
         turnDisplayer.setTranslateX(200);
         root.getChildren().add(turnDisplayer);
 
+        game = new BoardConstructor("PWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", true, turnDisplayer);
 
-        Button refresh = new Button("End Turn");
-        refresh.setOnAction(actionEvent -> {
-            game.game.endTurn();
-            turnDisplayer.setText(game.game.getCurrentPlayer().isWhite() ? "White" : "Black");
-        });
-        root.getChildren().add(refresh);
+        root.getChildren().add(game);
 
         primaryStage.setScene(scene);
         primaryStage.show();
