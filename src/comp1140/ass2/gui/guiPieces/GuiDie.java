@@ -49,7 +49,7 @@ public class GuiDie extends MeshView {
         AnimationTimer animation = new AnimationTimer() {
             @Override
             public void handle(long l) {
-                setTranslateY(getTranslateY() + ((viewer.selectedDie == thisModel ? -50 : 0) - getTranslateY())*0.2);
+                setTranslateY(getTranslateY() + ((viewer.isDieSelected(die) ? -50 : 0) - getTranslateY())*0.2);
             }
         };
 
