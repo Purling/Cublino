@@ -6,6 +6,9 @@ import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
 
+import java.util.Arrays;
+import java.util.Random;
+
 import static comp1140.ass2.State.Boards.boardToString;
 
 /**
@@ -373,8 +376,9 @@ public class Cublino {
     public static String generateMoveContra(String state) {
         Boards board = new Boards(state);
         ContraCublino contra = new ContraCublino(Character.isUpperCase(state.charAt(0)), board);
+        Random rand = new Random();
+        System.out.println(Arrays.toString(contra.generateLegalMoves()));
 
-        return contra.generateLegalMoves()[0].getEncodedMove();
+        return contra.generateLegalMoves()[rand.nextInt(contra.generateLegalMoves().length)].getEncodedMove();
     }
-
 }

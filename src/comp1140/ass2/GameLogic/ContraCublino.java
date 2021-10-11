@@ -9,7 +9,6 @@ import java.util.*;
 
 import static comp1140.ass2.GameLogic.Game.MoveType.TIP;
 import static comp1140.ass2.State.Boards.BOARD_DIMENSION;
-import static comp1140.ass2.State.Direction.*;
 
 /** A gamemode of Cublino extends from Game class
  *
@@ -27,6 +26,11 @@ public class ContraCublino extends Game implements Serializable {
         }
 
         public String getEncodedMove() {
+            return encodedMove;
+        }
+
+        @Override
+        public String toString() {
             return encodedMove;
         }
     }
@@ -117,36 +121,15 @@ public class ContraCublino extends Game implements Serializable {
         List<ContraMove> possibleMoves = new ArrayList<>();
 
         for (Die die : possibleDie) {
-            if (isDirectionClear(RIGHT, die)) {
-                ContraCublino clone = deepClone();
-                Die dieClone = die.deepClone();
-                clone.applyStep(dieClone, dieClone.getPositionOneOver(RIGHT));
-                ContraMove move = new ContraMove(clone, Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1));
-                possibleMoves.add(move);
-            }
-
-            if (isDirectionClear(LEFT, die)) {
-                ContraCublino clone = deepClone();
-                Die dieClone = die.deepClone();
-                clone.applyStep(dieClone, dieClone.getPositionOneOver(LEFT));
-                ContraMove move = new ContraMove(clone, Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1));
-                possibleMoves.add(move);
-            }
-
-            if (isDirectionClear(DOWN, die)) {
-                ContraCublino clone = deepClone();
-                Die dieClone = die.deepClone();
-                clone.applyStep(dieClone, dieClone.getPositionOneOver(DOWN));
-                ContraMove move = new ContraMove(clone, Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1));
-                possibleMoves.add(move);
-            }
-
-            if (isDirectionClear(UP, die)) {
-                ContraCublino clone = deepClone();
-                Die dieClone = die.deepClone();
-                clone.applyStep(dieClone, dieClone.getPositionOneOver(UP));
-                ContraMove move = new ContraMove(clone, Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1));
-                possibleMoves.add(move);
+            for(Direction direction : Direction.values()) {
+                if (isDirectionClear(direction, die)) {
+                    ContraCublino clone = deepClone();
+                    Die dieClone = die.deepClone();
+                    clone.applyStep(dieClone, dieClone.getPositionOneOver(direction));
+                    // FIXME Remove the magic numbers below
+                    ContraMove move = new ContraMove(clone, Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1));
+                    possibleMoves.add(move);
+                }
             }
         }
         return possibleMoves.toArray(ContraMove[]::new);
@@ -181,7 +164,7 @@ public class ContraCublino extends Game implements Serializable {
             case RIGHT -> ((die.getX() + 1) < BOARD_DIMENSION && (board.getAt(die.getX() + 1, die.getY()) == null));
             case LEFT -> ((die.getX()) > 0 && (board.getAt(die.getX() - 1, die.getY()) == null));
             case UP -> (die.isWhite() && (die.getY() + 1) < BOARD_DIMENSION && (board.getAt(die.getX(), die.getY() + 1) == null));
-            case DOWN -> (die.isWhite() && (die.getY()) > 0 && (board.getAt(die.getX(), die.getY() - 1) == null));
+            case DOWN -> (!die.isWhite() && (die.getY()) > 0 && (board.getAt(die.getX(), die.getY() - 1) == null));
         };
     }
 
