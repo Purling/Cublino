@@ -1,12 +1,10 @@
 package comp1140.ass2.gui;
 
+import comp1140.ass2.gui.guiPieces.GuiBoard;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 /**
@@ -24,7 +22,7 @@ public class Board extends Application {
     private static final int VIEWER_WIDTH = 933;
     private static final int VIEWER_HEIGHT = 700;
 
-    BoardConstructor game;
+    GuiBoard game;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -38,7 +36,7 @@ public class Board extends Application {
         turnDisplayer.setTranslateX(200);
         root.getChildren().add(turnDisplayer);
 
-        game = new BoardConstructor("PWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", true, turnDisplayer);
+        game = new GuiBoard("PWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", true, turnDisplayer);
 
         root.getChildren().add(game);
 

@@ -165,7 +165,8 @@ public abstract class Game implements Serializable{
         currentPlayer = otherPlayer;
         otherPlayer = temp;
         stepHistory.clear();
-        turnHistory.add(this.deepClone());
+        turnHistory.clear();
+        turnHistory.add(deepClone());
         currentMoveDie = null;
     }
 

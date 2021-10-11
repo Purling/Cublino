@@ -1,6 +1,7 @@
 package comp1140.ass2.gui;
 
 
+import comp1140.ass2.gui.guiPieces.GuiBoard;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -29,16 +30,16 @@ public class Viewer extends Application {
     private final Group controls = new Group();
     private TextField textField;
 
-    private BoardConstructor boardSubscene = new BoardConstructor("", false, null);
+    private GuiBoard boardSubscene;
 
     /**
      * Draw a placement in the window, removing any previously drawn one
      *
      * @param placement A valid placement string
      */
-    void makePlacement(String placement) {
+    void makePlacement(String placement) throws Exception {
         root.getChildren().remove(boardSubscene);
-        boardSubscene = new BoardConstructor(placement, false, null);
+        boardSubscene = new GuiBoard(placement, false, null);
         root.getChildren().add(boardSubscene);
     }
 
@@ -51,8 +52,12 @@ public class Viewer extends Application {
         textField.setPrefWidth(300);
         Button refresh = new Button("Refresh");
         refresh.setOnAction(actionEvent -> {
+            try {
                 makePlacement(textField.getText());
-                textField.clear();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            textField.clear();
         });
         HBox hb = new HBox();
         hb.getChildren().addAll(label1, textField, refresh);
@@ -69,6 +74,9 @@ public class Viewer extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
+        boardSubscene = new GuiBoard("", false, null);
+
         primaryStage.setTitle("Cublino Viewer");
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
         root.getChildren().add(controls);
