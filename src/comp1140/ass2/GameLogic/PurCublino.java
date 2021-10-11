@@ -36,7 +36,7 @@ public class PurCublino extends Game {
         Boards clone = board.deepClone();
         boolean firstEntry = true;
         for (Move x : getStepHistory()) {
-            if (x.getType() != MoveType.INVALID) firstEntry = false;
+            if (x.getType() != MoveType.ORIGIN && x.getType() != MoveType.INVALID) firstEntry = false;
         }
 
         if (board.getAt(endPosition) != null) {
@@ -62,8 +62,14 @@ public class PurCublino extends Game {
             moveType = MoveType.INVALID;
         }
 
-        if (firstEntry) addToStepHistory(new Move(clone, MoveType.ORIGIN));
+        System.out.println(firstEntry);
+        if (firstEntry) {
+            clearStepHistory();
+            addToStepHistory(new Move(clone, MoveType.ORIGIN));
+        }
         addToStepHistory(new Move(clone, moveType));
+
+        System.out.println(getStepHistory());
     }
 
     /**

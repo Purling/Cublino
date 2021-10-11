@@ -165,6 +165,10 @@ public abstract class Game implements Serializable{
         currentMoveDie = null;
     }
 
+    public void clearStepHistory() {
+        stepHistory.clear();
+    }
+
     /**
      * Creates a deep copy of the game
      * @return A deep copy the game
