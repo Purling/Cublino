@@ -6,7 +6,6 @@ import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
 
-import static comp1140.ass2.GameLogic.PurCublino.getWinner;
 import static comp1140.ass2.State.Boards.boardToString;
 
 /**
@@ -160,7 +159,15 @@ public class Cublino {
      */
     public static int isGameOverPur(String state) {
         if (state.charAt(0) != 'p' && state.charAt(0)!= 'P') return 0;
-        else {return getWinner(state);}
+        else {
+            PurCublino cublino = new PurCublino(true, new Boards(state));
+            return switch(cublino.getWinner()) {
+                case UNFINISHED -> 0;
+                case WHITE_WINS -> 1;
+                case BLACK_WINS -> 2;
+                case TIE -> 3;
+            };
+        }
     }
 
     /**

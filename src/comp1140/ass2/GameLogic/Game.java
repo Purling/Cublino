@@ -23,6 +23,10 @@ public abstract class Game implements Serializable{
         TIP, JUMP, ORIGIN, INVALID
     }
 
+    public enum GameResult {
+        UNFINISHED, WHITE_WINS, BLACK_WINS, TIE
+    }
+
     public class Move {
         Boards historicalBoard;
         MoveType type;

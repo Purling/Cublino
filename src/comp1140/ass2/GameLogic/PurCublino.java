@@ -115,32 +115,31 @@ public class PurCublino extends Game {
         return (isDiceAmountCorrect(board) && !hasBothWon(board));
     }
 
-    public static int getWinner(String state){
-
+    public GameResult getWinner() {
         int p1 = 0;
         int p2 = 0;
         int p1s = 0;
         int p2s = 0;
-        int i = 0;
-        while (i < 14){
-            String s = state.substring(3*i+1, 3*i+4);
-            if (s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && s.charAt(2) == '7'){
+
+        for (Die d : board.getWhitePlayer().getDice()) {
+            if (d.getPosition().charAt(1) == '6') {
                 p1++;
-                p1s += (s.charAt(0) - 'A')/4 + 1;
-                i++;
+                p1s += d.getTop();
             }
-            else if (s.charAt(0) >= 'a' && s.charAt(0) <= 'z' && s.charAt(2) == '1'){
+        }
+
+        for (Die d : board.getBlackPlayer().getDice()) {
+            if (d.getPosition().charAt(1) == '0') {
                 p2++;
-                p2s += (s.charAt(0) - 'a')/4 + 1;
-                i++;
+                p2s += d.getTop();
             }
-            else i++;
         }
+
         if (p1 == 7 || p2 == 7) {
-            if (p1s > p2s) return 1;
-            else if(p1s < p2s) return 2;
-            else return 3;
-        }
-        return 0;
+            if (p1s > p2s) return GameResult.WHITE_WINS;
+            else if(p1s < p2s) return GameResult.BLACK_WINS;
+            else return GameResult.TIE;
+        } else return GameResult.UNFINISHED;
     }
+
 }
