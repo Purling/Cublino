@@ -11,28 +11,27 @@ public class GuiTile extends Box {
     final static PhongMaterial redTileMaterial = GuiBoard.makePhongFromAsset("selectedtile.png");
 
     Position position;
-    GuiBoard viewer;
 
-    public GuiTile(Position p, GuiBoard viewer) {
+    public GuiTile(Position position, GuiBoard board) {
         super(125, 20, 125);
-        setTranslateX(125 * (p.x - 3));
+        setTranslateX(125 * (position.x - 3));
         setTranslateY(50);
-        setTranslateZ(125 * (p.y - 3));
+        setTranslateZ(125 * (position.y - 3));
 
-        this.position = new Position(p.x, p.y);
-        this.viewer = viewer;
+        this.position = new Position(position.x, position.y);
 
         setSelected(SelectionType.UNSELECTED);
         toBack();
 
-        setOnMouseEntered(e -> viewer.handleMouseOverTile(position));
-        setOnMouseDragEntered(e -> viewer.handleMouseOverTile(position));
-        setOnMouseExited(e -> viewer.handleMouseExitTile(position));
-        setOnMouseDragExited(e -> viewer.handleMouseExitTile(position));
+        setOnMouseEntered(e -> board.handleMouseOverTile(position));
+        setOnMouseDragEntered(e -> board.handleMouseOverTile(position));
+        setOnMouseExited(e -> board.handleMouseExitTile(position));
+        setOnMouseDragExited(e -> board.handleMouseExitTile(position));
     }
 
     public void setSelected(SelectionType s) {
         switch (s) {
+            // Draw a checkerboard pattern by the parity of the sum of the tile's coordinates
             case UNSELECTED -> setMaterial((position.x + position.y) % 2 == 0
                     ? whiteTileMaterial : blackTileMaterial);
             case PREVIOUS -> setMaterial(darkRedTileMaterial);

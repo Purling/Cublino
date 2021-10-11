@@ -3,7 +3,6 @@ package comp1140.ass2.gui.guiPieces;
 import comp1140.ass2.State.Die;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point3D;
-import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
@@ -11,8 +10,18 @@ import javafx.scene.transform.Transform;
 
 public class GuiDie extends MeshView {
 
-    final static PhongMaterial whiteMaterial = GuiBoard.makePhongFromAsset("whitedie.png");
-    final static PhongMaterial blackMaterial = GuiBoard.makePhongFromAsset("blackdie.png");
+    public enum Skin {
+        NONE, PLAIN_WHITE, PLAIN_BLACK, GILDED
+    }
+
+    public static String filenameOfSkin(Skin skin) {
+        return switch(skin) {
+            case NONE -> "";
+            case PLAIN_WHITE -> "whitedie.png";
+            case PLAIN_BLACK -> "blackdie.png";
+            case GILDED ->  "gildedDie.png";
+        };
+    }
 
     Die die;
     GuiBoard viewer;
@@ -22,8 +31,10 @@ public class GuiDie extends MeshView {
      * accurate visual model of any die.
      *
      * @param die the die to show
+     * @param viewer the parent GuiBoard
+     * @param skins the skins associated with each player in the game
      */
-    public GuiDie(Die die, GuiBoard viewer) {
+    public GuiDie(Die die, GuiBoard viewer, Skin[] skins) {
         super(dieMesh);
 
         if (!meshConstructed) createDieMesh();
@@ -31,8 +42,12 @@ public class GuiDie extends MeshView {
         this.die = die;
         this.viewer = viewer;
 
-        // Apply the die texture to the mesh
-        setMaterial(die.isWhite() ? whiteMaterial : blackMaterial);
+        // Apply the appropriate die texture to the mesh
+        if (skins != null) {
+            Skin appropriateSkin = skins[die.isWhite() ? 0 : 1];
+            if (appropriateSkin != Skin.NONE)
+                setMaterial(GuiBoard.makePhongFromAsset(filenameOfSkin(appropriateSkin)));
+        }
 
         // Rotate the mesh to show the correct numbers
         getTransforms().add(necessaryRotations());
@@ -45,15 +60,12 @@ public class GuiDie extends MeshView {
 
         setMouseTransparent(true);
 
-        GuiDie thisModel = this;
-        AnimationTimer animation = new AnimationTimer() {
+        new AnimationTimer() {
             @Override
             public void handle(long l) {
                 setTranslateY(getTranslateY() + ((viewer.isDieSelected(die) ? -50 : 0) - getTranslateY())*0.2);
             }
-        };
-
-        animation.start();
+        }.start();
     }
 
     /**

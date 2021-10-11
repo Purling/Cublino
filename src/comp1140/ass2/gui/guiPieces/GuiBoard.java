@@ -47,10 +47,14 @@ public class GuiBoard extends SubScene {
     private Position mouseOverTile;
     private final List<Position> selectedTiles = new ArrayList<>();
 
+    private final static GuiDie.Skin[] diceSkins = {GuiDie.Skin.PLAIN_WHITE, GuiDie.Skin.PLAIN_BLACK};
+
     /**
-     * Draw a placement in the window, removing any previously drawn one
-     *
-     * @param placement A valid placement string
+     * Constructs a board and all reliant 3D elements to represent a game position
+     * @param placement The initial position of the board to be displayed
+     * @param playable whether or not moves can be made in the GUI. The board can be rotated regardless
+     * @param turnLabel the text label in the HUD to be updated with info about the game
+     * @throws Exception if moves can be made but null HUD label is provided
      */
     public GuiBoard(String placement, boolean playable, Label turnLabel) throws Exception {
         super(new Group(), VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
@@ -77,7 +81,7 @@ public class GuiBoard extends SubScene {
                 // If the game state contains a die at the current position, construct it as well
                 Die die = game.getBoard().getAt(x, y);
                 if (die != null) {
-                    GuiDie m = new GuiDie(die, this);
+                    GuiDie m = new GuiDie(die, this, diceSkins);
                     root.getChildren().add(m);
                     guiDice.add(m);
                 }
@@ -95,10 +99,12 @@ public class GuiBoard extends SubScene {
             }
         });
         // If the mouse is dragged across the screen without die selected, rotate the board
+        // TODO: allow the user to rotate the board if they M1 outside of the board model
         setEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
             if (selectedDie == null) handleBoardRotate(e.getSceneX());
         });
-        // Tells the tiles that moving the mouse while holding M1 is not dragging the board, so they should still select
+        // Tells the tiles that moving the mouse while holding M1 is not dragging the board,
+        // so they should still be highlighted as the mouse moves over them
         setOnDragDetected(e -> startFullDrag());
         // When M1 is released, drop the currently selected die
         setEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
@@ -118,6 +124,9 @@ public class GuiBoard extends SubScene {
 
         // Establish soft white lighting to remove shading and shadows
         root.getChildren().add(new AmbientLight(Color.WHITE));
+
+        root.getChildren().add(new GuiAvatar(this, 180, "White Player"));
+        root.getChildren().add(new GuiAvatar(this, 0, "Black Player"));
     }
 
     /**
@@ -131,7 +140,7 @@ public class GuiBoard extends SubScene {
         selectedTiles.add(mouseOverTile);
 
         for (GuiDie m : guiDice) {
-            if (m.die.getPosition().equals(mouseOverTile.toString())
+            if (mouseOverTile != null && m.die.getPosition().equals(mouseOverTile.toString())
                     && m.die.isWhite() == game.getCurrentPlayer().isWhite()) {
                 selectedDie = m;
                 return;
@@ -146,6 +155,7 @@ public class GuiBoard extends SubScene {
      * Try to move the currently picked-up die into the currently indicated position
      */
     private void handleApplyStep() {
+        if (mouseOverTile == null) return;
         game.applyStep(selectedDie.die, mouseOverTile.toString());
         selectedTiles.add(new Position(selectedDie.die.getX(), selectedDie.die.getY()));
         selectedDie.setTranslationFromDie();
@@ -220,7 +230,7 @@ public class GuiBoard extends SubScene {
     private void redrawSelection() {
         if (!permitsMoveMaking) return;
 
-        // Deselect any currently selected tiles: tiles that remain selected will be rehighlighted later
+        // Deselect any currently selected tiles: tiles that remain selected will be re-highlighted later
         for (int x = 0; x < 7; x++) {
             for (int y = 0; y < 7; y++) {
                 boardTiles[y][x].setSelected(GuiTile.SelectionType.UNSELECTED);
@@ -236,8 +246,14 @@ public class GuiBoard extends SubScene {
             boardTiles[mouseOverTile.x][mouseOverTile.y].setSelected(GuiTile.SelectionType.CURRENT);
     }
 
+    /**
+     * Checks whether or not a particular die is selected by the user.
+     * (NB: this is essentially a get method for selectedDie)
+     * @param die the die to check
+     * @return whether the die is selected
+     */
     public boolean isDieSelected(Die die) {
-        return (selectedDie.die == die);
+        return selectedDie != null && selectedDie.die == die;
     }
 
     /**
