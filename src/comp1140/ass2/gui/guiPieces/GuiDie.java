@@ -1,5 +1,6 @@
 package comp1140.ass2.gui.guiPieces;
 
+import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.State.Die;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point3D;
@@ -32,9 +33,9 @@ public class GuiDie extends MeshView {
      *
      * @param die the die to show
      * @param viewer the parent GuiBoard
-     * @param skins the skins associated with each player in the game
+     * @param controllers the controllers associated with each player in the game
      */
-    public GuiDie(Die die, GuiBoard viewer, Skin[] skins) {
+    public GuiDie(Die die, GuiBoard viewer, Controller[] controllers) {
         super(dieMesh);
 
         if (!meshConstructed) createDieMesh();
@@ -43,8 +44,8 @@ public class GuiDie extends MeshView {
         this.viewer = viewer;
 
         // Apply the appropriate die texture to the mesh
-        if (skins != null) {
-            Skin appropriateSkin = skins[die.isWhite() ? 0 : 1];
+        if (controllers != null) {
+            Skin appropriateSkin = controllers[die.isWhite() ? 0 : 1].getDiceSkin();
             if (appropriateSkin != Skin.NONE)
                 setMaterial(GuiBoard.makePhongFromAsset(filenameOfSkin(appropriateSkin)));
         }

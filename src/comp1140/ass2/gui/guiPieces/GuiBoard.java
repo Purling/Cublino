@@ -1,5 +1,8 @@
 package comp1140.ass2.gui.guiPieces;
 
+import comp1140.ass2.Controller.Controller;
+import comp1140.ass2.Controller.EasyAI;
+import comp1140.ass2.Controller.Human;
 import comp1140.ass2.GameLogic.Game;
 import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Die;
@@ -48,6 +51,7 @@ public class GuiBoard extends SubScene {
     private final List<Position> selectedTiles = new ArrayList<>();
 
     private final static GuiDie.Skin[] diceSkins = {GuiDie.Skin.PLAIN_WHITE, GuiDie.Skin.PLAIN_BLACK};
+    private static final Controller[] controllers = {new Human(true), new EasyAI(false)};
 
     /**
      * Constructs a board and all reliant 3D elements to represent a game position
@@ -81,7 +85,7 @@ public class GuiBoard extends SubScene {
                 // If the game state contains a die at the current position, construct it as well
                 Die die = game.getBoard().getAt(x, y);
                 if (die != null) {
-                    GuiDie m = new GuiDie(die, this, diceSkins);
+                    GuiDie m = new GuiDie(die, this, controllers);
                     root.getChildren().add(m);
                     guiDice.add(m);
                 }
@@ -125,8 +129,8 @@ public class GuiBoard extends SubScene {
         // Establish soft white lighting to remove shading and shadows
         root.getChildren().add(new AmbientLight(Color.WHITE));
 
-        root.getChildren().add(new GuiAvatar(this, 180, "White Player"));
-        root.getChildren().add(new GuiAvatar(this, 0, "Black Player"));
+        root.getChildren().add(new GuiAvatar(this, 180, controllers[0].getName()));
+        root.getChildren().add(new GuiAvatar(this, 0, controllers[1].getName()));
     }
 
     /**
