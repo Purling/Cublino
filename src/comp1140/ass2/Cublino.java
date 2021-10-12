@@ -375,10 +375,11 @@ public class Cublino {
      */
     public static String generateMoveContra(String state) {
         Boards board = new Boards(state);
-        ContraCublino contra = new ContraCublino(Character.isUpperCase(state.charAt(0)), board);
+        char turnInformation = state.charAt(0);
+        ContraCublino contra = new ContraCublino(Character.isUpperCase(turnInformation), board);
         Random rand = new Random();
-        System.out.println(Arrays.toString(contra.generateLegalMoves()));
+        int randomMove = rand.nextInt(contra.generateLegalMoves().length);
 
-        return contra.generateLegalMoves()[rand.nextInt(contra.generateLegalMoves().length)].getEncodedMove();
+        return contra.generateLegalMoves()[randomMove].getEncodedMove();
     }
 }

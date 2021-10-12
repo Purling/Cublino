@@ -29,6 +29,16 @@ public class ContraCublino extends Game implements Serializable {
             return encodedMove;
         }
 
+        /**
+         * Getter for possibleState
+         */
+        public ContraCublino getPossibleState() {
+            return possibleState;
+        }
+
+        /**
+         * To string method
+         */
         @Override
         public String toString() {
             return encodedMove;

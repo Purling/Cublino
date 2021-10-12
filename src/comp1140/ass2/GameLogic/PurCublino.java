@@ -36,14 +36,16 @@ public class PurCublino extends Game {
         Boards clone = board.deepClone();
         boolean firstEntry = true;
         for (Move x : getStepHistory()) {
-            if (x.getType() != MoveType.ORIGIN && x.getType() != MoveType.INVALID) firstEntry = false;
+            if (x.getType() != MoveType.ORIGIN && x.getType() != MoveType.INVALID) {
+                firstEntry = false;
+                break;
+            }
         }
 
         if (board.getAt(endPosition) != null) {
             addToStepHistory(new Move(clone, MoveType.INVALID));
             return;
         }
-
 
         String diePosition = die.getPosition();
         int distance = Boards.getManhattanDistance(diePosition, endPosition);
