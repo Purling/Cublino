@@ -27,7 +27,7 @@ public abstract class Game implements Serializable{
         UNFINISHED, WHITE_WINS, BLACK_WINS, TIE
     }
 
-    public class Move {
+    public class Move implements Serializable {
         Boards historicalBoard;
         MoveType type;
 

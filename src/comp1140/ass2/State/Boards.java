@@ -283,6 +283,21 @@ public class Boards implements Serializable{
         return str.toString();
     }
 
+    /**
+     * Akin to a toString method for Boards
+     */
+    public String getStringRepresentation() {
+        String boardRepresentation = Arrays.deepToString(board);
+        String formattedCorrectly = boardRepresentation.replaceAll("(?<=[]])", "\n");
+        String noCommas = formattedCorrectly.replaceAll("\n, ", "\n");
+        String noFirstBracket = noCommas.substring(1);
+        String noLastBracket = noFirstBracket.substring(0,noFirstBracket.length() - 2); // subtract 2 to account for the extra "\n" character
+        return noLastBracket + "\n"; // \n for formatting in trees
+    }
+
+    /**
+     * toString method for Boards
+     */
     @Override
     public String toString() {
         return whitePlayer.getDice().toString() + "\n" + blackPlayer.getDice();

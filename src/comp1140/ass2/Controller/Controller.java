@@ -11,10 +11,19 @@ public class Controller {
     String name;
     GuiDie.Skin diceSkin;
 
+    /**
+     * Constructor for Controller
+     */
     public Controller(boolean isHuman, String name, GuiDie.Skin diceSkin) {
         this.isHuman = isHuman;
         this.name = name;
         this.diceSkin = diceSkin;
+    }
+
+    /**
+     * Empty constructor for Controller
+     */
+    public Controller() {
     }
 
     /**

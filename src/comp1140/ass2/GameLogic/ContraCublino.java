@@ -136,6 +136,7 @@ public class ContraCublino extends Game implements Serializable {
                     ContraCublino clone = deepClone();
                     Die dieClone = die.deepClone();
                     clone.applyStep(dieClone, dieClone.getPositionOneOver(direction));
+                    clone.endTurn();
                     // FIXME Remove the magic numbers below
                     ContraMove move = new ContraMove(clone, Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1));
                     possibleMoves.add(move);
@@ -185,5 +186,10 @@ public class ContraCublino extends Game implements Serializable {
      */
     public boolean isGameValid(Boards board){
         return (isDiceAmountCorrect(board) && !hasBothWon(board));
+    }
+
+    @Override
+    public String toString() {
+        return board.getStringRepresentation();
     }
 }
