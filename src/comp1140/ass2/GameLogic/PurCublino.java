@@ -5,7 +5,8 @@ import comp1140.ass2.State.Die;
 
 import java.util.List;
 
-/** A gamemode of Cublino that extends from the Game class
+/**
+ * A gamemode of Cublino that extends from the Game class
  *
  * @author Ziling Ouyang, Yuechen Liu
  */
@@ -14,11 +15,11 @@ public class PurCublino extends Game {
 
     private static final int JUMP_DISTANCE = 2;
 
-    public PurCublino(){
+    public PurCublino() {
         super();
     }
 
-    public PurCublino(boolean isWhite, Boards board){
+    public PurCublino(boolean isWhite, Boards board) {
         super(isWhite, board);
     }
 
@@ -26,7 +27,7 @@ public class PurCublino extends Game {
      * Given a valid die, moves the die to the valid position give. It stores the step that has been applied to the die in the stepHistory
      * variable. If the move is invalid, that is also stored in stepHistory under MoveType INVALID.
      *
-     * @param die The die to be moved
+     * @param die         The die to be moved
      * @param endPosition The coordinates to move the die to
      */
     @Override
@@ -36,14 +37,16 @@ public class PurCublino extends Game {
         Boards clone = board.deepClone();
         boolean firstEntry = true;
         for (Move x : getStepHistory()) {
-            if (x.getType() != MoveType.ORIGIN && x.getType() != MoveType.INVALID) firstEntry = false;
+            if (x.getType() != MoveType.ORIGIN && x.getType() != MoveType.INVALID) {
+                firstEntry = false;
+                break;
+            }
         }
 
         if (board.getAt(endPosition) != null) {
             addToStepHistory(new Move(clone, MoveType.INVALID));
             return;
         }
-
 
         String diePosition = die.getPosition();
         int distance = Boards.getManhattanDistance(diePosition, endPosition);
@@ -69,18 +72,24 @@ public class PurCublino extends Game {
         addToStepHistory(new Move(clone, moveType));
     }
 
+    @Override
+    protected boolean isGameOver() {
+        return false;
+    }
+
     /**
-     *  A boolean function to evaluate if the correct number of dice is on the board.
+     * A boolean function to evaluate if the correct number of dice is on the board.
+     *
      * @param board The current board that is being played on
      * @return True if the board contains 14 dice
      */
     @Override
-    public boolean isDiceAmountCorrect(Boards board){
+    public boolean isDiceAmountCorrect(Boards board) {
         return (board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() == 2 * Boards.BOARD_DIMENSION);
     }
 
     @Override
-    public boolean hasBothWon(Boards board){
+    public boolean hasBothWon(Boards board) {
 
         List<Die> white = board.getWhitePlayer().getDice();
         List<Die> black = board.getBlackPlayer().getDice();
@@ -92,23 +101,32 @@ public class PurCublino extends Game {
 
         String middle = Boards.getMiddlePosition(startPosition, endPosition);
 
-        return !isMoveBackwards(startPosition,endPosition)
+        return !isMoveBackwards(startPosition, endPosition)
                 && (board.getAt(Boards.getPositionX(middle), Boards.getPositionY(middle)) != null)
                 && (Boards.sameAxis(startPosition, endPosition));
     }
 
-    public void applyJump(Die initial, String endPosition) {
-
+    /**
+     * Applies a jump given the die and the position the die will jump to
+     *
+     * @param initial     The die
+     * @param endPosition The position the die will jump to
+     */
+    public void applyJump(Die initial, String endPosition) { // This might still be incorrect and not actually move the die
         String start = initial.getPosition();
+        int index = getCurrentPlayer().getDice().indexOf(initial);
+        assert index != -1;
 
-        if(board.getAt(endPosition) == null) {
-            initial.setPosition(endPosition);
-            board.setAt(endPosition, initial);
-            board.setAt(start,null);
+        if (board.getAt(endPosition) == null) {
+            Die realDie = getCurrentPlayer().getDice().get(index);
+            realDie.setPosition(endPosition);
+            initial.setPosition(realDie.getPosition());
+            board.setAt(endPosition, realDie);
+            board.setAt(start, null);
         }
     }
 
-    public boolean isGameValid(Boards board){
+    public boolean isGameValid(Boards board) {
         return (isDiceAmountCorrect(board) && !hasBothWon(board));
     }
 
@@ -134,7 +152,7 @@ public class PurCublino extends Game {
 
         if (p1 == 7 || p2 == 7) {
             if (p1s > p2s) return GameResult.WHITE_WINS;
-            else if(p1s < p2s) return GameResult.BLACK_WINS;
+            else if (p1s < p2s) return GameResult.BLACK_WINS;
             else return GameResult.TIE;
         } else return GameResult.UNFINISHED;
     }
