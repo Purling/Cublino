@@ -50,7 +50,6 @@ public class GuiBoard extends SubScene {
     private Position mouseOverTile;
     private final List<Position> selectedTiles = new ArrayList<>();
 
-    private final static GuiDie.Skin[] diceSkins = {GuiDie.Skin.PLAIN_WHITE, GuiDie.Skin.PLAIN_BLACK};
     private static final Controller[] controllers = {new Human(true), new EasyAI(false)};
 
     /**
