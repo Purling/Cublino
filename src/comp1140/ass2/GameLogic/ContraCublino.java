@@ -7,10 +7,12 @@ import comp1140.ass2.State.Direction;
 import java.io.*;
 import java.util.*;
 
+import static comp1140.ass2.GameLogic.Game.GameResult.*;
 import static comp1140.ass2.GameLogic.Game.MoveType.TIP;
 import static comp1140.ass2.State.Boards.BOARD_DIMENSION;
 
-/** A gamemode of Cublino extends from Game class
+/**
+ * A gamemode of Cublino extends from Game class
  *
  * @author Ziling Ouyang, Yuechen Liu
  */
@@ -45,29 +47,30 @@ public class ContraCublino extends Game implements Serializable {
         }
     }
 
-    public ContraCublino(){
+    public ContraCublino() {
     }
 
     /**
      * Constructor for ContraCublino
      */
-    public ContraCublino(boolean isWhite, Boards board){
+    public ContraCublino(boolean isWhite, Boards board) {
         super(isWhite, board);
     }
 
     @Override
-    public boolean isDiceAmountCorrect(Boards board){
+    public boolean isDiceAmountCorrect(Boards board) {
         return (board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() <= 2 * BOARD_DIMENSION
-        && board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() >= 2);
+                && board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() >= 2);
     }
 
     /**
      * Returns if both players have won (an invalid state)
+     *
      * @param board The board being played
      * @return True if both players have simultaneously won, false otherwise
      */
     @Override
-    public boolean hasBothWon(Boards board){
+    public boolean hasBothWon(Boards board) {
         List<Die> white = board.getWhitePlayer().getDice();
         List<Die> black = board.getBlackPlayer().getDice();
         return white.stream().filter(Die::isWhiteDieFinished).count() + black.stream().filter(Die::isBlackDieFinished).count() > 1;
@@ -77,7 +80,7 @@ public class ContraCublino extends Game implements Serializable {
      * Given a valid die, moves the die to the valid position give. It stores the step that has been applied to the die in the stepHistory
      * variable. If the move is invalid, that is also stored in stepHistory under MoveType INVALID.
      *
-     * @param die The die to be moved
+     * @param die         The die to be moved
      * @param endPosition The coordinates to move the die to
      */
     @Override
@@ -98,7 +101,7 @@ public class ContraCublino extends Game implements Serializable {
             setCurrentMoveDie(die.deepClone());
         }
 
-        if(board.getAdjacentDie(die) != null && !(board.getAdjacentDie(die).length == 0)) {
+        if (board.getAdjacentDie(die) != null && !(board.getAdjacentDie(die).length == 0)) {
             battle(die);
         }
     }
@@ -124,6 +127,7 @@ public class ContraCublino extends Game implements Serializable {
 
     /**
      * Returns any legal moves that can be made by the current player given the game up to that point
+     *
      * @return An array of games which represent each possible move that can be made by the player
      */
     public ContraMove[] generateLegalMoves() { // Can probably be abstracted
@@ -131,7 +135,7 @@ public class ContraCublino extends Game implements Serializable {
         List<ContraMove> possibleMoves = new ArrayList<>();
 
         for (Die die : possibleDie) {
-            for(Direction direction : Direction.values()) {
+            for (Direction direction : Direction.values()) {
                 if (isDirectionClear(direction, die)) {
                     ContraCublino clone = deepClone();
                     Die dieClone = die.deepClone();
@@ -148,6 +152,7 @@ public class ContraCublino extends Game implements Serializable {
 
     /**
      * Creates a deep copy of the ContraCublino
+     *
      * @return A deep copy the ContraCublino
      */
     public ContraCublino deepClone() {
@@ -165,9 +170,35 @@ public class ContraCublino extends Game implements Serializable {
     }
 
     /**
+     * Determine whether the game is over or not
+     *
+     * @return True if the game is over and false otherwise
+     */
+    @Override
+    public boolean isGameOver() {
+        List<Die> white = board.getWhitePlayer().getDice();
+        List<Die> black = board.getBlackPlayer().getDice();
+        return white.stream().anyMatch(Die::isWhiteDieFinished) || black.stream().anyMatch(Die::isBlackDieFinished);
+    }
+
+    /**
+     * Assuming that the game is finished, gives the winner of the game
+     *
+     * @return An enum indicating that white or black has won or that there was a tie
+     */
+    public GameResult getWinner() {
+        List<Die> white = board.getWhitePlayer().getDice();
+        List<Die> black = board.getBlackPlayer().getDice();
+        if (white.stream().anyMatch(Die::isWhiteDieFinished)) return WHITE_WINS;
+        if (black.stream().anyMatch(Die::isBlackDieFinished)) return BLACK_WINS;
+        return TIE;
+    }
+
+    /**
      * Method which evaluates if the space directly ahead in the specified direction (Manhattan distance of 1) is clear
+     *
      * @param direction The direction which needs to be checked
-     * @param die The die from which the origin is based
+     * @param die       The die from which the origin is based
      * @return True if the space is clear, false otherwise
      */
     public boolean isDirectionClear(Direction direction, Die die) {
@@ -181,10 +212,11 @@ public class ContraCublino extends Game implements Serializable {
 
     /**
      * Evaluates whether the game is valid i.e. It has an appropriate amount of dice and has not reached an invalid state
+     *
      * @param board The board to be evaluated
      * @return True if the game is valid, false otherwise
      */
-    public boolean isGameValid(Boards board){
+    public boolean isGameValid(Boards board) {
         return (isDiceAmountCorrect(board) && !hasBothWon(board));
     }
 

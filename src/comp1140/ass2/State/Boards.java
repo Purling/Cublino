@@ -292,7 +292,7 @@ public class Boards implements Serializable{
         String noCommas = formattedCorrectly.replaceAll("\n, ", "\n");
         String noFirstBracket = noCommas.substring(1);
         String noLastBracket = noFirstBracket.substring(0,noFirstBracket.length() - 2); // subtract 2 to account for the extra "\n" character
-        return noLastBracket + "\n"; // \n for formatting in trees
+        return noLastBracket; // \n for formatting in trees
     }
 
     /**

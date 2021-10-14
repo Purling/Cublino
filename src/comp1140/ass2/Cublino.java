@@ -6,7 +6,6 @@ import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
 
-import java.util.Arrays;
 import java.util.Random;
 
 import static comp1140.ass2.State.Boards.boardToString;
@@ -51,16 +50,16 @@ public class Cublino {
      * [variant][dice]*
      * where [variant] and [dice] are replaced by the corresponding substrings below. Note that [dice]* means zero or
      * more repetitions of the [dice] substring.
-     *
+     * <p>
      * 1. [variant] The variant substring is a single character which is either an upper or lower case 'p' or 'c' - The
      * letter encodes which variant the of the rules the game is using and the case represents the turn of the current
      * player.
-     *
+     * <p>
      * 2. [dice] The dice substring contains three characters. The first character can be either an upper or lower case
      * letter in the range 'a' to 'x'. The letter encodes the orientation of the dice and the case encodes which player
      * the dice belongs two. The next two characters encode the position of the dice in the format [column][row] where
      * the column is one character in the range 'a' to 'g' and the row is one character in the range '1' to '7'.
-     *
+     * <p>
      * See the "Encoding Game State" section in the README for more details.
      *
      * @param state a string representing a game state
@@ -73,26 +72,23 @@ public class Cublino {
                 int l = (state.length() - 1) / 3;
                 if (l != 0) {
                     int i = 1;
-                    while (i < state.length()){
+                    while (i < state.length()) {
                         String x;
-                        if (i+3 == state.length()) {
+                        if (i + 3 == state.length()) {
                             x = state.substring(i);
-                        }
-                        else {
+                        } else {
                             x = state.substring(i, i + 3);
                         }
 
                         if (x.charAt(0) < 'A' || (x.charAt(0) > 'X' && x.charAt(0) < 'a')
                                 || x.charAt(0) > 'x') {
                             return false;
-                        }
-                        else if (x.charAt(1) > 'g' || x.charAt(1) < 'a') {
+                        } else if (x.charAt(1) > 'g' || x.charAt(1) < 'a') {
+                            return false;
+                        } else if (x.charAt(2) > '7' || x.charAt(2) < '1') {
                             return false;
                         }
-                        else if (x.charAt(2) > '7' || x.charAt(2) < '1') {
-                            return false;
-                        }
-                        i+=3;
+                        i += 3;
                     }
                 }
                 return true;
@@ -107,16 +103,16 @@ public class Cublino {
      * A game state is valid if it satisfies the conditions below. Note that there are some shared conditions and
      * some conditions which are specific to each variant of the game. For this task you are expected to check states
      * from both variants.
-     *
+     * <p>
      * [Both Variants]
      * 1. The game state is well formed.
      * 2. No two dice occupy the same position on the board.
-     *
+     * <p>
      * [Pur]
      * 1. Each player has exactly seven dice.
      * 2. Both players do not have all seven of their dice on the opponent's end of the board (as the game would have
      * already finished before this)
-     *
+     * <p>
      * [Contra]
      * 1. Each player has no more than seven dice.
      * 2. No more than one player has a dice on the opponent's end of the board.
@@ -129,7 +125,8 @@ public class Cublino {
         char purMode = 'p';
         int noDie = 1;
 
-        if(!isStateWellFormed(state) || (state.toLowerCase().charAt(0) == purMode && state.length() == noDie)) return false;
+        if (!isStateWellFormed(state) || (state.toLowerCase().charAt(0) == purMode && state.length() == noDie))
+            return false;
 
         char gameMode = state.toLowerCase().charAt(0);
         Boards board = new Boards();
@@ -137,9 +134,9 @@ public class Cublino {
         PurCublino purCublino = new PurCublino();
         ContraCublino contraCublino = new ContraCublino();
 
-        if(board.containsOverlappingPieces()) return false;
+        if (board.containsOverlappingPieces()) return false;
 
-        if(gameMode == purMode){
+        if (gameMode == purMode) {
             return purCublino.isGameValid(board);
         } else {
             return contraCublino.isGameValid(board);
@@ -149,11 +146,11 @@ public class Cublino {
     /**
      * Task 6:
      * Determine whether a state represents a finished Pur game, and if so who the winner is.
-     *
+     * <p>
      * A game of Cublino Pur is finished once one player has reached the opponent's end of the board with all seven of
      * their dice. Each player then adds the numbers facing upwards on their dice which have reached the opponent's end
      * of the board. The player with the highest total wins.
-     *
+     * <p>
      * You may assume that all states input into this method will be of the Pur variant and that the state will be
      * valid.
      *
@@ -161,10 +158,10 @@ public class Cublino {
      * @return 1 if player one has won, 2 if player two has won, 3 if the result is a draw, otherwise 0.
      */
     public static int isGameOverPur(String state) {
-        if (state.charAt(0) != 'p' && state.charAt(0)!= 'P') return 0;
+        if (state.charAt(0) != 'p' && state.charAt(0) != 'P') return 0;
         else {
             PurCublino cublino = new PurCublino(true, new Boards(state));
-            return switch(cublino.getWinner()) {
+            return switch (cublino.getWinner()) {
                 case UNFINISHED -> 0;
                 case WHITE_WINS -> 1;
                 case BLACK_WINS -> 2;
@@ -180,18 +177,18 @@ public class Cublino {
      * position on the board. The first position represents the starting position of the dice making the step and the
      * second position represents the ending position of the dice making the step. You may assume that the step strings
      * input into this method are well formed according to the above specification.
-     *
+     * <p>
      * A step is valid if it satisfies the following conditions:
      * 1. It represents either a tilt or a jump of a dice.
      * 2. The ending position of the step is not occupied.
      * 3. The step moves towards the opponent's end of the board or horizontally (along its current row).
      * 3. If it is a jump step, there is a dice in the position which is jumped over.
-     *
+     * <p>
      * You may assume that all states input into this method will be of the Pur variant and that the state will be
      * valid.
      *
      * @param state a Pur game state
-     * @param step a string representing a single step of a move
+     * @param step  a string representing a single step of a move
      * @return true if the step is valid for the given state, otherwise false
      */
     public static Boolean isValidStepPur(String state, String step) {
@@ -203,11 +200,11 @@ public class Cublino {
         String start = positions[0].toString();
         String end = positions[positions.length - 1].toString();
 
-        if(board.getAtPosition(end) != null) return false;
+        if (board.getAtPosition(end) != null) return false;
 
         if (board.isAdjacent(start, end)) {
-            return !purCublino.isMoveBackwards(start,end);
-        } else if (Boards.getManhattanDistance(start,end) == jumpDistance) {
+            return !purCublino.isMoveBackwards(start, end);
+        } else if (Boards.getManhattanDistance(start, end) == jumpDistance) {
             return purCublino.isJumpValid(start, end);
         } else {
             return false;
@@ -221,19 +218,19 @@ public class Cublino {
      * lists a sequence of positions that a dice will have as it makes a move. Note that [position]* means zero or more
      * repetitions of the [position] substring. You may assume that the move strings input into this method are well
      * formed according to the above specification.
-     *
+     * <p>
      * A move is valid if it satisfies the following conditions:
      * 1. The starting position of the move contains a dice belonging to the player who's turn it is.
      * 2. All steps in the move are valid.
      * 3. The move contains at least one step.
      * 4. Only the first step may be a tipping step.
      * 5. The starting and ending positions of the moved dice are different.
-     *
+     * <p>
      * You may assume that all states input into this method will be of the Pur variant and that the state will be
      * valid.
      *
      * @param state a Pur game state
-     * @param move a string representing a move
+     * @param move  a string representing a move
      * @return true if the move is valid for the given state, otherwise false
      */
     public static Boolean isValidMovePur(String state, String move) {
@@ -245,12 +242,12 @@ public class Cublino {
         String lastPosition = stepPositions[stepPositions.length - 1].toString();
         int firstStepIndex = 1;
 
-        if(move.length() == 0 || board.getAt(diePosition) == null || diePosition.equals(lastPosition)) return false;
-        if(pur.getCurrentPlayer().isWhite() == board.getAt(diePosition).isWhite()){
-            for(int i = firstStepIndex; i < stepPositions.length; i++) {
+        if (move.length() == 0 || board.getAt(diePosition) == null || diePosition.equals(lastPosition)) return false;
+        if (pur.getCurrentPlayer().isWhite() == board.getAt(diePosition).isWhite()) {
+            for (int i = firstStepIndex; i < stepPositions.length; i++) {
                 Die initial = board.getAt(stepPositions[i - firstStepIndex].toString());
                 pur.applyStep(initial, stepPositions[i].toString());
-                if(pur.getStepHistory().stream().anyMatch((x) -> x.getType() == Game.MoveType.INVALID)) return false;
+                if (pur.getStepHistory().stream().anyMatch((x) -> x.getType() == Game.MoveType.INVALID)) return false;
             }
         }
         return (pur.getStepHistory().size() != 0);
@@ -261,31 +258,32 @@ public class Cublino {
      * Given a Pur game state and a move to play, determine the state that results from that move being played.
      * If the move ends the game, the turn should be the player who would have played next had the game not ended. If
      * the move is invalid the game state should remain unchanged.
-     *
+     * <p>
      * You may assume that all states input into this method will be of the Pur variant and that the state will be
      * valid.
      *
      * @param state a Pur game state
-     * @param move a move being played
+     * @param move  a move being played
      * @return the resulting state after the move has been applied
      */
     public static String applyMovePur(String state, String move) {
         if (!isValidMovePur(state, move)) return state;
-        else{
+        else {
             Boards board = new Boards(state);
             PurCublino pur = new PurCublino(Character.isUpperCase(state.charAt(0)), board);
             Boards.Positions[] stepPositions = Boards.moveToPositions(move);
             Die d = board.getAt(stepPositions[0].toString());
             char p;
-            if(state.charAt(0) == 'p') p = 'P';
+            if (state.charAt(0) == 'p') p = 'P';
             else p = 'p';
 
-            for(int i = 1; i < stepPositions.length; i++){
+            for (int i = 1; i < stepPositions.length; i++) {
                 Die die = board.getAt(stepPositions[i - 1].toString());
                 pur.applyStep(die, stepPositions[i].toString());
             }
 
-            return p+ boardToString(board);}
+            return p + boardToString(board);
+        }
     }
 
     /**
@@ -294,7 +292,7 @@ public class Cublino {
      * This task imposes an additional constraint that moves returned must not revisit positions previously occupied as
      * part of the move (ie. a move may not contain a jumping move followed by another jumping move back to the previous
      * position).
-     *
+     * <p>
      * You may assume that all states input into this method will be of the Pur variant and that the state will be
      * valid.
      *
@@ -309,9 +307,9 @@ public class Cublino {
     /**
      * Task 14a:
      * Determine whether a state represents a finished Contra game, and if so who the winner is.
-     *
+     * <p>
      * A player wins a game of Cublino Contra by reaching the opponent's end of the board with one of their dice.
-     *
+     * <p>
      * You may assume that all states input into this method will be of the Contra variant and that the state will be
      * valid.
      *
@@ -319,20 +317,14 @@ public class Cublino {
      * @return 1 if player one has won, 2 if player two has won, otherwise 0.
      */
     public static int isGameOverContra(String state) {
-        int numOfDice = (state.length() - 1) /3;
-        int i = 0;
-
-        while (i < numOfDice){
-            String s = state.substring(3*i+1, 3*i+4);
-            if (s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && s.charAt(2) == '7'){
-                return 1;
-            }
-            else if (s.charAt(0) >= 'a' && s.charAt(0) <= 'z' && s.charAt(2) == '1'){
-                return 2;
-            }
-            else i++;
-        }
-        return 0;
+        Boards board = new Boards(state);
+        ContraCublino contra = new ContraCublino(Character.isUpperCase(state.charAt(0)), board);
+        if (!contra.isGameOver()) return 0;
+        return switch (contra.getWinner()) {
+            case WHITE_WINS -> 1;
+            case BLACK_WINS -> 2;
+            default -> 0;
+        };
     }
 
     /**
@@ -341,12 +333,12 @@ public class Cublino {
      * If the move ends the game, the turn should be the player who would have played next had the game not ended. If
      * the move is invalid the game state should remain unchanged. See the README for what constitutes a valid Contra
      * move and the rules for updating the game state.
-     *
+     * <p>
      * You may assume that all states input into this method will be of the Contra variant and that the state will be
      * valid.
      *
      * @param state a Contra game state
-     * @param move a move being played
+     * @param move  a move being played
      * @return the resulting state after the move has been applied
      */
     public static String applyMoveContra(String state, String move) {
@@ -354,19 +346,19 @@ public class Cublino {
         ContraCublino contra = new ContraCublino(Character.isUpperCase(state.charAt(0)), board);
         Boards.Positions[] stepPositions = Boards.moveToPositions(move);
 
-        for(int i = 1; i < stepPositions.length; i++){
+        for (int i = 1; i < stepPositions.length; i++) {
             Die die = board.getAt(stepPositions[i - 1].toString());
             contra.applyStep(die, stepPositions[i].toString());
         }
 
         return ((Character.isLowerCase(state.charAt(0))) ? String.valueOf(Character.toUpperCase(state.charAt(0))) : Character.toLowerCase(state.charAt(0)))
-            + boardToString(board);
+                + boardToString(board);
     }
 
     /**
      * Task 14c:
      * Given a valid Contra game state, return a valid move.
-     *
+     * <p>
      * You may assume that all states input into this method will be of the Contra variant and that the state will be
      * valid.
      *

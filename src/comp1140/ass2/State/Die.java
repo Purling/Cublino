@@ -4,19 +4,20 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import static comp1140.ass2.State.Boards.BOARD_DIMENSION;
 import static comp1140.ass2.State.Direction.*;
-import static comp1140.ass2.State.Direction.DOWN;
 
 /**
  * @author Whole group
  */
-public class Die implements Serializable{
-    /** x and y represents the coordinate of the dice on a board */
+public class Die implements Serializable {
+    /**
+     * x and y represents the coordinate of the dice on a board
+     */
     private int x;
     private int y;
-    /** the value on each side of a dice
-    * values will vary when the position/ orientation of the dice changes
+    /**
+     * the value on each side of a dice
+     * values will vary when the position/ orientation of the dice changes
      */
     private int top;
     private int down;
@@ -33,7 +34,7 @@ public class Die implements Serializable{
             int a = (dieA.getX() + dieA.getY()) * Boards.BOARD_DIMENSION;
             int b = (dieB.getX() + dieB.getY()) * Boards.BOARD_DIMENSION;
 
-            if(a == b) {
+            if (a == b) {
                 return Integer.signum(dieA.getX() - dieB.getX());
             } else {
                 return (a > b) ? 1 : -1;
@@ -41,8 +42,10 @@ public class Die implements Serializable{
         }
     }
 
-    /** Given the coordinates, the values of the dice on each side, and the owner of the dice,
-    * construct the corresponding dice.*/
+    /**
+     * Given the coordinates, the values of the dice on each side, and the owner of the dice,
+     * construct the corresponding dice.
+     */
     public Die(int top, int down, int front, int back, int left, int right, int x, int y, boolean isWhite) {
         this.top = top;
         this.down = down;
@@ -69,7 +72,7 @@ public class Die implements Serializable{
 
         // All 24 orientations in the order {top}{front}{left},
         // manually determined by yours truly
-        int[][] orientations = new int[][] {
+        int[][] orientations = new int[][]{
                 {1, 2, 3},
                 {1, 3, 5},
                 {1, 4, 2},
@@ -111,7 +114,9 @@ public class Die implements Serializable{
      * Obtain the value on the top of the dice
      * The value will vary when the orientation of dice changes
      */
-    public int getTop() {return this.top;}
+    public int getTop() {
+        return this.top;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -124,10 +129,11 @@ public class Die implements Serializable{
 
     /**
      * Get the value of the die on a particular side
+     *
      * @param d The side of the die the value is on
      * @return The int value on the particular side of the die or -1 if not valid
      */
-    public int getSide(Direction d){
+    public int getSide(Direction d) {
         return switch (d) {
             case UP -> back;
             case DOWN -> front;
@@ -143,13 +149,14 @@ public class Die implements Serializable{
 
     /**
      * Get the current position of the dice in the form of a string
+     *
      * @return string x+""+y
      */
-    public String getPosition(){
+    public String getPosition() {
         return x + "" + y;
     }
 
-    public String getFaces(){
+    public String getFaces() {
         return "Top: " + top +
                 " Down: " + down +
                 " Front: " + front +
@@ -158,18 +165,19 @@ public class Die implements Serializable{
                 " Right: " + right;
     }
 
-    public void setPosition(int x, int y){
+    public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public void setPosition(String position){
-        this.x = Integer.parseInt(position.substring(0,1));
+    public void setPosition(String position) {
+        this.x = Integer.parseInt(position.substring(0, 1));
         this.y = Integer.parseInt(position.substring(1));
     }
 
     /**
      * Creates a deep copy of the die
+     *
      * @return A deep copy the die
      */
     public Die deepClone() {
@@ -186,8 +194,13 @@ public class Die implements Serializable{
         }
     }
 
-    public int getX() {return x;}
-    public int getY() {return y;}
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
 
     public boolean isWhiteDieFinished() {
         return getY() == 6;
@@ -203,18 +216,20 @@ public class Die implements Serializable{
 
     /**
      * Returns whether the current instance of dice is adjacent to another given dice
+     *
      * @param other A die
      * @return True if dice are adjacent, false otherwise
      */
-    public boolean isAdjacent(Die other){
-        return Boards.getManhattanDistance(other.getPosition(),getPosition()) == 1;
+    public boolean isAdjacent(Die other) {
+        return Boards.getManhattanDistance(other.getPosition(), getPosition()) == 1;
     }
 
     /**
      * Tip the dice in a given direction the orientation and position of the dice will change accordingly
+     *
      * @param direction The direction the die will roll in
      */
-    public void tip(Direction direction){
+    public void tip(Direction direction) {
 
         switch (direction) {
             case UP -> {
@@ -223,7 +238,7 @@ public class Die implements Serializable{
                 setBack(getDown());
                 setDown(getFront());
                 setFront(temp);
-                setPosition(getX(), getY() - 1);
+                setPosition(getX(), getY() + 1);
             }
             case DOWN -> {
                 int temp = getTop();
@@ -231,7 +246,7 @@ public class Die implements Serializable{
                 setFront(getDown());
                 setDown(getBack());
                 setBack(temp);
-                setPosition(getX(), getY() + 1);
+                setPosition(getX(), getY() - 1);
             }
             case LEFT -> {
                 int temp = getLeft();
@@ -254,6 +269,7 @@ public class Die implements Serializable{
 
     /**
      * Returns the position that is one over in whichever direction specified
+     *
      * @param direction The direction specified
      * @return The position which is one position over
      */
@@ -270,13 +286,13 @@ public class Die implements Serializable{
 
         Boards.Positions end = new Boards.Positions(endPosition);
 
-        if(getX() > end.getX()){
+        if (getX() > end.getX()) {
             return LEFT;
-        } else if(getX() < end.getX()) {
+        } else if (getX() < end.getX()) {
             return RIGHT;
-        } else if(getY() < end.getY()) {
+        } else if (getY() < end.getY()) {
             return UP;
-        } else if(getY() > end.getY()) {
+        } else if (getY() > end.getY()) {
             return DOWN;
         }
         return null;

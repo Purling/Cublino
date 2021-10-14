@@ -17,6 +17,7 @@ public class EasyAI extends Controller { // Maybe split into two i.e., PurEasyAI
 
     /**
      * Greedy AI for contra
+     *
      * @param currentGameState The current condition of the game
      * @return The board after the move determined by the AI is played
      */
@@ -30,17 +31,19 @@ public class EasyAI extends Controller { // Maybe split into two i.e., PurEasyAI
 
     /**
      * "AI" which just generates a random move
+     *
      * @param currentGameState The current game state
-     * @return The board after the move has been applied
+     * @return The game after the move has been applied
      */
-    public Boards randomMove(ContraCublino currentGameState) {
+    public ContraCublino randomMove(ContraCublino currentGameState) {
         Random rand = new Random();
         int randomMove = rand.nextInt(currentGameState.generateLegalMoves().length);
-        return currentGameState.generateLegalMoves()[randomMove].getPossibleState().getBoard();
+        return currentGameState.generateLegalMoves()[randomMove].getPossibleState();
     }
 
     /**
      * A heuristic for contra which is simplistic. It looks at how far along the farthest die is
+     *
      * @param currentGameState The current condition of the game
      * @return A numerical evaluation of the game state
      */
@@ -55,13 +58,20 @@ public class EasyAI extends Controller { // Maybe split into two i.e., PurEasyAI
             if (playerDice.stream().anyMatch(Die::isBlackDieFinished)) return 100;
             if (playerDice.stream().anyMatch(Die::isWhiteDieFinished)) return -100;
         }
-        return playerDice.stream().mapToInt(Die::getY).max().orElse(-99) * (100/7);
+        return playerDice.stream().mapToInt(Die::getY).max().orElse(-99) * (100 / 7);
     }
 
     /**
      * If the player is AI, then automatically choose the move;
      */
-    public void requestMove(){}
+    public void requestMove() {
+    }
+
+    /**
+     * Empty constructor for EasyAI
+     */
+    public EasyAI() {
+    }
 
     /**
      * Constructor
