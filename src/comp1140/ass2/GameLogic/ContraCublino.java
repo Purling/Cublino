@@ -18,35 +18,6 @@ import static comp1140.ass2.State.Boards.BOARD_DIMENSION;
  */
 public class ContraCublino extends Game implements Serializable {
 
-    public class ContraMove {
-        ContraCublino possibleState;
-        String encodedMove;
-
-        public ContraMove(ContraCublino possibleState, String encodedMove) {
-            this.possibleState = possibleState;
-            this.encodedMove = encodedMove;
-        }
-
-        public String getEncodedMove() {
-            return encodedMove;
-        }
-
-        /**
-         * Getter for possibleState
-         */
-        public ContraCublino getPossibleState() {
-            return possibleState;
-        }
-
-        /**
-         * To string method
-         */
-        @Override
-        public String toString() {
-            return encodedMove;
-        }
-    }
-
     public ContraCublino() {
     }
 
@@ -223,5 +194,34 @@ public class ContraCublino extends Game implements Serializable {
     @Override
     public String toString() {
         return board.getStringRepresentation();
+    }
+
+    public class ContraMove {
+        ContraCublino possibleState;
+        String encodedMove;
+
+        public ContraMove(ContraCublino possibleState, String encodedMove) {
+            this.possibleState = possibleState;
+            this.encodedMove = encodedMove;
+        }
+
+        public String getEncodedMove() {
+            return encodedMove;
+        }
+
+        /**
+         * Getter for possibleState
+         */
+        public ContraCublino getPossibleState() {
+            return possibleState;
+        }
+
+        /**
+         * To string method
+         */
+        @Override
+        public String toString() {
+            return encodedMove;
+        }
     }
 }

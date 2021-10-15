@@ -29,6 +29,7 @@ public class Controller {
     /**
      * Get the information of the player
      * If the player is an AI, then chooseMove will be called for the AIs
+     *
      * @return boolean isHuman
      */
     public boolean getIsHuman() {
@@ -47,5 +48,6 @@ public class Controller {
     /**
      * If the player is AI, then automatically choose the move;
      */
-    public void requestMove(){}
+    public void requestMove() {
+    }
 }

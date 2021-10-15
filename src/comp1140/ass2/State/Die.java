@@ -10,6 +10,7 @@ import static comp1140.ass2.State.Direction.*;
  * @author Whole group
  */
 public class Die implements Serializable {
+    private final boolean isWhite;
     /**
      * x and y represents the coordinate of the dice on a board
      */
@@ -25,22 +26,6 @@ public class Die implements Serializable {
     private int back;
     private int left;
     private int right;
-    private boolean isWhite;
-
-    static class SortByColour implements Comparator<Die> {
-
-        @Override
-        public int compare(Die dieA, Die dieB) {
-            int a = (dieA.getX() + dieA.getY()) * Boards.BOARD_DIMENSION;
-            int b = (dieB.getX() + dieB.getY()) * Boards.BOARD_DIMENSION;
-
-            if (a == b) {
-                return Integer.signum(dieA.getX() - dieB.getX());
-            } else {
-                return (a > b) ? 1 : -1;
-            }
-        }
-    }
 
     /**
      * Given the coordinates, the values of the dice on each side, and the owner of the dice,
@@ -110,12 +95,66 @@ public class Die implements Serializable {
         this.y = placement.charAt(2) - '1';
     }
 
+    public static String dieToEnc(Die die) {
+        int[][] orientations = new int[][]{
+                {1, 2, 3},
+                {1, 3, 5},
+                {1, 4, 2},
+                {1, 5, 4},
+                {2, 1, 4},
+                {2, 3, 1},
+                {2, 4, 6},
+                {2, 6, 3},
+                {3, 1, 2},
+                {3, 2, 6},
+                {3, 5, 1},
+                {3, 6, 5},
+                {4, 1, 5},
+                {4, 2, 1},
+                {4, 5, 6},
+                {4, 6, 2},
+                {5, 1, 3},
+                {5, 3, 6},
+                {5, 4, 1},
+                {5, 6, 4},
+                {6, 2, 4},
+                {6, 3, 2},
+                {6, 4, 5},
+                {6, 5, 3}
+        };
+        char zero;
+        char one;
+        char two;
+        int[] current = {die.getTop(), die.getFront(), die.getLeft()};
+        int index = -1;
+        for (int i = 0; i < orientations.length; i++) {
+            if (Arrays.equals(orientations[i], current)) {
+                index = i;
+            }
+        }
+        if (die.isWhite()) {
+            zero = (char) (index + 65);
+        } else {
+            zero = (char) (index + 97);
+        }
+        //String z = current.toString();
+
+        one = (char) (die.getX() + 'a');
+        two = (char) (die.getY() + '1');
+
+        return "" + zero + one + two;
+    }
+
     /**
      * Obtain the value on the top of the dice
      * The value will vary when the orientation of dice changes
      */
     public int getTop() {
         return this.top;
+    }
+
+    public void setTop(int top) {
+        this.top = top;
     }
 
     @Override
@@ -156,6 +195,11 @@ public class Die implements Serializable {
         return x + "" + y;
     }
 
+    public void setPosition(String position) {
+        this.x = Integer.parseInt(position.substring(0, 1));
+        this.y = Integer.parseInt(position.substring(1));
+    }
+
     public String getFaces() {
         return "Top: " + top +
                 " Down: " + down +
@@ -168,11 +212,6 @@ public class Die implements Serializable {
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
-    }
-
-    public void setPosition(String position) {
-        this.x = Integer.parseInt(position.substring(0, 1));
-        this.y = Integer.parseInt(position.substring(1));
     }
 
     /**
@@ -298,10 +337,6 @@ public class Die implements Serializable {
         return null;
     }
 
-    public void setTop(int top) {
-        this.top = top;
-    }
-
     public int getDown() {
         return down;
     }
@@ -342,53 +377,18 @@ public class Die implements Serializable {
         this.right = right;
     }
 
-    public static String dieToEnc(Die die) {
-        int[][] orientations = new int[][]{
-                {1, 2, 3},
-                {1, 3, 5},
-                {1, 4, 2},
-                {1, 5, 4},
-                {2, 1, 4},
-                {2, 3, 1},
-                {2, 4, 6},
-                {2, 6, 3},
-                {3, 1, 2},
-                {3, 2, 6},
-                {3, 5, 1},
-                {3, 6, 5},
-                {4, 1, 5},
-                {4, 2, 1},
-                {4, 5, 6},
-                {4, 6, 2},
-                {5, 1, 3},
-                {5, 3, 6},
-                {5, 4, 1},
-                {5, 6, 4},
-                {6, 2, 4},
-                {6, 3, 2},
-                {6, 4, 5},
-                {6, 5, 3}
-        };
-        char zero;
-        char one;
-        char two;
-        int[] current = {die.getTop(), die.getFront(), die.getLeft()};
-        int index = -1;
-        for (int i = 0; i < orientations.length; i++) {
-            if (Arrays.equals(orientations[i], current)) {
-                index = i;
+    static class SortByColour implements Comparator<Die> {
+
+        @Override
+        public int compare(Die dieA, Die dieB) {
+            int a = (dieA.getX() + dieA.getY()) * Boards.BOARD_DIMENSION;
+            int b = (dieB.getX() + dieB.getY()) * Boards.BOARD_DIMENSION;
+
+            if (a == b) {
+                return Integer.signum(dieA.getX() - dieB.getX());
+            } else {
+                return (a > b) ? 1 : -1;
             }
         }
-        if (die.isWhite()) {
-            zero = (char) (index + 65);
-        } else {
-            zero = (char) (index + 97);
-        }
-        //String z = current.toString();
-
-        one = (char) (die.getX() + 'a');
-        two = (char) (die.getY() + '1');
-
-        return "" + zero + one + two;
     }
 }
