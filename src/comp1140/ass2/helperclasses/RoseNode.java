@@ -9,8 +9,8 @@ public class RoseNode<T> {
     int winCount = 0;
     T state;
     RoseNode<T> parent;
-    private List<RoseNode<T>> children = new ArrayList<>();
     int depth;
+    private List<RoseNode<T>> children = new ArrayList<>();
 
     /**
      * Constructor for RoseTree
@@ -22,6 +22,7 @@ public class RoseNode<T> {
 
     /**
      * Adds a child to the RoseTree node
+     *
      * @param child The child to be added to the RoseTree
      * @return The child added
      */
@@ -114,9 +115,9 @@ public class RoseNode<T> {
             result.insert(0, "\n").append(state.toString()); // \n appended at the start because of replaceAll quirk
         }
         result = new StringBuilder(result.toString().replaceAll("\n", "\n" + "    ".repeat(depth)));
-        if(children == null) return state.toString();
+        if (children == null) return state.toString();
 
-        for(RoseNode<T> child : children) {
+        for (RoseNode<T> child : children) {
             result.append(child);
         }
         return result.toString();

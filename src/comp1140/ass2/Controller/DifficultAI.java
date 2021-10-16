@@ -6,9 +6,10 @@ import comp1140.ass2.State.Boards;
 import comp1140.ass2.gui.guiPieces.GuiDie;
 import comp1140.ass2.helperclasses.RoseNode;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * A difficult AI controller
@@ -30,22 +31,20 @@ public class DifficultAI extends Controller {
     }
 
     public static void main(String[] args) {
-        Boards board = new Boards("CWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7");
-        ContraCublino contra = new ContraCublino(true, board);
+        Boards board = new Boards("cWa1Wb1Wc1Wd1We1Wf1Lg2va7vb7vc7vd7ve7vf7vg7");
+//        Boards board = new Boards("cWa1Wb1Lc2Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
+        ContraCublino contra = new ContraCublino(false, board); // remember to switch isWhite to false if black is the current player
         RoseNode<ContraCublino> tree = new RoseNode(contra);
         DifficultAI difficultAI = new DifficultAI(tree);
+//        difficultAI.monteCarloExpansion(difficultAI.gameTree); //CWa1Wb1Lc2Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7
+//        difficultAI.simulate(contra);
+
         System.out.println(difficultAI.monteCarloTreeSearch());
-//        difficultAI.monteCarloExpansion(difficultAI.gameTree);
-//        contra.generateLegalMoves();
-//        for (RoseNode<ContraCublino> node : difficultAI.gameTree.getChildren()) {
-//            difficultAI.monteCarloExpansion(node);
-//        }
-//        System.out.println(difficultAI.gameTree);
-//        System.out.println(difficultAI.simulate(contra));
     }
 
     /**
      * Implements the Monte Carlo Tree search and returns the next best move
+     *
      * @return The next best move as a board
      */
     public Boards monteCarloTreeSearch() { // Assumes that a new gameTree is generated each time
@@ -53,6 +52,7 @@ public class DifficultAI extends Controller {
         long end = start + RUN_TIME;
         monteCarloExpansion(gameTree);
         while (System.currentTimeMillis() < end) { // can potentially exit earlier
+            long startTime  = System.currentTimeMillis();
             RoseNode<ContraCublino> selectedNode = findNode(gameTree);
             if (selectedNode.getVisitCount() == 0) {
                 backPropagate(selectedNode, simulate(selectedNode.getState()));
@@ -61,17 +61,19 @@ public class DifficultAI extends Controller {
                 RoseNode<ContraCublino> firstChild = selectedNode.getChildren().get(0);
                 backPropagate(firstChild, simulate(firstChild.getState()));
             }
+            System.out.println("While loop taking:"+(System.currentTimeMillis()-startTime)+"ms");
         }
         return getMaxChild(gameTree);
     }
 
     /**
      * Finds the child node with the most wins / win-visit ratio depending on what is wanted
+     *
      * @param treeNode The node from which to get the best child node
      * @return The best child node
      */
     private Boards getMaxChild(RoseNode<ContraCublino> treeNode) { // Can also make this based on percentages
-        List<Integer> winScores = treeNode.getChildren().stream().map(RoseNode::getWinCount).collect(Collectors.toList());
+        List<Integer> winScores = treeNode.getChildren().stream().map(RoseNode::getWinCount).collect(toList());
         int indexWanted = winScores.indexOf(winScores.stream().max(Integer::compareTo).orElseThrow());
         return treeNode.getChildren().get(indexWanted).getState().getBoard(); // Get rid of in production
     }
@@ -85,7 +87,7 @@ public class DifficultAI extends Controller {
     private void monteCarloExpansion(RoseNode<ContraCublino> treeNode) { // Consider where this should be
         ContraCublino nodeToExpand = treeNode.getState();
         List<ContraCublino> children = Arrays.stream(nodeToExpand.generateLegalMoves()).map(ContraCublino.ContraMove::getPossibleState)
-                .collect(Collectors.toList());
+                .collect(toList());
         if (children.isEmpty()) {
             ContraCublino game = treeNode.getState().deepClone(); //deepClone just to be safe. If it's 100% not necessary, delete it
             game.endTurn();
@@ -108,10 +110,12 @@ public class DifficultAI extends Controller {
         // Really need to optimise simulate, it is one of the things preventing the tree search from being very fast
         // Random moves is probably a bit too slow,
         // greedy with lookahead of 1 is probably too stupid. Maybe try greedy with a lookahead of 2 or 3.
+//        long startTime  = System.currentTimeMillis();
         EasyAI easyAI = new EasyAI();
         while (!contra.isGameOver()) {
             contra = easyAI.greedyAI(contra); // Can be any move making mechanism. e.g., minimax, greedy, etc
         }
+//        System.out.println("Simulate Takes:"+(System.currentTimeMillis()-startTime));
         return contra.getWinner();
     }
 
@@ -137,7 +141,6 @@ public class DifficultAI extends Controller {
      */
     public void backPropagate(RoseNode<ContraCublino> node, Game.GameResult result) {
         node.incrementVisitCount();
-        if (node.getParent() == null) return;
         boolean isWhite = gameTree.getState().getCurrentPlayer().isWhite();
         switch (result) {
             case WHITE_WINS:
@@ -147,6 +150,7 @@ public class DifficultAI extends Controller {
                 if (!isWhite) node.incrementWinCount();
                 break;
         }
+        if (node.getParent() == null) return;
         backPropagate(node.getParent(), result);
     }
 
@@ -170,9 +174,16 @@ public class DifficultAI extends Controller {
      * @return The chosen node
      */
     public RoseNode<ContraCublino> monteCarloSelection(RoseNode<ContraCublino> node) {
-        List<Double> UCT = node.getChildren().stream().map(this::upperConfidenceBoundCalculation).collect(Collectors.toList());
-        int index = UCT.indexOf(UCT.stream().max(Double::compareTo).orElseThrow()); //remove in production
-        return node.getChildren().get(index);
+        List<Double> UCT = node.getChildren().stream().map(this::upperConfidenceBoundCalculation).collect(toList());
+        Double largest = UCT.stream().max(Double::compareTo).orElseThrow(); //remove in production
+        List<Integer> indices = new ArrayList<>();
+        Random rand = new Random(0);
+
+        for (int i = 0; i < UCT.size(); i++) {
+            if (UCT.get(i).equals(largest)) indices.add(i);
+        }
+
+        return node.getChildren().get(indices.get(rand.nextInt(indices.size())));
     }
 
     /**

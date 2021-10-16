@@ -43,6 +43,20 @@ public class Die implements Serializable {
         this.isWhite = isWhite;
     }
 
+    /**
+     * Given a die, create the same die
+     */
+    public void setDie(Die die) {
+        this.top = die.top;
+        this.down = die.down;
+        this.front = die.front;
+        this.back = die.back;
+        this.left = die.left;
+        this.right = die.right;
+        this.x = die.x;
+        this.y = die.y;
+    }
+
     public Die(String placement, Players whitePlayer, Players blackPlayer) {
         assert placement.length() == 3;
         int orientation = placement.charAt(0);

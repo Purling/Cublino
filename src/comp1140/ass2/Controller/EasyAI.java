@@ -1,7 +1,6 @@
 package comp1140.ass2.Controller;
 
 import comp1140.ass2.GameLogic.ContraCublino;
-import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
 import comp1140.ass2.gui.guiPieces.GuiDie;
 

@@ -6,7 +6,6 @@ import comp1140.ass2.State.Direction;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static comp1140.ass2.State.Boards.BOARD_DIMENSION;
@@ -125,10 +124,10 @@ public class PurCublino extends Game implements Serializable {
 
         if (board.getAt(endPosition) == null) {
             Die realDie = getCurrentPlayer().getDice().get(index);
-            realDie.jump(realDie.getDirection(endPosition));
+            realDie.jump(realDie.getDirection(endPosition)); //realDie.setPosition(endPosition);
+            initial.setDie(realDie);
             board.setAt(endPosition, realDie);
             board.setAt(start, null);
-            initial.setPosition(realDie.getPosition());
         }
     }
 

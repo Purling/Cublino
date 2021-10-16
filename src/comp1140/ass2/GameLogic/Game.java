@@ -175,7 +175,7 @@ public abstract class Game implements Serializable {
             realDie.tip(currentPlayer.getDice().get(index).getDirection(endPosition));
             board.setAt(endPosition, currentPlayer.getDice().get(index));
             board.setAt(start, null);
-            initial.setPosition(realDie.getPosition());
+            initial.setDie(realDie);
         }
     }
 

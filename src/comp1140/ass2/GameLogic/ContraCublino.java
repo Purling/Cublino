@@ -79,6 +79,8 @@ public class ContraCublino extends Game implements Serializable {
 
     /**
      * Method which compares adjacent die of opposing players and eliminates the loser according to the Contra gamemode
+     *
+     * @param adjacentDie The die that is always a participant in battles
      */
     public void battle(Die adjacentDie) {
         Die[] potentialBattles = Arrays.stream(board.getAdjacentDie(adjacentDie)).filter((x) -> x.isWhite() != adjacentDie.isWhite()).toArray(Die[]::new);
