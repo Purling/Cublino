@@ -300,9 +300,15 @@ public class Cublino {
      * @return a valid move for the current game state.
      */
     public static String generateMovePur(String state) {
-        return null; // FIXME Task 11 (D)
-        // FIXME Task 13 (HD): Implement a "smart" generateMove()
+        Boards board = new Boards(state);
+        char turnInformation = state.charAt(0);
+        PurCublino pur = new PurCublino(Character.isUpperCase(turnInformation), board);
+        Random rand = new Random();
+        int randomMove = rand.nextInt(pur.generatePurMove().length);
+
+        return pur.generatePurMove()[randomMove].getEncodedMove();
     }
+        // FIXME Task 13 (HD): Implement a "smart" generateMove()
 
     /**
      * Task 14a:

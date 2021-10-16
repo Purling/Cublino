@@ -306,13 +306,24 @@ public class Die implements Serializable {
         }
     }
 
+    public void jump(Direction direction){
+
+        switch (direction){
+            case UP -> setPosition(getX(), getY() + 2);
+            case DOWN -> setPosition(getX(), getY() - 2);
+            case LEFT -> setPosition(getX() - 2, getY());
+            case RIGHT -> setPosition(getX() + 2, getY());
+        }
+    }
+
     /**
-     * Returns the position that is one over in whichever direction specified
+     * Returns the position that is a given steps over in whichever direction specified
      *
      * @param direction The direction specified
-     * @return The position which is one position over
+     * @param n
+     * @return The position which is n positions over
      */
-    public String getPositionOneOver(Direction direction) {
+    public String getPositionOver(Direction direction, int n) {
         return switch (direction) {
             case RIGHT -> Integer.toString(getX() + 1) + getY();
             case LEFT -> Integer.toString(getX() - 1) + getY();

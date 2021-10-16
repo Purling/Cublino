@@ -176,6 +176,8 @@ public class Boards implements Serializable{
         return adjacentDice.toArray(Die[]::new);
     }
 
+
+
     /**
      * Returns whether two positions are horizontal or vertical to each other
      * @param position1 Position on board

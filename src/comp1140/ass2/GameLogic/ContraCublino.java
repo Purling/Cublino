@@ -110,7 +110,7 @@ public class ContraCublino extends Game implements Serializable {
                 if (isDirectionClear(direction, die)) {
                     ContraCublino clone = deepClone();
                     Die dieClone = die.deepClone();
-                    clone.applyStep(dieClone, dieClone.getPositionOneOver(direction));
+                    clone.applyStep(dieClone, dieClone.getPositionOver(direction,1));
                     clone.endTurn();
                     // FIXME Remove the magic numbers below
                     ContraMove move = new ContraMove(clone, Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1));

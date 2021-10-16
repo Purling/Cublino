@@ -2,8 +2,14 @@ package comp1140.ass2.GameLogic;
 
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
+import comp1140.ass2.State.Direction;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static comp1140.ass2.State.Boards.BOARD_DIMENSION;
 
 /**
  * A gamemode of Cublino that extends from the Game class
@@ -11,7 +17,7 @@ import java.util.List;
  * @author Ziling Ouyang, Yuechen Liu
  */
 
-public class PurCublino extends Game {
+public class PurCublino extends Game implements Serializable {
 
     private static final int JUMP_DISTANCE = 2;
 
@@ -85,7 +91,7 @@ public class PurCublino extends Game {
      */
     @Override
     public boolean isDiceAmountCorrect(Boards board) {
-        return (board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() == 2 * Boards.BOARD_DIMENSION);
+        return (board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() == 2 * BOARD_DIMENSION);
     }
 
     @Override
@@ -119,10 +125,10 @@ public class PurCublino extends Game {
 
         if (board.getAt(endPosition) == null) {
             Die realDie = getCurrentPlayer().getDice().get(index);
-            realDie.setPosition(endPosition);
-            initial.setPosition(realDie.getPosition());
+            realDie.jump(realDie.getDirection(endPosition));
             board.setAt(endPosition, realDie);
             board.setAt(start, null);
+            initial.setPosition(realDie.getPosition());
         }
     }
 
@@ -157,4 +163,168 @@ public class PurCublino extends Game {
         } else return GameResult.UNFINISHED;
     }
 
+    /**
+     * Create a deep copy of the PurCublino
+     *
+     * @return a deep copy of the PurCublino
+     */
+    public PurCublino deepClone() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (PurCublino) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    public PurMove[] generatePurMove() {
+        List<Die> possibleDie = getCurrentPlayer().getDice();
+        List<PurMove> possibleMoves = new ArrayList<>();
+
+        for (Die die : possibleDie){
+            for (Direction direction : Direction.values()){
+                if(isValidTipDirection(direction, die)){
+                    String move = "";
+                    PurCublino clone = deepClone();
+                    Die dieClone = die.deepClone();
+                    clone.applyTip(dieClone, dieClone.getPositionOver(direction, 1));
+                    move += Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1);
+                    PurMove m = new PurMove(clone, move);
+                    possibleMoves.add(m);
+                    //possibleMoves.addAll(Arrays.asList(clone.generatePurJump(dieClone, move)));
+                }
+                //if(isValidJumpDirection(direction, die)){
+                   // possibleMoves.addAll(Arrays.asList(generatePurJump("")));
+                //}
+            }
+        }
+        //possibleMoves.addAll(Arrays.asList(generatePurJump(null, "")));
+        return possibleMoves.toArray(PurMove[]::new);
+
+    }
+
+//    public PurMove[] generatePurJump(Die d, String preMove) {
+//        List<Die> possibleDie = getCurrentPlayer().getDice();
+//        List<PurMove> possibleMoves = new ArrayList<>();
+//
+//        if(d == null) {
+//            for (Die die : possibleDie) {
+//                List<String> previousPosition = new ArrayList<>();
+//                for (Direction direction : Direction.values()) {
+//                    if (isValidJumpDirection(direction, die)) {
+//                        previousPosition.add(die.getPosition());
+//                        String move = preMove;
+//                        PurCublino clone = deepClone();
+//                        Die dieClone = die.deepClone();
+//
+//                        if (!previousPosition.contains(dieClone.getPositionOver(direction, 2))) {
+//                            clone.applyJump(dieClone, dieClone.getPositionOver(direction, 2));
+//                            if (move == "") {
+//                                move += Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1);
+//                            } else {
+//                                move += Die.dieToEnc(dieClone).substring(1);
+//                            }
+//                            PurMove m = new PurMove(clone, move);
+//                            possibleMoves.add(m);
+//                            previousPosition.add(Die.dieToEnc(dieClone).substring(1));
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        else{
+//            for (Direction direction : Direction.values()) {
+//                List<String> prePosition = new ArrayList<>();
+//                if (isValidJumpDirection(direction, d)) {
+//
+//                    prePosition.add(d.getPosition());
+//                    String move = preMove;
+//                    PurCublino clone = deepClone();
+//                    Die dieClone = d.deepClone();
+//
+//                    if (!prePosition.contains(dieClone.getPositionOver(direction, 2))) {
+//                        clone.applyJump(dieClone, dieClone.getPositionOver(direction, 2));
+//                        if (move == "") {
+//                            move += Die.dieToEnc(d).substring(1) + Die.dieToEnc(dieClone).substring(1);
+//                        } else {
+//                            move += Die.dieToEnc(dieClone).substring(1);
+//                        }
+//                        PurMove m = new PurMove(clone, move);
+//                        possibleMoves.add(m);
+//                        prePosition.add(Die.dieToEnc(dieClone).substring(1));
+//                    }
+//                }
+//            }
+//
+//        }
+//        return possibleMoves.toArray(PurMove[]::new);
+//    }
+
+    public boolean isValidJumpDirection(Direction direction, Die die) {
+        return switch (direction) {
+            case UP -> die.isWhite() && die.getY() + 2 < BOARD_DIMENSION
+                    && (board.getAt(die.getX(), die.getY() + 1) != null)
+                    && (board.getAt(die.getX(), die.getY() + 2) == null);
+            case DOWN -> (!die.isWhite()) && die.getY() - 2 > 0
+                    && (board.getAt(die.getX(), die.getY() - 1) != null)
+                    && (board.getAt(die.getX(), die.getY() - 2) == null);
+            case LEFT -> (die.getX() - 2) > 0
+                    && (board.getAt(die.getX() - 1, die.getY()) != null)
+                    && (board.getAt(die.getX() - 2, die.getY()) == null);
+            case RIGHT -> (die.getX() + 2) < BOARD_DIMENSION
+                    && (board.getAt(die.getX() + 1, die.getY()) != null)
+                    && (board.getAt(die.getX() + 2, die.getY()) == null);
+        };
+    }
+
+    public boolean isValidTipDirection(Direction direction, Die die) {
+        return switch (direction) {
+            case RIGHT -> (die.getX() + 1) < BOARD_DIMENSION
+                    && (board.getAt(die.getX() + 1, die.getY()) == null);
+            case LEFT -> (die.getX()) > 0 && (board.getAt(die.getX() - 1, die.getY()) == null);
+            case UP -> die.isWhite() && (die.getY() + 1) < BOARD_DIMENSION
+                    && (board.getAt(die.getX(), die.getY() + 1) == null);
+            case DOWN -> (!die.isWhite()) && (die.getY()) > 0
+                    && (board.getAt(die.getX(), die.getY() - 1) == null);
+        };
+    }
+
+
+    /**
+     * Written by Ziling, Modified by Yuechen
+     */
+    public class PurMove {
+        PurCublino possibleState;
+        String encodedMove;
+
+        public PurMove(PurCublino possibleState, String encodedMove) {
+            this.possibleState = possibleState;
+            this.encodedMove = encodedMove;
+        }
+
+        public String getEncodedMove() {
+            return encodedMove;
+        }
+
+        /**
+         * Getter for possibleState
+         */
+        public PurCublino getPossibleState() {
+            return possibleState;
+        }
+
+        /**
+         * To string method
+         */
+        @Override
+        public String toString() {
+            return encodedMove;
+        }
+
+    }
 }
