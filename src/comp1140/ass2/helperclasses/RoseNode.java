@@ -109,10 +109,12 @@ public class RoseNode<T> {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
+        StringBuilder wins = new StringBuilder("Win count:" + winCount);
+        StringBuilder visits = new StringBuilder("Visit count:" + visitCount);
         if (depth == 0) {
-            result.append(state.toString());
+            result.append(wins).append(" ").append(visits).append(state.toString());
         } else {
-            result.insert(0, "\n").append(state.toString()); // \n appended at the start because of replaceAll quirk
+            result.insert(0, "\n").append(wins).append(" ").append(visits).append(state.toString()); // \n appended at the start because of replaceAll quirk
         }
         result = new StringBuilder(result.toString().replaceAll("\n", "\n" + "    ".repeat(depth)));
         if (children == null) return state.toString();

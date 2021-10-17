@@ -41,11 +41,12 @@ public class EasyAI extends Controller { // Maybe split into two i.e., PurEasyAI
         if (isWhite) {
             if (playerDice.stream().anyMatch(Die::isWhiteDieFinished)) return 100;
             if (playerDice.stream().anyMatch(Die::isBlackDieFinished)) return -100;
+            return playerDice.stream().mapToInt(Die::getY).max().orElse(-99) * (100 / 7);
         } else {
             if (playerDice.stream().anyMatch(Die::isBlackDieFinished)) return 100;
             if (playerDice.stream().anyMatch(Die::isWhiteDieFinished)) return -100;
+            return playerDice.stream().mapToInt((x) -> 7 - x.getY()).max().orElse(-99) * (100 / 7);
         }
-        return playerDice.stream().mapToInt(Die::getY).max().orElse(-99) * (100 / 7);
     }
 
     /**

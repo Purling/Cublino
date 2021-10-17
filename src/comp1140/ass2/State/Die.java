@@ -334,15 +334,15 @@ public class Die implements Serializable {
      * Returns the position that is a given steps over in whichever direction specified
      *
      * @param direction The direction specified
-     * @param n
+     * @param n The amount of positions over
      * @return The position which is n positions over
      */
     public String getPositionOver(Direction direction, int n) {
         return switch (direction) {
-            case RIGHT -> Integer.toString(getX() + 1) + getY();
-            case LEFT -> Integer.toString(getX() - 1) + getY();
-            case UP -> getX() + Integer.toString(getY() + 1);
-            case DOWN -> getX() + Integer.toString(getY() - 1);
+            case RIGHT -> Integer.toString(getX() + n) + getY();
+            case LEFT -> Integer.toString(getX() - n) + getY();
+            case UP -> getX() + Integer.toString(getY() + n);
+            case DOWN -> getX() + Integer.toString(getY() - n);
         };
     }
 

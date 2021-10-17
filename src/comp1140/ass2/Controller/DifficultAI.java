@@ -31,7 +31,7 @@ public class DifficultAI extends Controller {
     }
 
     public static void main(String[] args) {
-        Boards board = new Boards("cWa1Wb1Wc1Wd1We1Wf1Lg2va7vb7vc7vd7ve7vf7vg7");
+        Boards board = new Boards("CWa1Wb1Wc1Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
 //        Boards board = new Boards("cWa1Wb1Lc2Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
         ContraCublino contra = new ContraCublino(false, board); // remember to switch isWhite to false if black is the current player
         RoseNode<ContraCublino> tree = new RoseNode(contra);
@@ -50,6 +50,7 @@ public class DifficultAI extends Controller {
     public Boards monteCarloTreeSearch() { // Assumes that a new gameTree is generated each time
         long start = System.currentTimeMillis();
         long end = start + RUN_TIME;
+        Random rand = new Random();
         monteCarloExpansion(gameTree);
         while (System.currentTimeMillis() < end) { // can potentially exit earlier
             long startTime  = System.currentTimeMillis();
@@ -58,10 +59,14 @@ public class DifficultAI extends Controller {
                 backPropagate(selectedNode, simulate(selectedNode.getState()));
             } else {
                 monteCarloExpansion(selectedNode);
-                RoseNode<ContraCublino> firstChild = selectedNode.getChildren().get(0);
+                RoseNode<ContraCublino> firstChild = selectedNode.getChildren().get(rand.nextInt(selectedNode.getChildren().size()));
                 backPropagate(firstChild, simulate(firstChild.getState()));
             }
             System.out.println("While loop taking:"+(System.currentTimeMillis()-startTime)+"ms");
+        }
+        System.out.println("Win count:" + gameTree.getWinCount() + "  Visit count:" + gameTree.getVisitCount());
+        for (RoseNode<ContraCublino> state : gameTree.getChildren()) {
+            System.out.println("Win count:" + state.getWinCount() + "  Visit count:" + state.getVisitCount());
         }
         return getMaxChild(gameTree);
     }
@@ -109,13 +114,20 @@ public class DifficultAI extends Controller {
     public Game.GameResult simulate(ContraCublino contra) {
         // Really need to optimise simulate, it is one of the things preventing the tree search from being very fast
         // Random moves is probably a bit too slow,
-        // greedy with lookahead of 1 is probably too stupid. Maybe try greedy with a lookahead of 2 or 3.
-//        long startTime  = System.currentTimeMillis();
+        // greedy with lookahead of 1 is probably too stupid. Maybe try greedy with a lookahead of 2 or 3 in combination with random
+        long startTime  = System.currentTimeMillis();
         EasyAI easyAI = new EasyAI();
-        while (!contra.isGameOver()) {
-            contra = easyAI.greedyAI(contra); // Can be any move making mechanism. e.g., minimax, greedy, etc
+        int counter = 1;
+        while (contra.getWinner().equals(Game.GameResult.UNFINISHED)) {
+            boolean everyThird = (counter % 3) == 0;
+            // Can be any move making mechanism. e.g., minimax, greedy, etc
+            // Currently a combination of random and greedy
+            if (everyThird) contra = easyAI.randomMove(contra);
+            if (contra.getWinner().equals(Game.GameResult.UNFINISHED)) contra = easyAI.greedyAI(contra);
+            if (contra.getWinner().equals(Game.GameResult.UNFINISHED) && everyThird) contra = easyAI.randomMove(contra);
+            counter++;
         }
-//        System.out.println("Simulate Takes:"+(System.currentTimeMillis()-startTime));
+        System.out.println("Simulate Takes:"+(System.currentTimeMillis()-startTime));
         return contra.getWinner();
     }
 
@@ -182,7 +194,6 @@ public class DifficultAI extends Controller {
         for (int i = 0; i < UCT.size(); i++) {
             if (UCT.get(i).equals(largest)) indices.add(i);
         }
-
         return node.getChildren().get(indices.get(rand.nextInt(indices.size())));
     }
 

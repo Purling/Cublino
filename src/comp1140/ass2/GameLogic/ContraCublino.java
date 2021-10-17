@@ -162,9 +162,9 @@ public class ContraCublino extends Game implements Serializable {
     public GameResult getWinner() {
         List<Die> white = board.getWhitePlayer().getDice();
         List<Die> black = board.getBlackPlayer().getDice();
-        if (white.stream().anyMatch(Die::isWhiteDieFinished)) return WHITE_WINS;
-        if (black.stream().anyMatch(Die::isBlackDieFinished)) return BLACK_WINS;
-        return TIE;
+        if (white.stream().anyMatch(Die::isWhiteDieFinished) || black.isEmpty()) return WHITE_WINS;
+        if (black.stream().anyMatch(Die::isBlackDieFinished) || white.isEmpty()) return BLACK_WINS;
+        return UNFINISHED;
     }
 
     /**

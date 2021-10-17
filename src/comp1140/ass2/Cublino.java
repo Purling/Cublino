@@ -6,6 +6,7 @@ import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import static comp1140.ass2.State.Boards.boardToString;
@@ -304,11 +305,10 @@ public class Cublino {
         char turnInformation = state.charAt(0);
         PurCublino pur = new PurCublino(Character.isUpperCase(turnInformation), board);
         Random rand = new Random();
-        int randomMove = rand.nextInt(pur.generatePurMove().length);
-
-        return pur.generatePurMove()[randomMove].getEncodedMove();
+        int randomMove = rand.nextInt(pur.generatePurMoves().length);
+        return pur.generatePurMoves()[randomMove].getEncodedMove();
     }
-        // FIXME Task 13 (HD): Implement a "smart" generateMove()
+    // FIXME Task 13 (HD): Implement a "smart" generateMove()
 
     /**
      * Task 14a:
