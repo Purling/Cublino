@@ -25,7 +25,6 @@ class generateMovePurTest {
         for (int i = 0; i < states.length; i++) {
             String move = Cublino.generateMovePur(states[i]);
             Set<String> legalMoves = new HashSet<>(Arrays.asList(moves[i]));
-            System.out.println(Arrays.toString(moves[i])); // remove
             assertTrue(legalMoves.contains(move), errorPrefix(states[i], move) + "expected a move from \n" + Arrays.toString(moves[i]));
         }
     }
