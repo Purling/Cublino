@@ -1,9 +1,10 @@
 package comp1140.ass2.helperclasses;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RoseNode<T> {
+public class RoseNode<T> implements Serializable {
 
     int visitCount = 0;
     int winCount = 0;

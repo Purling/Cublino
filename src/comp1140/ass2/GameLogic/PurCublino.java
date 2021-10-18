@@ -166,9 +166,9 @@ public class PurCublino extends Game implements Serializable {
     }
 
     /**
-     * Create a deep copy of the PurCublino
+     * Create a deep copy of the PurCublino object
      *
-     * @return a deep copy of the PurCublino
+     * @return a deep copy of the PurCublino object
      */
     public PurCublino deepClone() {
         try {
@@ -184,6 +184,11 @@ public class PurCublino extends Game implements Serializable {
         }
     }
 
+    /**
+     * Generates the moves which can be reached by a tip
+     *
+     * @return List of moves which can be reached with only a tip
+     */
     public List<PurMove> generatePurTip() {
         List<Die> possibleDie = getCurrentPlayer().getDice();
         List<PurMove> possibleMoves = new ArrayList<>();
@@ -198,26 +203,22 @@ public class PurCublino extends Game implements Serializable {
                     move += Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1);
                     PurMove m = new PurMove(clone, move);
                     possibleMoves.add(m);
-                    //possibleMoves.addAll(Arrays.asList(clone.generatePurJump(dieClone, move)));
                 }
-                //if(isValidJumpDirection(direction, die)){
-                // possibleMoves.addAll(Arrays.asList(generatePurJump("")));
-                //}
             }
         }
-        //possibleMoves.addAll(Arrays.asList(generatePurJump(null, "")));
         return possibleMoves;
     }
 
+    /**
+     * Based on the current state of the board, generates any possible sequence of steps i.e., a move
+     *
+     * @return Every possible move from the current board state
+     */
     public PurMove[] generatePurMoves() {
-        List<Die> possibleDie = getCurrentPlayer().getDice();
-        List<PurMove> possibleMoves = new ArrayList<>();
-        List<PurMove> moveToExpand = new ArrayList<>();
         List<PurMove> basicMoves = Stream.concat(generatePurJump().stream(), generatePurTip().stream()).collect(Collectors.toList());
-
         List<List<PurCublino.PurMove>> expanded = basicMoves.stream().map((x) -> x.getPossibleState().generatePurJump(x.getEncodedMove())).collect(Collectors.toList());
         List<PurCublino.PurMove> flat = expanded.stream().flatMap(List::stream).collect(Collectors.toList());
-        List<PurCublino.PurMove> concat = Stream.concat(basicMoves.stream(),flat.stream()).collect(Collectors.toList());
+        List<PurCublino.PurMove> concat = Stream.concat(basicMoves.stream(), flat.stream()).collect(Collectors.toList());
         return Stream.concat(concat.stream(), generatePurMovesRecursion(flat).stream()).toArray(PurMove[]::new);
     }
 
@@ -228,25 +229,25 @@ public class PurCublino extends Game implements Serializable {
         return Stream.concat(flat.stream(), generatePurMovesRecursion(flat).stream()).collect(Collectors.toList());
     }
 
-    public List<PurMove> generatePurJump(String preMoves) {
+    public List<PurMove> generatePurJump(String historicalMoves) {
         List<PurMove> possibleMoves = new ArrayList<>();
-        Boards.Positions[] moved = Boards.moveToPositions(preMoves);
-        List<String> moves = Arrays.stream(moved).map(Boards.Positions::toString).collect(Collectors.toList());
-        Die die = board.getAt(moved[moved.length - 1].toString());
+        Boards.Positions[] givenMoves = Boards.moveToPositions(historicalMoves);
+        List<String> moves = Arrays.stream(givenMoves).map(Boards.Positions::toString).collect(Collectors.toList());
+        Die die = board.getAt(moves.get(moves.size() - 1));
 
-            for (Direction direction : Direction.values()) {
-                if (isValidJumpDirection(direction, die)) {
-                    String move = preMoves.substring(0,preMoves.length() - 2);
-                    PurCublino clone = deepClone();
-                    Die dieClone = die.deepClone();
-                    clone.applyJump(dieClone, dieClone.getPositionOver(direction, 2));
-                    if (!moves.contains(dieClone.getPosition())) {
-                        move += Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1);
-                        PurMove m = new PurMove(clone, move);
-                        possibleMoves.add(m);
-                    }
+        for (Direction direction : Direction.values()) {
+            if (isValidJumpDirection(direction, die)) {
+                String move = historicalMoves.substring(0, historicalMoves.length() - 2); // TODO refactor so that move and historicalMoves aren't used anymore
+                PurCublino clone = deepClone();
+                Die dieClone = die.deepClone();
+                clone.applyJump(dieClone, dieClone.getPositionOver(direction, 2));
+                if (!moves.contains(dieClone.getPosition())) {
+                    move += Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1);
+                    PurMove m = new PurMove(clone, move);
+                    possibleMoves.add(m);
                 }
             }
+        }
         return possibleMoves;
     }
 
@@ -269,63 +270,6 @@ public class PurCublino extends Game implements Serializable {
         }
         return possibleMoves;
     }
-
-//    public PurMove[] generatePurJump(Die d, String preMove) {
-//        List<Die> possibleDie = getCurrentPlayer().getDice();
-//        List<PurMove> possibleMoves = new ArrayList<>();
-//
-//        if(d == null) {
-//            for (Die die : possibleDie) {
-//                List<String> previousPosition = new ArrayList<>();
-//                for (Direction direction : Direction.values()) {
-//                    if (isValidJumpDirection(direction, die)) {
-//                        previousPosition.add(die.getPosition());
-//                        String move = preMove;
-//                        PurCublino clone = deepClone();
-//                        Die dieClone = die.deepClone();
-//
-//                        if (!previousPosition.contains(dieClone.getPositionOver(direction, 2))) {
-//                            clone.applyJump(dieClone, dieClone.getPositionOver(direction, 2));
-//                            if (move == "") {
-//                                move += Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1);
-//                            } else {
-//                                move += Die.dieToEnc(dieClone).substring(1);
-//                            }
-//                            PurMove m = new PurMove(clone, move);
-//                            possibleMoves.add(m);
-//                            previousPosition.add(Die.dieToEnc(dieClone).substring(1));
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        else{
-//            for (Direction direction : Direction.values()) {
-//                List<String> prePosition = new ArrayList<>();
-//                if (isValidJumpDirection(direction, d)) {
-//
-//                    prePosition.add(d.getPosition());
-//                    String move = preMove;
-//                    PurCublino clone = deepClone();
-//                    Die dieClone = d.deepClone();
-//
-//                    if (!prePosition.contains(dieClone.getPositionOver(direction, 2))) {
-//                        clone.applyJump(dieClone, dieClone.getPositionOver(direction, 2));
-//                        if (move == "") {
-//                            move += Die.dieToEnc(d).substring(1) + Die.dieToEnc(dieClone).substring(1);
-//                        } else {
-//                            move += Die.dieToEnc(dieClone).substring(1);
-//                        }
-//                        PurMove m = new PurMove(clone, move);
-//                        possibleMoves.add(m);
-//                        prePosition.add(Die.dieToEnc(dieClone).substring(1));
-//                    }
-//                }
-//            }
-//
-//        }
-//        return possibleMoves.toArray(PurMove[]::new);
-//    }
 
     public boolean isValidJumpDirection(Direction direction, Die die) {
         return switch (direction) {
