@@ -189,14 +189,8 @@ public abstract class Game implements Serializable {
     }
 
     /**
-     * Adds a turn to the record of player turns
-     *
-     * @param game The gamestate at the end of a player's turn
+     * Getter for stepHistory
      */
-    public void addToTurnHistory(Game game) {
-        turnHistory.add(game);
-    }
-
     public List<Move> getStepHistory() {
         return stepHistory;
     }

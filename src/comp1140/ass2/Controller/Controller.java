@@ -1,6 +1,8 @@
 package comp1140.ass2.Controller;
 
+import comp1140.ass2.GameLogic.ContraCublino;
 import comp1140.ass2.GameLogic.Game;
+import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.gui.guiPieces.GuiBoard;
 import comp1140.ass2.gui.guiPieces.GuiDie;
 
@@ -34,10 +36,30 @@ public class Controller {
 
     /**
      * If the player is AI, then automatically choose the move;
-     * @param game
+     * @param gui The UI components
      */
-    public void requestMove(Game game, GuiBoard gui) {
-        //TODO: make the move
-        if (type != ControllerType.HUMAN) gui.moveComplete();
+    public void requestMove(GuiBoard gui) {
+        if (gui.getGame() instanceof PurCublino) {
+            if (type != ControllerType.HUMAN) gui.moveComplete();
+        } else {
+            switch (type) {
+                case EASY_AI -> {
+                    System.out.println(EasyAI.greedyAI((ContraCublino) gui.getGame()));
+                    System.out.println(gui.getGame().getCurrentPlayer());
+                    gui.setGame(EasyAI.greedyAI((ContraCublino) gui.getGame()));
+                    System.out.println(("\n"));
+                    System.out.println(EasyAI.greedyAI((ContraCublino) gui.getGame()));
+                    System.out.println(gui.getGame().getCurrentPlayer());
+                    gui.moveComplete();
+                }
+
+                case DIFFICULT_AI -> {
+                    DifficultAI difficultAI = new DifficultAI(gui.getGame());
+                    difficultAI.monteCarloMain();
+                    gui.moveCompleteAI();
+                }
+            }
+        }
+            //TODO: make the move
     }
 }

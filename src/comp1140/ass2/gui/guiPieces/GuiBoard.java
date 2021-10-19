@@ -245,7 +245,7 @@ public class GuiBoard extends SubScene {
         Game.GameResult result = game.getWinner();
         if (result == Game.GameResult.UNFINISHED) {
             turnLabel.setText(controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].getName() + "'s turn.");
-            controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].requestMove(game, this);
+            controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].requestMove(this);
         } else {
             permitsMoveMaking = false;
             switch(result) {
@@ -260,6 +260,11 @@ public class GuiBoard extends SubScene {
     public void moveComplete() {
         game.endTurn();
         haveCurrentPlayerMakeMove();
+    }
+
+    public void moveCompleteAI() {
+        redrawSelection();
+//        haveCurrentPlayerMakeMove();
     }
 
     /**
@@ -287,5 +292,19 @@ public class GuiBoard extends SubScene {
         public InvalidSetupException(String errorMessage) {
             super(errorMessage);
         }
+    }
+
+    /**
+     * Setter for game
+     */
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    /**
+     * Getter for game
+     */
+    public Game getGame() {
+        return game;
     }
 }

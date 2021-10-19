@@ -1,6 +1,7 @@
 package comp1140.ass2.Controller;
 
 import comp1140.ass2.GameLogic.ContraCublino;
+import comp1140.ass2.GameLogic.Game;
 import comp1140.ass2.State.Die;
 import comp1140.ass2.gui.guiPieces.GuiDie;
 
@@ -47,7 +48,7 @@ public class EasyAI { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
      * @param currentGameState The current condition of the game
      * @return The board after the move determined by the AI is played
      */
-    public ContraCublino greedyAI(ContraCublino currentGameState) {
+    public static ContraCublino greedyAI(ContraCublino currentGameState) {
         ContraCublino.ContraMove[] legalMoves = currentGameState.generateLegalMoves();
         List<Integer> evaluatedMoves = Arrays.stream(legalMoves).map((x) -> greedyEvaluation(x.getPossibleState())).collect(Collectors.toList());
         int generatedMoveIndex = evaluatedMoves.indexOf(evaluatedMoves.stream().max(Integer::compareTo).orElse(0));
@@ -61,7 +62,7 @@ public class EasyAI { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
      * @param currentGameState The current game state
      * @return The game after the move has been applied
      */
-    public ContraCublino randomMove(ContraCublino currentGameState) {
+    public static ContraCublino randomMove(ContraCublino currentGameState) {
         Random rand = new Random();
         int randomMove = rand.nextInt(currentGameState.generateLegalMoves().length);
         return currentGameState.generateLegalMoves()[randomMove].getPossibleState();

@@ -3,14 +3,12 @@ package comp1140.ass2.Controller;
 import comp1140.ass2.GameLogic.ContraCublino;
 import comp1140.ass2.GameLogic.Game;
 import comp1140.ass2.State.Boards;
-import comp1140.ass2.gui.guiPieces.GuiDie;
 import comp1140.ass2.helperclasses.RoseNode;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -18,14 +16,19 @@ import static java.util.stream.Collectors.toList;
  * A difficult AI controller
  */
 public class DifficultAI implements Serializable {
-    private static final long RUN_TIME = 100000;
-    private RoseNode<ContraCublino> gameTree;
+    private static final long RUN_TIME = 30000;
+    private RoseNode<ContraCublino> contraGameTree;
+    private Game game;
 
     /**
      * Constructor for DifficultAI
      */
-    public DifficultAI(RoseNode<ContraCublino> gameTree) {
-        this.gameTree = gameTree;
+    public DifficultAI(Game game) {
+        this.game = game;
+        if (game instanceof ContraCublino) {
+            RoseNode<ContraCublino> gameTree = new RoseNode<>((ContraCublino) game);
+            this.contraGameTree = gameTree;
+        }
     }
 
     public static void main(String[] args) {
@@ -33,17 +36,8 @@ public class DifficultAI implements Serializable {
 //        Boards board = new Boards("cWa1Wb1Lc2Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
         ContraCublino contra = new ContraCublino(true, board); // remember to switch isWhite to false if black is the current player
         RoseNode<ContraCublino> tree = new RoseNode(contra);
-        DifficultAI difficultAI = new DifficultAI(tree);
-        RunMonteCarlo thread = new RunMonteCarlo(difficultAI);
-        RunMonteCarlo thread1 = new RunMonteCarlo(difficultAI.deepClone());
-        RunMonteCarlo thread2 = new RunMonteCarlo(difficultAI.deepClone());
-        RunMonteCarlo thread3 = new RunMonteCarlo(difficultAI.deepClone());
-        RunMonteCarlo thread4 = new RunMonteCarlo(difficultAI.deepClone());
-        thread.start();
-        thread1.start();
-        thread2.start();
-        thread3.start();
-        thread4.start(); // 3 threads are probably best
+//        DifficultAI difficultAI = new DifficultAI(tree);
+//        difficultAI.monteCarloMain();
     }
 
     /**
@@ -62,6 +56,40 @@ public class DifficultAI implements Serializable {
             return (DifficultAI) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             return null;
+        }
+    }
+
+    /**
+     * Multithreading the MCTS
+     */
+    public void monteCarloMain() {
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        List<Integer> indices = new ArrayList<>();
+        List<RoseNode<ContraCublino>> trees = new ArrayList<>();
+        List<Future<RoseNode<ContraCublino>>> futures = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            Callable<RoseNode<ContraCublino>> callable = new RunMonteCarlo(this);
+            Future<RoseNode<ContraCublino>> future = executor.submit(callable);
+            futures.add(future);
+        }
+        for(Future<RoseNode<ContraCublino>> future : futures){
+            try {
+                indices.add(getMaxChildIndex(future.get()));
+                trees.add(future.get());
+                executor.shutdown();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        HashSet<Integer> nodes = new HashSet<>(indices);
+        if (nodes.size() == indices.size()) {
+            List<Integer> wins = trees.stream().map(RoseNode::getWinCount).collect(toList());
+            int bestChild = wins.indexOf(wins.stream().max(Integer::compareTo).orElse(0));
+            game = trees.get(bestChild).getState();
+        } else {
+            List<Integer> frequencies = indices.stream().map((x) -> Collections.frequency(indices, x)).collect(Collectors.toList());
+            int maxFrequency = frequencies.stream().max(Integer::compareTo).orElse(0);
+            game = trees.get(indices.get(frequencies.indexOf(maxFrequency))).getState();
         }
     }
 
@@ -105,6 +133,17 @@ public class DifficultAI implements Serializable {
     }
 
     /**
+     * Finds the child node with the most wins / win-visit ratio depending on what is wanted
+     *
+     * @param treeNode The node from which to get the best child node
+     * @return The best child node
+     */
+    private int getMaxChildIndex(RoseNode<ContraCublino> treeNode) { // Can also make this based on percentages
+        List<Integer> winScores = treeNode.getChildren().stream().map(RoseNode::getWinCount).collect(toList());
+        return winScores.indexOf(winScores.stream().max(Integer::compareTo).orElseThrow());
+    }
+
+    /**
      * Expands a node so that its children are the possible states reached after playing a move. If there are no possible moves, the child is the same game but
      * with the turn ended.
      *
@@ -136,19 +175,16 @@ public class DifficultAI implements Serializable {
         // Really need to optimise simulate, it is one of the things preventing the tree search from being very fast
         // Random moves is probably a bit too slow,
         // greedy with lookahead of 1 is probably too stupid. Maybe try greedy with a lookahead of 2 or 3 in combination with random
-//        long startTime = System.currentTimeMillis();
-        EasyAI easyAI = new EasyAI();
         int counter = 1;
         while (contra.getWinner().equals(Game.GameResult.UNFINISHED)) {
             boolean everyThird = (counter % 3) == 0;
             // Can be any move making mechanism. e.g., minimax, greedy, etc
             // Currently a combination of random and greedy
-            if (everyThird) contra = easyAI.randomMove(contra);
-            if (contra.getWinner().equals(Game.GameResult.UNFINISHED)) contra = easyAI.greedyAI(contra);
-            if (contra.getWinner().equals(Game.GameResult.UNFINISHED) && everyThird) contra = easyAI.randomMove(contra);
+            if (everyThird) contra = EasyAI.randomMove(contra);
+            if (contra.getWinner().equals(Game.GameResult.UNFINISHED)) contra = EasyAI.greedyAI(contra);
+            if (contra.getWinner().equals(Game.GameResult.UNFINISHED) && everyThird) contra = EasyAI.randomMove(contra);
             counter++;
         }
-//        System.out.println("Simulate Takes:" + (System.currentTimeMillis() - startTime));
         return contra.getWinner();
     }
 
@@ -174,7 +210,7 @@ public class DifficultAI implements Serializable {
      */
     public void backPropagate(RoseNode<ContraCublino> node, Game.GameResult result) {
         node.incrementVisitCount();
-        boolean isWhite = gameTree.getState().getCurrentPlayer().isWhite();
+        boolean isWhite = contraGameTree.getState().getCurrentPlayer().isWhite();
         switch (result) {
             case WHITE_WINS:
                 if (isWhite) node.incrementWinCount();
@@ -218,59 +254,25 @@ public class DifficultAI implements Serializable {
         return node.getChildren().get(indices.get(rand.nextInt(indices.size())));
     }
 
-    /**
-     * Setter for gameTree
-     */
-    public void setGameTree(RoseNode<ContraCublino> gameTree) {
-        this.gameTree = gameTree;
-    }
-
-    public static class RunMonteCarlo implements Runnable {
-        private Thread thread;
+    public static class RunMonteCarlo implements Callable<RoseNode<ContraCublino>> {
         private final DifficultAI ai;
 
         /**
          * Constructor for RunMonteCarlo
          */
         RunMonteCarlo(DifficultAI ai) {
-            this.ai = ai;
+            this.ai = ai.deepClone();
         }
 
         /**
-         * When an object implementing interface {@code Runnable} is used
-         * to create a thread, starting the thread causes the object's
-         * {@code run} method to be called in that separately executing
-         * thread.
-         * <p>
-         * The general contract of the method {@code run} is that it may
-         * take any action whatsoever.
+         * Computes a result, or throws an exception if unable to do so.
          *
-         * @see Thread#run()
+         * @return computed result
+         * @throws Exception if unable to compute a result
          */
         @Override
-        public void run() {
-            try {
-                ai.setGameTree(ai.monteCarloTreeSearch(ai.gameTree));
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
-
-        /**
-         * Getter for gameTree
-         */
-        public RoseNode<ContraCublino> getTree() {
-            return ai.gameTree;
-        }
-
-        /**
-         * Creates a thread
-         */
-        public void start() {
-            if (thread == null) {
-                thread = new Thread(this);
-                thread.start();
-            }
+        public RoseNode<ContraCublino> call() throws Exception {
+            return ai.monteCarloTreeSearch(ai.contraGameTree);
         }
     }
 }
