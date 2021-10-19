@@ -13,7 +13,7 @@ public class Menu extends Group {
         p1Menu.setLayoutY(100);
         p2Menu.setLayoutY(150);
 
-        ChoiceBox gameMode = new ChoiceBox();
+        ChoiceBox<String> gameMode = new ChoiceBox<>();
         gameMode.getItems().addAll("Pur Cublino", "Contra Cublino");
         gameMode.getSelectionModel().select(0);
         gameMode.setLayoutX(100);
@@ -34,33 +34,32 @@ public class Menu extends Group {
         getChildren().addAll(p1Menu, p2Menu, gameMode, beginButton);
     }
 
-    public class PlayerMenu extends Group {
+    public static class PlayerMenu extends Group {
 
-        ChoiceBox controller;
+        ChoiceBox<String> controller;
         TextField name;
-        ChoiceBox skin;
+        ChoiceBox<String> skin;
 
-        private String defaultName;
-        private int index;
+        private final int index;
 
         private final String[] defaultNames = {"Player 1", "Player 2", "Easy AI 1", "Easy AI 2", "Difficult AI 1", "Difficult AI 2"};
 
         public PlayerMenu(int index) {
             this.index = index;
 
-            controller = new ChoiceBox();
+            controller = new ChoiceBox<>();
             controller.getItems().addAll("Human", "Easy AI", "Difficult AI");
             controller.getSelectionModel().select(index);
 
-            controller.setOnAction(e -> {checkDefaultName();});
+            controller.setOnAction(e -> checkDefaultName());
 
-            skin = new ChoiceBox();
-            skin.getItems().addAll("White", "Black", "Gilded");
+            skin = new ChoiceBox<>();
+            skin.getItems().addAll("White", "Black", "Oak", "Cloudy", "Marshmellow",
+                    "Mint", "Deepsea", "Neon", "Pumpkin", "Starry", "Gilded");
             skin.setPrefWidth(100);
             skin.getSelectionModel().select(index);
 
             name = new TextField();
-            defaultName = (index == 0 ? "Player" : "Easy AI");
             name.setText(nameFromControllerSetting(index) + " " + (index + 1));
             name.setPrefWidth(300);
 
@@ -77,29 +76,37 @@ public class Menu extends Group {
         }
 
         public Controller.ControllerType typeFromDropdown(int i) {
-            switch(i) {
-                case 1: return Controller.ControllerType.EASY_AI;
-                case 2: return Controller.ControllerType.DIFFICULT_AI;
-                default: return Controller.ControllerType.HUMAN;
-            }
+            return switch (i) {
+                case 1 -> Controller.ControllerType.EASY_AI;
+                case 2 -> Controller.ControllerType.DIFFICULT_AI;
+                default -> Controller.ControllerType.HUMAN;
+            };
         }
 
         public GuiDie.Skin skinFromDropdown(int i) {
-            switch(i) {
-                case 0: return GuiDie.Skin.PLAIN_WHITE;
-                case 1: return GuiDie.Skin.PLAIN_BLACK;
-                case 2: return GuiDie.Skin.GILDED;
-                default: return GuiDie.Skin.NONE;
-            }
+            return switch (i) {
+                case 0 -> GuiDie.Skin.PLAIN_WHITE;
+                case 1 -> GuiDie.Skin.PLAIN_BLACK;
+                case 2 -> GuiDie.Skin.OAK;
+                case 3 -> GuiDie.Skin.CLOUDY;
+                case 4 -> GuiDie.Skin.MARSH_MELLOW;
+                case 5 -> GuiDie.Skin.MINT;
+                case 6 -> GuiDie.Skin.DEEP_SEA;
+                case 7 -> GuiDie.Skin.NEON;
+                case 8 -> GuiDie.Skin.PUMPKIN;
+                case 9 -> GuiDie.Skin.STARRY;
+                case 10 -> GuiDie.Skin.GILDED;
+                default -> GuiDie.Skin.NONE;
+            };
         }
 
         public String nameFromControllerSetting(int i) {
-            switch(i) {
-                case 0: return "Player";
-                case 1: return "Easy AI";
-                case 2: return "Difficult AI";
-                default: return "";
-            }
+            return switch (i) {
+                case 0 -> "Player";
+                case 1 -> "Easy AI";
+                case 2 -> "Difficult AI";
+                default -> "";
+            };
         }
 
         public void checkDefaultName() {

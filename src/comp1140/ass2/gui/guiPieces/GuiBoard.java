@@ -148,7 +148,7 @@ public class GuiBoard extends SubScene {
 
         for (GuiDie m : guiDice) {
             if (mouseOverTile != null && m.die.getPosition().equals(mouseOverTile.toString())
-                    && m.die.isWhite() == game.getCurrentPlayer().isWhite()) {
+                    && m.die.isWhite() == game.getCurrentPlayer().isWhite() && !m.die.isDeleted()) {
                 selectedDie = m;
                 return;
             }
