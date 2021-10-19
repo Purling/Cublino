@@ -1,5 +1,6 @@
 package comp1140.ass2.gui;
 
+import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.gui.guiPieces.GuiBoard;
 import comp1140.ass2.gui.guiPieces.Menu;
 import javafx.application.Application;
@@ -41,14 +42,14 @@ public class Board extends Application {
         primaryStage.show();
     }
 
-    public void startGame(boolean isPur) throws Exception {
+    public void startGame(boolean isPur, Controller[] controllers) throws Exception {
         root.getChildren().clear();
 
         Label turnDisplayer = new Label("White");
         turnDisplayer.setTranslateX(200);
         root.getChildren().add(turnDisplayer);
 
-        game = new GuiBoard((isPur ? "P" : "C") + "Wa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", isPur,true, turnDisplayer);
+        game = new GuiBoard((isPur ? "P" : "C") + "Wa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", controllers, isPur,true, turnDisplayer);
 
         root.getChildren().add(game);
     }

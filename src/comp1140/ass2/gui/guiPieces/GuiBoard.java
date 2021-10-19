@@ -52,7 +52,7 @@ public class GuiBoard extends SubScene {
     private Position mouseOverTile;
     private final List<Position> selectedTiles = new ArrayList<>();
 
-    private static final Controller[] controllers = {new Human(true), new EasyAI(false)};
+    private Controller[] controllers;
 
     /**
      * Constructs a board and all reliant 3D elements to represent a game position
@@ -61,8 +61,10 @@ public class GuiBoard extends SubScene {
      * @param turnLabel the text label in the HUD to be updated with info about the game
      * @throws Exception if moves can be made but null HUD label is provided
      */
-    public GuiBoard(String placement, boolean isPur, boolean playable, Label turnLabel) throws Exception {
+    public GuiBoard(String placement, Controller[] controllers, boolean isPur, boolean playable, Label turnLabel) throws Exception {
         super(new Group(), VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
+
+        this.controllers = controllers;
 
         this.permitsMoveMaking = playable;
         if (permitsMoveMaking && turnLabel == null)
