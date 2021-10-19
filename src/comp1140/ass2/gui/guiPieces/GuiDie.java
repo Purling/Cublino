@@ -184,7 +184,7 @@ public class GuiDie extends MeshView {
         if (tz-getTranslateZ() > 10 && tz-getTranslateZ() < 200) {
             rotateAngle = -90;
             rotateAxis = new Point3D(1, 0, 0);
-        } else if (tz-getTranslateZ() < -10 && tz-getTranslateZ() < -200) {
+        } else if (tz-getTranslateZ() < -10 && tz-getTranslateZ() > -200) {
             rotateAngle = 90;
             rotateAxis = new Point3D(1, 0, 0);
         } else if (tx-getTranslateX() < -10 && tx-getTranslateX() > -200) {
