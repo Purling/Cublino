@@ -54,7 +54,8 @@ public class Menu extends Group {
             controller.setOnAction(e -> checkDefaultName());
 
             skin = new ChoiceBox<>();
-            skin.getItems().addAll("White", "Black", "Oak", "Cloudy", "Deepsea", "Starry", "Gilded");
+            skin.getItems().addAll("White", "Black", "Oak", "Cloudy", "Marshmellow",
+                    "Mint", "Deepsea", "Neon", "Pumpkin", "Starry", "Gilded");
             skin.setPrefWidth(100);
             skin.getSelectionModel().select(index);
 
@@ -88,9 +89,13 @@ public class Menu extends Group {
                 case 1 -> GuiDie.Skin.PLAIN_BLACK;
                 case 2 -> GuiDie.Skin.OAK;
                 case 3 -> GuiDie.Skin.CLOUDY;
-                case 4 -> GuiDie.Skin.DEEP_SEA;
-                case 5 -> GuiDie.Skin.STARRY;
-                case 6 -> GuiDie.Skin.GILDED;
+                case 4 -> GuiDie.Skin.MARSH_MELLOW;
+                case 5 -> GuiDie.Skin.MINT;
+                case 6 -> GuiDie.Skin.DEEP_SEA;
+                case 7 -> GuiDie.Skin.NEON;
+                case 8 -> GuiDie.Skin.PUMPKIN;
+                case 9 -> GuiDie.Skin.STARRY;
+                case 10 -> GuiDie.Skin.GILDED;
                 default -> GuiDie.Skin.NONE;
             };
         }
