@@ -24,7 +24,7 @@ public class GuiDie extends MeshView {
             case OAK -> "oakDie.png";
             case DEEP_SEA -> "deepSeaDie.png";
             case STARRY -> "starryDie.png";
-            case CLOUDY -> "cloudDie.png";
+            case CLOUDY -> "cloudyDie.png";
         };
     }
 
