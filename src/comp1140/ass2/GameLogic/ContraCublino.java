@@ -18,35 +18,6 @@ import static comp1140.ass2.State.Boards.BOARD_DIMENSION;
  */
 public class ContraCublino extends Game implements Serializable {
 
-    public class ContraMove {
-        ContraCublino possibleState;
-        String encodedMove;
-
-        public ContraMove(ContraCublino possibleState, String encodedMove) {
-            this.possibleState = possibleState;
-            this.encodedMove = encodedMove;
-        }
-
-        public String getEncodedMove() {
-            return encodedMove;
-        }
-
-        /**
-         * Getter for possibleState
-         */
-        public ContraCublino getPossibleState() {
-            return possibleState;
-        }
-
-        /**
-         * To string method
-         */
-        @Override
-        public String toString() {
-            return encodedMove;
-        }
-    }
-
     public ContraCublino() {
     }
 
@@ -108,6 +79,8 @@ public class ContraCublino extends Game implements Serializable {
 
     /**
      * Method which compares adjacent die of opposing players and eliminates the loser according to the Contra gamemode
+     *
+     * @param adjacentDie The die that is always a participant in battles
      */
     public void battle(Die adjacentDie) {
         Die[] potentialBattles = Arrays.stream(board.getAdjacentDie(adjacentDie)).filter((x) -> x.isWhite() != adjacentDie.isWhite()).toArray(Die[]::new);
@@ -139,7 +112,7 @@ public class ContraCublino extends Game implements Serializable {
                 if (isDirectionClear(direction, die)) {
                     ContraCublino clone = deepClone();
                     Die dieClone = die.deepClone();
-                    clone.applyStep(dieClone, dieClone.getPositionOneOver(direction));
+                    clone.applyStep(dieClone, dieClone.getPositionOver(direction,1));
                     clone.endTurn();
                     // FIXME Remove the magic numbers below
                     ContraMove move = new ContraMove(clone, Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1));
@@ -189,9 +162,9 @@ public class ContraCublino extends Game implements Serializable {
     public GameResult getWinner() {
         List<Die> white = board.getWhitePlayer().getDice();
         List<Die> black = board.getBlackPlayer().getDice();
-        if (white.stream().anyMatch(Die::isWhiteDieFinished)) return WHITE_WINS;
-        if (black.stream().anyMatch(Die::isBlackDieFinished)) return BLACK_WINS;
-        return TIE;
+        if (white.stream().anyMatch(Die::isWhiteDieFinished) || black.isEmpty()) return WHITE_WINS;
+        if (black.stream().anyMatch(Die::isBlackDieFinished) || white.isEmpty()) return BLACK_WINS;
+        return UNFINISHED;
     }
 
     /**
@@ -223,5 +196,34 @@ public class ContraCublino extends Game implements Serializable {
     @Override
     public String toString() {
         return board.getStringRepresentation();
+    }
+
+    public class ContraMove {
+        ContraCublino possibleState;
+        String encodedMove;
+
+        public ContraMove(ContraCublino possibleState, String encodedMove) {
+            this.possibleState = possibleState;
+            this.encodedMove = encodedMove;
+        }
+
+        public String getEncodedMove() {
+            return encodedMove;
+        }
+
+        /**
+         * Getter for possibleState
+         */
+        public ContraCublino getPossibleState() {
+            return possibleState;
+        }
+
+        /**
+         * To string method
+         */
+        @Override
+        public String toString() {
+            return encodedMove;
+        }
     }
 }

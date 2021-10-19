@@ -3,7 +3,6 @@ package comp1140.ass2.GameLogic;
 import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.State.Die;
-import comp1140.ass2.State.Direction;
 import comp1140.ass2.State.Players;
 import comp1140.ass2.gui.Board;
 
@@ -20,106 +19,44 @@ import java.util.List;
 
 public abstract class Game implements Serializable {
 
-    public enum MoveType {
-        TIP, JUMP, ORIGIN, INVALID
-    }
-
-    public enum GameResult {
-        UNFINISHED, WHITE_WINS, BLACK_WINS, TIE
-    }
-
-    public class Move implements Serializable {
-        Boards historicalBoard;
-        MoveType type;
-
-        public Move(Boards historicalBoard, MoveType type) {
-            this.historicalBoard = historicalBoard;
-            this.type = type;
-        }
-
-        public MoveType getType() {
-            return type;
-        }
-
-        public Boards getBoard() {
-            return historicalBoard;
-        }
-    }
-
+    public static final int TIP_DISTANCE = 1;
+    private final List<Move> stepHistory = new ArrayList<>();
+    private final List<Game> turnHistory = new ArrayList<>();
     /**
      * the current board two players are playing on
      */
     Boards board;
-
-    public static final int TIP_DISTANCE = 1;
-
-    private List<Move> stepHistory = new ArrayList<>();
-    private List<Game> turnHistory = new ArrayList<>();
-
+    /**
+     * the status of the two players
+     */
+    Controller whitePlayer;
+    Controller blackPlayer;
+    /**
+     * Check whether a player has made moves or not.
+     * if the player has possible legal moves then at least one move should be made by the player
+     */
+    boolean hasMadeMove;
+    /**
+     * the result in terms of winning and tie when the game is finished
+     */
+    GameResult result;
     /**
      * store the current player that is making his moves
      */
     private Players currentPlayer;
-
     /**
      * store the player who is not making a move
      */
     private Players otherPlayer;
-
     /**
      * The die that is currently selected to be moved
      */
     private Die currentMoveDie;
 
     /**
-     * the status of the two players
-     */
-    Controller whitePlayer;
-    Controller blackPlayer;
-
-    /**
-     * Check whether a player has made moves or not.
-     * if the player has possible legal moves then at least one move should be made by the player
-     */
-    boolean hasMadeMove;
-
-    /**
-     * the result in terms of winning and tie when the game is finished
-     */
-    GameResult result;
-
-    /**
-     * Returns if both players have achieved a win condition simultaneously
-     *
-     * @return True if both players have won, False otherwise
-     */
-    abstract protected boolean hasBothWon(Boards board);
-
-    /**
-     * Returns if each player has a legal amount of dice
-     *
-     * @return True if the dice amount is valid, False otherwise
-     */
-    abstract protected boolean isDiceAmountCorrect(Boards board);
-
-    /**
      * Empty constructor for Game
      */
     public Game() {
-    }
-
-    /**
-     * Setter for currentMoveDie
-     */
-    public void setCurrentMoveDie(Die currentMoveDie) {
-        this.currentMoveDie = currentMoveDie;
-    }
-
-    /**
-     * Getter for currentMoveDie
-     */
-    public Die getCurrentMoveDie() {
-        return currentMoveDie;
     }
 
     /**
@@ -136,6 +73,34 @@ public abstract class Game implements Serializable {
         this.currentPlayer = (isWhite) ? board.getWhitePlayer() : board.getBlackPlayer();
         this.otherPlayer = (isWhite) ? board.getBlackPlayer() : board.getWhitePlayer();
         this.board = board;
+    }
+
+    /**
+     * Returns if both players have achieved a win condition simultaneously
+     *
+     * @return True if both players have won, False otherwise
+     */
+    abstract protected boolean hasBothWon(Boards board);
+
+    /**
+     * Returns if each player has a legal amount of dice
+     *
+     * @return True if the dice amount is valid, False otherwise
+     */
+    abstract protected boolean isDiceAmountCorrect(Boards board);
+
+    /**
+     * Getter for currentMoveDie
+     */
+    public Die getCurrentMoveDie() {
+        return currentMoveDie;
+    }
+
+    /**
+     * Setter for currentMoveDie
+     */
+    public void setCurrentMoveDie(Die currentMoveDie) {
+        this.currentMoveDie = currentMoveDie;
     }
 
     /**
@@ -210,7 +175,7 @@ public abstract class Game implements Serializable {
             realDie.tip(currentPlayer.getDice().get(index).getDirection(endPosition));
             board.setAt(endPosition, currentPlayer.getDice().get(index));
             board.setAt(start, null);
-            initial.setPosition(realDie.getPosition());
+            initial.setDie(realDie);
         }
     }
 
@@ -277,5 +242,31 @@ public abstract class Game implements Serializable {
      * @return True if the game is over and false otherwise
      */
     protected abstract boolean isGameOver();
+
+    public enum MoveType {
+        TIP, JUMP, ORIGIN, INVALID
+    }
+
+    public enum GameResult {
+        UNFINISHED, WHITE_WINS, BLACK_WINS, TIE
+    }
+
+    public class Move implements Serializable {
+        Boards historicalBoard;
+        MoveType type;
+
+        public Move(Boards historicalBoard, MoveType type) {
+            this.historicalBoard = historicalBoard;
+            this.type = type;
+        }
+
+        public MoveType getType() {
+            return type;
+        }
+
+        public Boards getBoard() {
+            return historicalBoard;
+        }
+    }
 
 }

@@ -268,22 +268,18 @@ public class Cublino {
      */
     public static String applyMovePur(String state, String move) {
         if (!isValidMovePur(state, move)) return state;
-        else {
-            Boards board = new Boards(state);
-            PurCublino pur = new PurCublino(Character.isUpperCase(state.charAt(0)), board);
-            Boards.Positions[] stepPositions = Boards.moveToPositions(move);
-            Die d = board.getAt(stepPositions[0].toString());
-            char p;
-            if (state.charAt(0) == 'p') p = 'P';
-            else p = 'p';
+        Boards board = new Boards(state);
+        char gameIdentifier = state.charAt(0);
+        PurCublino pur = new PurCublino(Character.isUpperCase(gameIdentifier), board);
+        Boards.Positions[] stepPositions = Boards.moveToPositions(move);
+        char purIdentifier = (Character.isLowerCase(gameIdentifier) ? Character.toUpperCase(gameIdentifier) : Character.toLowerCase(gameIdentifier));
 
-            for (int i = 1; i < stepPositions.length; i++) {
-                Die die = board.getAt(stepPositions[i - 1].toString());
-                pur.applyStep(die, stepPositions[i].toString());
-            }
-
-            return p + boardToString(board);
+        for (int i = 1; i < stepPositions.length; i++) {
+            Die die = board.getAt(stepPositions[i - 1].toString());
+            pur.applyStep(die, stepPositions[i].toString());
         }
+
+        return purIdentifier + boardToString(board);
     }
 
     /**
@@ -300,8 +296,12 @@ public class Cublino {
      * @return a valid move for the current game state.
      */
     public static String generateMovePur(String state) {
-        return null; // FIXME Task 11 (D)
-        // FIXME Task 13 (HD): Implement a "smart" generateMove()
+        Boards board = new Boards(state);
+        char turnInformation = state.charAt(0);
+        PurCublino pur = new PurCublino(Character.isUpperCase(turnInformation), board);
+        Random rand = new Random();
+        int randomMove = rand.nextInt(pur.generatePurMoves().length);
+        return pur.generatePurMoves()[randomMove].getEncodedMove();
     }
 
     /**
@@ -350,7 +350,6 @@ public class Cublino {
             Die die = board.getAt(stepPositions[i - 1].toString());
             contra.applyStep(die, stepPositions[i].toString());
         }
-
         return ((Character.isLowerCase(state.charAt(0))) ? String.valueOf(Character.toUpperCase(state.charAt(0))) : Character.toLowerCase(state.charAt(0)))
                 + boardToString(board);
     }
@@ -371,7 +370,6 @@ public class Cublino {
         ContraCublino contra = new ContraCublino(Character.isUpperCase(turnInformation), board);
         Random rand = new Random();
         int randomMove = rand.nextInt(contra.generateLegalMoves().length);
-
         return contra.generateLegalMoves()[randomMove].getEncodedMove();
     }
 }
