@@ -3,15 +3,11 @@ package comp1140.ass2.gui.guiPieces;
 import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.State.Die;
 import javafx.animation.AnimationTimer;
-import javafx.animation.PathTransition;
-import javafx.animation.RotateTransition;
 import javafx.geometry.Point3D;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
-import javafx.scene.transform.Translate;
-import javafx.util.Duration;
 
 public class GuiDie extends MeshView {
 
@@ -31,12 +27,7 @@ public class GuiDie extends MeshView {
     Die die;
     GuiBoard viewer;
 
-    double animationVelocityX = 0;
-    double animationVelocityZ = 0;
-
-    double animationDegrees = 0;
-    double animationDegreesTarget = 0;
-    Point3D animationAxis = new Point3D(0, 0, 0);
+    AnimationTarget tipAnimation = null;
 
     /**
      * Constructs and transforms a die mesh to provide an
@@ -80,27 +71,19 @@ public class GuiDie extends MeshView {
         new AnimationTimer() {
             @Override
             public void handle(long l) {
-                boolean canBePutDown = !viewer.isDieSelected(die) && animationVelocityX == 0 && animationVelocityZ == 0;
+                boolean canBePutDown = !viewer.isDieSelected(die) && (tipAnimation == null || tipAnimation.hasFinished(l));
                 setTranslateY(getTranslateY() + ((canBePutDown ? 0 : -50) - getTranslateY())*0.2);
-                double targetX = 125 * (die.getX()-3);
-                double targetZ = 125 * (die.getY()-3);
-                setTranslateX(getTranslateX()+animationVelocityX/30);
-                setTranslateZ(getTranslateZ()+animationVelocityZ/30);
-                if (Math.abs(getTranslateX()-targetX) < Math.abs(animationVelocityX/10)) {
-                    animationVelocityX = 0;
-                    setTranslateX(targetX);
-                }
-                if (Math.abs(getTranslateZ()-targetZ) < Math.abs(animationVelocityZ/10)) {
-                    animationVelocityZ = 0;
-                    setTranslateZ(targetZ);
-                }
-                animationDegrees += (animationDegreesTarget > animationDegrees ? 3 : -3);
-                if (Math.abs(animationDegrees-animationDegreesTarget) < 4) {
-                    animationDegrees = animationDegreesTarget;
+
+                if (tipAnimation == null) return;
+                if (tipAnimation.hasFinished(l)) {
                     getTransforms().set(1, necessaryRotations());
+                    setTranslationFromDie();
                     getTransforms().set(0, zeroTransform());
+                    tipAnimation = null;
                 } else {
-                    getTransforms().set(0, new Rotate(animationDegrees, animationAxis));
+                    setTranslateX(tipAnimation.xAtTime(l));
+                    setTranslateZ(tipAnimation.zAtTime(l));
+                    getTransforms().set(0, tipAnimation.rotateAtTime(l));
                 }
             }
         }.start();
@@ -188,27 +171,73 @@ public class GuiDie extends MeshView {
     }
 
     void setTranslationFromDie() {
-        animationVelocityX = (125 * (die.getX()-3))-getTranslateX();
-        animationVelocityZ = (125 * (die.getY()-3))-getTranslateZ();
+        double tx = 125 * (die.getX()-3);
+        double tz = 125 * (die.getY()-3);
 
-        animationDegrees = 0;
-        if (animationVelocityZ > 0) {
-            animationDegreesTarget = -90;
-            animationAxis = new Point3D(1, 0, 0);
-            return;
-        } else if (animationVelocityZ < 0) {
-            //impossible
-        } else if (animationVelocityX < 0) {
-            animationDegreesTarget = -90;
-            animationAxis = new Point3D(0, 0, 1);
-            return;
-        } else if (animationVelocityX > 0) {
-            animationDegreesTarget = 90;
-            animationAxis = new Point3D(0, 0, 1);
-            return;
-        } else {
-            animationDegreesTarget = 0;
-            return;
+        double rotateAngle = 0;
+        Point3D rotateAxis = null;
+
+        if (tz-getTranslateZ() > 10 && tz-getTranslateZ() < 200) {
+            rotateAngle = -90;
+            rotateAxis = new Point3D(1, 0, 0);
+        } else if (tz-getTranslateZ() < -10 && tz-getTranslateZ() < -200) {
+            rotateAngle = 90;
+            rotateAxis = new Point3D(1, 0, 0);
+        } else if (tx-getTranslateX() < -10 && tx-getTranslateX() > -200) {
+            rotateAngle = -90;
+            rotateAxis = new Point3D(0, 0, 1);
+        } else if (tx-getTranslateX() > 10 && tx-getTranslateX() < 200) {
+            rotateAngle = 90;
+            rotateAxis = new Point3D(0, 0, 1);
+        }
+
+        if (rotateAxis == null)
+            tipAnimation = new AnimationTarget(this, tx, tz, 0, new Point3D(0, 1, 0));
+        else
+            tipAnimation = new AnimationTarget(this, tx, tz, rotateAngle, rotateAxis);
+    }
+
+    private static class AnimationTarget {
+        double targetAngle;
+        Point3D axis;
+        long startTime;
+
+        double startX;
+        double startZ;
+
+        double targetX;
+        double targetZ;
+
+        final double duration = 0.5e9;
+
+        public AnimationTarget(GuiDie model, double targetX, double targetZ, double targetAngle, Point3D axis) {
+            this.targetX = targetX;
+            this.targetZ = targetZ;
+            this.startX = model.getTranslateX();
+            this.startZ = model.getTranslateZ();
+            this.targetAngle = targetAngle;
+            this.axis = axis;
+        }
+
+        public Rotate rotateAtTime(long t) {
+            if (startTime == 0) startTime = t;
+            return new Rotate(targetAngle*normTime(t), axis);
+        }
+
+        public double xAtTime(long t) {
+            return startX + (targetX-startX)*normTime(t);
+        }
+
+        public double zAtTime(long t) {
+            return startZ + (targetZ-startZ)*normTime(t);
+        }
+
+        public boolean hasFinished(long t) {
+            return (startTime > 0) && normTime(t) >= 1;
+        }
+
+        private double normTime(long t) {
+            return (t-startTime)/duration;
         }
     }
 
