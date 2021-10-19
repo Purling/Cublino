@@ -1,9 +1,6 @@
 package comp1140.ass2.gui.guiPieces;
 
 import comp1140.ass2.Controller.Controller;
-import comp1140.ass2.Controller.EasyAI;
-import comp1140.ass2.Controller.Human;
-import comp1140.ass2.Cublino;
 import comp1140.ass2.GameLogic.ContraCublino;
 import comp1140.ass2.GameLogic.Game;
 import comp1140.ass2.GameLogic.PurCublino;
@@ -52,7 +49,7 @@ public class GuiBoard extends SubScene {
     private Position mouseOverTile;
     private final List<Position> selectedTiles = new ArrayList<>();
 
-    private Controller[] controllers;
+    private final Controller[] controllers;
 
     /**
      * Constructs a board and all reliant 3D elements to represent a game position
@@ -70,9 +67,6 @@ public class GuiBoard extends SubScene {
         if (permitsMoveMaking && turnLabel == null)
             throw new InvalidSetupException("Any playable board must have an associated HUD");
         this.turnLabel = turnLabel;
-        if (turnLabel != null) {
-            turnLabel.setText(controllers[0].getName());
-        }
 
         this.setRoot(root);
         boardTiles = new GuiTile[7][7];
@@ -138,6 +132,8 @@ public class GuiBoard extends SubScene {
 
         root.getChildren().add(new GuiAvatar(this, 180, controllers[0].getName()));
         root.getChildren().add(new GuiAvatar(this, 0, controllers[1].getName()));
+
+        if (permitsMoveMaking) haveCurrentPlayerMakeMove();
     }
 
     /**
@@ -190,26 +186,10 @@ public class GuiBoard extends SubScene {
     private void handleDieRelease() {
         selectedDie = null;
 
-        boolean moveExecuted = false;
         for (Game.Move m : game.getStepHistory()) {
             if (m.getType() == Game.MoveType.JUMP || m.getType() == Game.MoveType.TIP) {
-                moveExecuted = true;
+                moveComplete();
                 break;
-            }
-        }
-
-        if (moveExecuted) {
-            game.endTurn();
-            Game.GameResult result = game.getWinner();
-            if (result == Game.GameResult.UNFINISHED) {
-                turnLabel.setText(controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].getName());
-            } else {
-                permitsMoveMaking = false;
-                switch(result) {
-                    case TIE: turnLabel.setText("Tie!"); return;
-                    case WHITE_WINS: turnLabel.setText(controllers[0].getName() + " wins!"); return;
-                    case BLACK_WINS: turnLabel.setText(controllers[1].getName() + " wins!"); return;
-                }
             }
         }
 
@@ -260,6 +240,26 @@ public class GuiBoard extends SubScene {
         // Use a bright red to highlight the currently selected tile, if there is one
         if (mouseOverTile != null)
             boardTiles[mouseOverTile.x][mouseOverTile.y].setSelected(GuiTile.SelectionType.CURRENT);
+    }
+
+    private void haveCurrentPlayerMakeMove() {
+        Game.GameResult result = game.getWinner();
+        if (result == Game.GameResult.UNFINISHED) {
+            turnLabel.setText(controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].getName() + "'s turn.");
+            controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].requestMove();
+        } else {
+            permitsMoveMaking = false;
+            switch(result) {
+                case TIE: turnLabel.setText("Tie!"); return;
+                case WHITE_WINS: turnLabel.setText(controllers[0].getName() + " wins!"); return;
+                case BLACK_WINS: turnLabel.setText(controllers[1].getName() + " wins!"); return;
+            }
+        }
+    }
+
+    public void moveComplete() {
+        game.endTurn();
+        haveCurrentPlayerMakeMove();
     }
 
     /**
