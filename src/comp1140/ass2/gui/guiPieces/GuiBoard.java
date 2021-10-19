@@ -70,6 +70,9 @@ public class GuiBoard extends SubScene {
         if (permitsMoveMaking && turnLabel == null)
             throw new InvalidSetupException("Any playable board must have an associated HUD");
         this.turnLabel = turnLabel;
+        if (turnLabel != null) {
+            turnLabel.setText(controllers[0].getName());
+        }
 
         this.setRoot(root);
         boardTiles = new GuiTile[7][7];
@@ -197,11 +200,16 @@ public class GuiBoard extends SubScene {
 
         if (moveExecuted) {
             game.endTurn();
-            if (game.getWinner() == Game.GameResult.UNFINISHED) {
-                turnLabel.setText(game.getCurrentPlayer().isWhite() ? "White" : "Black");
+            Game.GameResult result = game.getWinner();
+            if (result == Game.GameResult.UNFINISHED) {
+                turnLabel.setText(controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].getName());
             } else {
                 permitsMoveMaking = false;
-                turnLabel.setText(game.getWinner().name());
+                switch(result) {
+                    case TIE: turnLabel.setText("Tie!"); return;
+                    case WHITE_WINS: turnLabel.setText(controllers[0].getName() + " wins!"); return;
+                    case BLACK_WINS: turnLabel.setText(controllers[1].getName() + " wins!"); return;
+                }
             }
         }
 
