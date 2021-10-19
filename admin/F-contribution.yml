@@ -14,8 +14,8 @@ contributions:
     contribution: 33
   - uid: u7227895
     contribution: 33
-  - uid:
-    contribution:
+  - uid: u7334218
+    contribution: 33
 
 # Sign *your* name and uids here. (Remove entries if you have fewer
 # than three members)
@@ -24,5 +24,5 @@ signatures:
     uid: u7312578
   - name: Yuechen Liu
     uid: u7227895
-  - name:
-    uid:
+  - name: Zane Gates
+    uid: u7334218
