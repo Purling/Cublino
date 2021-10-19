@@ -12,20 +12,12 @@ import java.util.stream.Collectors;
 /**
  * @author Ziling Ouyang, Zane Gates
  */
-public class EasyAI extends Controller { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
+public class EasyAI { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
 
     /**
      * Empty constructor for EasyAI
      */
     public EasyAI() {
-    }
-
-    /**
-     * Constructor
-     */
-    public EasyAI(boolean isWhite) {
-        super(false, "Easy AI " + (isWhite ? 1 : 2),
-                isWhite ? GuiDie.Skin.PLAIN_WHITE : GuiDie.Skin.PLAIN_BLACK);
     }
 
     /**

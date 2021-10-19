@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * A difficult AI controller
  */
-public class DifficultAI extends Controller implements Serializable {
+public class DifficultAI implements Serializable {
     private static final long RUN_TIME = 100000;
     private RoseNode<ContraCublino> gameTree;
 
@@ -26,11 +26,6 @@ public class DifficultAI extends Controller implements Serializable {
      */
     public DifficultAI(RoseNode<ContraCublino> gameTree) {
         this.gameTree = gameTree;
-    }
-
-    public DifficultAI(boolean isWhite) {
-        super(false, "Hard AI " + (isWhite ? 1 : 2),
-                isWhite ? GuiDie.Skin.PLAIN_WHITE : GuiDie.Skin.PLAIN_BLACK);
     }
 
     public static void main(String[] args) {

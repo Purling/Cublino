@@ -72,8 +72,16 @@ public class Menu extends Group {
         }
 
         public Controller asController() {
-            return new Controller(controller.getSelectionModel().getSelectedIndex() == 0,
+            return new Controller(typeFromDropdown(controller.getSelectionModel().getSelectedIndex()),
                     name.getText(), skinFromDropdown(skin.getSelectionModel().getSelectedIndex()));
+        }
+
+        public Controller.ControllerType typeFromDropdown(int i) {
+            switch(i) {
+                case 1: return Controller.ControllerType.EASY_AI;
+                case 2: return Controller.ControllerType.DIFFICULT_AI;
+                default: return Controller.ControllerType.HUMAN;
+            }
         }
 
         public GuiDie.Skin skinFromDropdown(int i) {

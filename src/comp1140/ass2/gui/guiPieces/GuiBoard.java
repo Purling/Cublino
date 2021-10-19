@@ -253,6 +253,7 @@ public class GuiBoard extends SubScene {
                 case TIE: turnLabel.setText("Tie!"); return;
                 case WHITE_WINS: turnLabel.setText(controllers[0].getName() + " wins!"); return;
                 case BLACK_WINS: turnLabel.setText(controllers[1].getName() + " wins!"); return;
+                //TODO: when the game is over, allow the user to return to the menu
             }
         }
     }
