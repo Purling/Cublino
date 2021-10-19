@@ -40,10 +40,19 @@ public class Menu extends Group {
         TextField name;
         ChoiceBox skin;
 
+        private String defaultName;
+        private int index;
+
+        private final String[] defaultNames = {"Player 1", "Player 2", "Easy AI 1", "Easy AI 2", "Difficult AI 1", "Difficult AI 2"};
+
         public PlayerMenu(int index) {
+            this.index = index;
+
             controller = new ChoiceBox();
             controller.getItems().addAll("Human", "Easy AI", "Difficult AI");
             controller.getSelectionModel().select(index);
+
+            controller.setOnAction(e -> {checkDefaultName();});
 
             skin = new ChoiceBox();
             skin.getItems().addAll("White", "Black", "Gilded");
@@ -51,7 +60,8 @@ public class Menu extends Group {
             skin.getSelectionModel().select(index);
 
             name = new TextField();
-            name.setText("Player " + (index+1));
+            defaultName = (index == 0 ? "Player" : "Easy AI");
+            name.setText(nameFromControllerSetting(index) + " " + (index + 1));
             name.setPrefWidth(300);
 
             HBox hb = new HBox();
@@ -72,6 +82,24 @@ public class Menu extends Group {
                 case 1: return GuiDie.Skin.PLAIN_BLACK;
                 case 2: return GuiDie.Skin.GILDED;
                 default: return GuiDie.Skin.NONE;
+            }
+        }
+
+        public String nameFromControllerSetting(int i) {
+            switch(i) {
+                case 0: return "Player";
+                case 1: return "Easy AI";
+                case 2: return "Difficult AI";
+                default: return "";
+            }
+        }
+
+        public void checkDefaultName() {
+            for (String n : defaultNames) {
+                if (n.equals(name.getText())) {
+                    name.setText(nameFromControllerSetting(controller.getSelectionModel().getSelectedIndex()) + " " + (index + 1));
+                    return;
+                }
             }
         }
     }
