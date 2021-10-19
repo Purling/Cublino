@@ -167,7 +167,6 @@ public class GuiBoard extends SubScene {
         selectedTiles.add(new Position(selectedDie.die.getX(), selectedDie.die.getY()));
         selectedDie.setTranslationFromDie();
         redrawSelection();
-        selectedDie.getTransforms().set(0, selectedDie.necessaryRotations());
     }
 
     /**

@@ -3,11 +3,15 @@ package comp1140.ass2.gui.guiPieces;
 import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.State.Die;
 import javafx.animation.AnimationTimer;
+import javafx.animation.PathTransition;
+import javafx.animation.RotateTransition;
 import javafx.geometry.Point3D;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
+import javafx.scene.transform.Translate;
+import javafx.util.Duration;
 
 public class GuiDie extends MeshView {
 
@@ -26,6 +30,13 @@ public class GuiDie extends MeshView {
 
     Die die;
     GuiBoard viewer;
+
+    double animationVelocityX = 0;
+    double animationVelocityZ = 0;
+
+    double animationDegrees = 0;
+    double animationDegreesTarget = 0;
+    Point3D animationAxis = new Point3D(0, 0, 0);
 
     /**
      * Constructs and transforms a die mesh to provide an
@@ -50,13 +61,18 @@ public class GuiDie extends MeshView {
                 setMaterial(GuiBoard.makePhongFromAsset(filenameOfSkin(appropriateSkin)));
         }
 
+
+        while (getTransforms().size() < 2) getTransforms().add(zeroTransform());
+
         // Rotate the mesh to show the correct numbers
-        getTransforms().add(necessaryRotations());
+        getTransforms().set(1, necessaryRotations());
 
         // Position and scale the mesh
         setScaleX(dieScale);
         setScaleY(dieScale);
         setScaleZ(dieScale);
+        setTranslateX(125 * (die.getX()-3));
+        setTranslateZ(125 * (die.getY()-3));
         setTranslationFromDie();
 
         setMouseTransparent(true);
@@ -64,7 +80,28 @@ public class GuiDie extends MeshView {
         new AnimationTimer() {
             @Override
             public void handle(long l) {
-                setTranslateY(getTranslateY() + ((viewer.isDieSelected(die) ? -50 : 0) - getTranslateY())*0.2);
+                boolean canBePutDown = !viewer.isDieSelected(die) && animationVelocityX == 0 && animationVelocityZ == 0;
+                setTranslateY(getTranslateY() + ((canBePutDown ? 0 : -50) - getTranslateY())*0.2);
+                double targetX = 125 * (die.getX()-3);
+                double targetZ = 125 * (die.getY()-3);
+                setTranslateX(getTranslateX()+animationVelocityX/30);
+                setTranslateZ(getTranslateZ()+animationVelocityZ/30);
+                if (Math.abs(getTranslateX()-targetX) < Math.abs(animationVelocityX/10)) {
+                    animationVelocityX = 0;
+                    setTranslateX(targetX);
+                }
+                if (Math.abs(getTranslateZ()-targetZ) < Math.abs(animationVelocityZ/10)) {
+                    animationVelocityZ = 0;
+                    setTranslateZ(targetZ);
+                }
+                animationDegrees += (animationDegreesTarget > animationDegrees ? 3 : -3);
+                if (Math.abs(animationDegrees-animationDegreesTarget) < 4) {
+                    animationDegrees = animationDegreesTarget;
+                    getTransforms().set(1, necessaryRotations());
+                    getTransforms().set(0, zeroTransform());
+                } else {
+                    getTransforms().set(0, new Rotate(animationDegrees, animationAxis));
+                }
             }
         }.start();
     }
@@ -84,6 +121,10 @@ public class GuiDie extends MeshView {
 
     Rotate rollTransform(double degrees) {
         return new Rotate(degrees, new Point3D(1, 0, 0));
+    }
+
+    Rotate zeroTransform() {
+        return new Rotate(0, new Point3D(0, 1, 0));
     }
 
     /**
@@ -147,8 +188,28 @@ public class GuiDie extends MeshView {
     }
 
     void setTranslationFromDie() {
-        setTranslateX(125 * (die.getX()-3));
-        setTranslateZ(125 * (die.getY()-3));
+        animationVelocityX = (125 * (die.getX()-3))-getTranslateX();
+        animationVelocityZ = (125 * (die.getY()-3))-getTranslateZ();
+
+        animationDegrees = 0;
+        if (animationVelocityZ > 0) {
+            animationDegreesTarget = -90;
+            animationAxis = new Point3D(1, 0, 0);
+            return;
+        } else if (animationVelocityZ < 0) {
+            //impossible
+        } else if (animationVelocityX < 0) {
+            animationDegreesTarget = -90;
+            animationAxis = new Point3D(0, 0, 1);
+            return;
+        } else if (animationVelocityX > 0) {
+            animationDegreesTarget = 90;
+            animationAxis = new Point3D(0, 0, 1);
+            return;
+        } else {
+            animationDegreesTarget = 0;
+            return;
+        }
     }
 
     public final static TriangleMesh dieMesh = new TriangleMesh();
