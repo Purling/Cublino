@@ -12,15 +12,19 @@ import javafx.scene.transform.Transform;
 public class GuiDie extends MeshView {
 
     public enum Skin {
-        NONE, PLAIN_WHITE, PLAIN_BLACK, GILDED
+        NONE, PLAIN_WHITE, PLAIN_BLACK, GILDED, OAK, DEEP_SEA, STARRY, CLOUDY
     }
 
     public static String filenameOfSkin(Skin skin) {
         return switch(skin) {
             case NONE -> "";
-            case PLAIN_WHITE -> "whitedie.png";
-            case PLAIN_BLACK -> "blackdie.png";
+            case PLAIN_WHITE -> "whiteDie.png";
+            case PLAIN_BLACK -> "blackDie.png";
             case GILDED ->  "gildedDie.png";
+            case OAK -> "oakDie.png";
+            case DEEP_SEA -> "deepSeaDie.png";
+            case STARRY -> "starryDie.png";
+            case CLOUDY -> "cloudDie.png";
         };
     }
 
