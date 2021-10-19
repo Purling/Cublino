@@ -75,6 +75,11 @@ public class GuiDie extends MeshView {
         new AnimationTimer() {
             @Override
             public void handle(long l) {
+                if (die.isDeleted() && (tipAnimation == null || tipAnimation.hasFinished(l))) {
+                    setTranslateY(getTranslateY()-10);
+                    return;
+                }
+
                 boolean canBePutDown = !viewer.isDieSelected(die) && (tipAnimation == null || tipAnimation.hasFinished(l));
                 setTranslateY(getTranslateY() + ((canBePutDown ? 0 : -50) - getTranslateY())*0.2);
 
