@@ -3,6 +3,8 @@ package comp1140.ass2.gui.guiPieces;
 import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.Controller.EasyAI;
 import comp1140.ass2.Controller.Human;
+import comp1140.ass2.Cublino;
+import comp1140.ass2.GameLogic.ContraCublino;
 import comp1140.ass2.GameLogic.Game;
 import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Die;
@@ -36,7 +38,7 @@ public class GuiBoard extends SubScene {
     private static final String URI_BASE = "assets/";
     private final Group root = new Group();
 
-    PurCublino game;
+    Game game;
     Label turnLabel;
     private boolean permitsMoveMaking;
 
@@ -59,7 +61,7 @@ public class GuiBoard extends SubScene {
      * @param turnLabel the text label in the HUD to be updated with info about the game
      * @throws Exception if moves can be made but null HUD label is provided
      */
-    public GuiBoard(String placement, boolean playable, Label turnLabel) throws Exception {
+    public GuiBoard(String placement, boolean isPur, boolean playable, Label turnLabel) throws Exception {
         super(new Group(), VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
 
         this.permitsMoveMaking = playable;
@@ -71,7 +73,8 @@ public class GuiBoard extends SubScene {
         boardTiles = new GuiTile[7][7];
 
         try {
-            game = new PurCublino(true, new Boards(placement));
+            if (isPur) game = new PurCublino(true, new Boards(placement));
+            else game = new ContraCublino(true, new Boards(placement));
         } catch (Exception e) {return;} // If the user inputs an invalid board state, do not update the display
 
         // Iterate over every tile in the board

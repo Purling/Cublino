@@ -243,6 +243,8 @@ public abstract class Game implements Serializable {
      */
     protected abstract boolean isGameOver();
 
+    public abstract GameResult getWinner();
+
     public enum MoveType {
         TIP, JUMP, ORIGIN, INVALID
     }
