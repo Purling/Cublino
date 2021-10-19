@@ -246,7 +246,7 @@ public class GuiBoard extends SubScene {
         Game.GameResult result = game.getWinner();
         if (result == Game.GameResult.UNFINISHED) {
             turnLabel.setText(controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].getName() + "'s turn.");
-            controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].requestMove();
+            controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].requestMove(game, this);
         } else {
             permitsMoveMaking = false;
             switch(result) {

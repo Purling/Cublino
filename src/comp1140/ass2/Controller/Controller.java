@@ -1,5 +1,7 @@
 package comp1140.ass2.Controller;
 
+import comp1140.ass2.GameLogic.Game;
+import comp1140.ass2.gui.guiPieces.GuiBoard;
 import comp1140.ass2.gui.guiPieces.GuiDie;
 
 public class Controller {
@@ -47,7 +49,10 @@ public class Controller {
 
     /**
      * If the player is AI, then automatically choose the move;
+     * @param game
      */
-    public void requestMove() {
+    public void requestMove(Game game, GuiBoard gui) {
+        //TODO: make the move
+        if (!isHuman) gui.moveComplete();
     }
 }
