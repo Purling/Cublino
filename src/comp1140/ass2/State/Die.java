@@ -17,8 +17,7 @@ public class Die implements Serializable {
     private int x;
     private int y;
     /**
-     * the value on each side of a dice
-     * values will vary when the position/ orientation of the dice changes
+     * The value on each side of a die values will vary when the position/ orientation of the dice changes
      */
     private int top;
     private int down;
@@ -26,6 +25,7 @@ public class Die implements Serializable {
     private int back;
     private int left;
     private int right;
+    private boolean deleted = false;
 
     /**
      * Given the coordinates, the values of the dice on each side, and the owner of the dice,
@@ -41,20 +41,6 @@ public class Die implements Serializable {
         this.x = x;
         this.y = y;
         this.isWhite = isWhite;
-    }
-
-    /**
-     * Given a die, create the same die
-     */
-    public void setDie(Die die) {
-        this.top = die.top;
-        this.down = die.down;
-        this.front = die.front;
-        this.back = die.back;
-        this.left = die.left;
-        this.right = die.right;
-        this.x = die.x;
-        this.y = die.y;
     }
 
     public Die(String placement, Players whitePlayer, Players blackPlayer) {
@@ -157,6 +143,34 @@ public class Die implements Serializable {
         two = (char) (die.getY() + '1');
 
         return "" + zero + one + two;
+    }
+
+    /**
+     * Set deleted flag to be true
+     */
+    public void delete() {
+        deleted = true;
+    }
+
+    /**
+     * Getter for deleted
+     */
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    /**
+     * Given a die, create the same die
+     */
+    public void setDie(Die die) {
+        this.top = die.top;
+        this.down = die.down;
+        this.front = die.front;
+        this.back = die.back;
+        this.left = die.left;
+        this.right = die.right;
+        this.x = die.x;
+        this.y = die.y;
     }
 
     /**
@@ -320,9 +334,9 @@ public class Die implements Serializable {
         }
     }
 
-    public void jump(Direction direction){
+    public void jump(Direction direction) {
 
-        switch (direction){
+        switch (direction) {
             case UP -> setPosition(getX(), getY() + 2);
             case DOWN -> setPosition(getX(), getY() - 2);
             case LEFT -> setPosition(getX() - 2, getY());
@@ -334,7 +348,7 @@ public class Die implements Serializable {
      * Returns the position that is a given steps over in whichever direction specified
      *
      * @param direction The direction specified
-     * @param n The amount of positions over
+     * @param n         The amount of positions over
      * @return The position which is n positions over
      */
     public String getPositionOver(Direction direction, int n) {

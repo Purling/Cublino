@@ -227,6 +227,7 @@ public abstract class Game implements Serializable {
         currentPlayer.getDice().remove(remove);
         otherPlayer.getDice().remove(remove);
         board.setAt(remove.getPosition(), null);
+        remove.delete();
     }
 
     /**
