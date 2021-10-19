@@ -12,8 +12,8 @@ declaration: >-
 contributions:
   - uid: u7312578
     contribution: 33
-  - uid:
-    contribution:
+  - uid: u7227895
+    contribution: 33
   - uid:
     contribution:
 
@@ -22,7 +22,7 @@ contributions:
 signatures:
   - name: Ziling Ouyang
     uid: u7312578
-  - name:
-    uid:
+  - name: Yuechen Liu
+    uid: u7227895
   - name:
     uid:
