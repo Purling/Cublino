@@ -258,6 +258,9 @@ public class GuiBoard extends SubScene {
     }
 
     public void moveComplete() {
+        for (GuiDie d : guiDice) {
+            d.setTranslationFromDie();
+        }
         game.endTurn();
         haveCurrentPlayerMakeMove();
     }

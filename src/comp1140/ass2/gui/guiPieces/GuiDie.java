@@ -9,6 +9,9 @@ import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GuiDie extends MeshView {
 
     public enum Skin {
@@ -35,7 +38,9 @@ public class GuiDie extends MeshView {
     Die die;
     GuiBoard viewer;
 
-    AnimationTarget tipAnimation = null;
+    AnimationTarget currentAnimation = null;
+
+    List<Position> animationQueue = new ArrayList<>();
 
     /**
      * Constructs and transforms a die mesh to provide an
@@ -79,24 +84,28 @@ public class GuiDie extends MeshView {
         new AnimationTimer() {
             @Override
             public void handle(long l) {
-                if (die.isDeleted() && (tipAnimation == null || tipAnimation.hasFinished(l))) {
+                if (currentAnimation == null || currentAnimation.hasFinished(l)) {
+                    if (animationQueue.isEmpty()) {
+                        currentAnimation = null;
+                        getTransforms().set(1, necessaryRotations());
+                        getTransforms().set(0, zeroTransform());
+                    }
+                    else currentAnimation = generateAnimationTo(animationQueue.remove(0));
+                }
+                if (currentAnimation != null) currentAnimation.start(l);
+
+                if (die.isDeleted() && (currentAnimation == null || currentAnimation.hasFinished(l))) {
                     setTranslateY(getTranslateY()-10);
                     return;
                 }
 
-                boolean canBePutDown = !viewer.isDieSelected(die) && (tipAnimation == null || tipAnimation.hasFinished(l));
+                boolean canBePutDown = !viewer.isDieSelected(die) && (currentAnimation == null);
                 setTranslateY(getTranslateY() + ((canBePutDown ? 0 : -50) - getTranslateY())*0.2);
 
-                if (tipAnimation == null) return;
-                if (tipAnimation.hasFinished(l)) {
-                    getTransforms().set(1, necessaryRotations());
-                    setTranslationFromDie();
-                    getTransforms().set(0, zeroTransform());
-                    tipAnimation = null;
-                } else {
-                    setTranslateX(tipAnimation.xAtTime(l));
-                    setTranslateZ(tipAnimation.zAtTime(l));
-                    getTransforms().set(0, tipAnimation.rotateAtTime(l));
+                if (!(currentAnimation == null) && !currentAnimation.hasFinished(l)) {
+                    setTranslateX(currentAnimation.xAtTime(l));
+                    setTranslateZ(currentAnimation.zAtTime(l));
+                    getTransforms().set(0, currentAnimation.rotateAtTime(l));
                 }
             }
         }.start();
@@ -184,11 +193,15 @@ public class GuiDie extends MeshView {
     }
 
     void setTranslationFromDie() {
-        double tx = 125 * (die.getX()-3);
-        double tz = 125 * (die.getY()-3);
+        animationQueue.add(new Position(die.getX(), die.getY()));
+    }
 
+    AnimationTarget generateAnimationTo(Position pos) {
         double rotateAngle = 0;
         Point3D rotateAxis = null;
+
+        double tx = 125 * (pos.x - 3);
+        double tz = 125 * (pos.y - 3);
 
         if (tz-getTranslateZ() > 10 && tz-getTranslateZ() < 200) {
             rotateAngle = -90;
@@ -204,10 +217,12 @@ public class GuiDie extends MeshView {
             rotateAxis = new Point3D(0, 0, 1);
         }
 
-        if (rotateAxis == null)
-            tipAnimation = new AnimationTarget(this, tx, tz, 0, new Point3D(0, 1, 0));
+        if (!(Math.abs(tx-getTranslateX())>10 || Math.abs(tz-getTranslateZ())>10))
+            return null;
+        else if (rotateAxis == null)
+            return new AnimationTarget(this, tx, tz, 0, new Point3D(0, 1, 0));
         else
-            tipAnimation = new AnimationTarget(this, tx, tz, rotateAngle, rotateAxis);
+            return new AnimationTarget(this, tx, tz, rotateAngle, rotateAxis);
     }
 
     private static class AnimationTarget {
@@ -232,8 +247,11 @@ public class GuiDie extends MeshView {
             this.axis = axis;
         }
 
-        public Rotate rotateAtTime(long t) {
+        public void start(long t) {
             if (startTime == 0) startTime = t;
+        }
+
+        public Rotate rotateAtTime(long t) {
             return new Rotate(targetAngle*normTime(t), axis);
         }
 
