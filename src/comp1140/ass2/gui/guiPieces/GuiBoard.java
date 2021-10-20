@@ -20,6 +20,7 @@ import java.util.List;
 import comp1140.ass2.State.Boards;
 
 import javafx.scene.*;
+import javafx.scene.transform.Rotate;
 
 /**
  * Displays a possibly interactive board.
@@ -33,13 +34,15 @@ public class GuiBoard extends SubScene {
     private static final int VIEWER_HEIGHT = 700;
 
     private static final String URI_BASE = "assets/";
-    private final Group root = new Group();
 
     Game game;
     Label turnLabel;
     private boolean permitsMoveMaking;
 
     private double mouseX = 0;
+    private double mouseY = 0;
+    private double cameraYaw = 0;
+    private double cameraPitch = 0;
     private GuiDie selectedDie = null;
 
     private final GuiTile[][] boardTiles;
@@ -50,6 +53,10 @@ public class GuiBoard extends SubScene {
     private final List<Position> selectedTiles = new ArrayList<>();
 
     private final Controller[] controllers;
+
+    PerspectiveCamera camera;
+
+    private final Group boardRoot = new Group();
 
     /**
      * Constructs a board and all reliant 3D elements to represent a game position
@@ -68,6 +75,7 @@ public class GuiBoard extends SubScene {
             throw new InvalidSetupException("Any playable board must have an associated HUD");
         this.turnLabel = turnLabel;
 
+        Group root = new Group();
         this.setRoot(root);
         boardTiles = new GuiTile[7][7];
 
@@ -76,18 +84,21 @@ public class GuiBoard extends SubScene {
             else game = new ContraCublino(true, new Boards(placement));
         } catch (Exception e) {return;} // If the user inputs an invalid board state, do not update the display
 
+        boardRoot.setRotationAxis(Rotate.Y_AXIS);
+        root.getChildren().add(boardRoot);
+
         // Iterate over every tile in the board
         for (int y = 0; y < 7; y++) {
             for (int x = 0; x < 7; x++) {
                 // Construct the checkerboard tile
                 boardTiles[x][y] = new GuiTile(new Position(x, y), this);
-                root.getChildren().add(boardTiles[x][y]);
+                boardRoot.getChildren().add(boardTiles[x][y]);
 
                 // If the game state contains a die at the current position, construct it as well
                 Die die = game.getBoard().getAt(x, y);
                 if (die != null) {
                     GuiDie m = new GuiDie(die, this, controllers);
-                    root.getChildren().add(m);
+                    boardRoot.getChildren().add(m);
                     guiDice.add(m);
                 }
             }
@@ -99,14 +110,14 @@ public class GuiBoard extends SubScene {
                 // If M2 is pressed while M1 is held, try to make the indicated move
                 if (permitsMoveMaking && e.isSecondaryButtonDown()) handleApplyStep();
                 // If M1 is pressed (and held), try to pick up the currently selected die
-                else handleSelectDie(e.getSceneX());
+                else handleSelectDie(e.getSceneX(), e.getSceneY());
                 redrawSelection();
             }
         });
         // If the mouse is dragged across the screen without die selected, rotate the board
         // TODO: allow the user to rotate the board if they M1 outside of the board model
         setEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
-            if (selectedDie == null) handleBoardRotate(e.getSceneX());
+            if (selectedDie == null) handleBoardRotate(e.getSceneX(), e.getSceneY());
         });
         // Tells the tiles that moving the mouse while holding M1 is not dragging the board,
         // so they should still be highlighted as the mouse moves over them
@@ -115,17 +126,12 @@ public class GuiBoard extends SubScene {
         setEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
             if (permitsMoveMaking && !e.isPrimaryButtonDown()) handleDieRelease();
         });
-        // Allow the board group to be rotated as the mouse is dragged
-        root.setRotationAxis(new Point3D(0, 1, 0));
 
         // Establish, position and rotate camera
-        PerspectiveCamera camera = new PerspectiveCamera();
+        camera = new PerspectiveCamera();
         camera.setRotationAxis(new Point3D(1, 0, 0));
-        camera.setTranslateY(100-VIEWER_HEIGHT*0.75);
-        camera.setTranslateZ(-250);
-        camera.setTranslateX(-VIEWER_WIDTH*0.5);
-        camera.setRotate(-25);
         setCamera(camera);
+
 
         // Establish soft white lighting to remove shading and shadows
         root.getChildren().add(new AmbientLight(Color.rgb(175, 175, 175)));
@@ -134,8 +140,14 @@ public class GuiBoard extends SubScene {
         pointLight.setTranslateY(-125);
         root.getChildren().add(pointLight);
 
-        root.getChildren().add(new GuiAvatar(this, 180, controllers[0].getName()));
-        root.getChildren().add(new GuiAvatar(this, 0, controllers[1].getName()));
+        boardRoot.getChildren().add(new GuiSkybox(imageFromAsset("skybox1.png")));
+
+        boardRoot.getChildren().add(new GuiAvatar(this, 180, controllers[0].getName()));
+        boardRoot.getChildren().add(new GuiAvatar(this, 0, controllers[1].getName()));
+
+        boardRoot.setTranslateX(450);
+
+        handleBoardRotate(0, 0);
 
         if (permitsMoveMaking) haveCurrentPlayerMakeMove();
     }
@@ -145,7 +157,7 @@ public class GuiBoard extends SubScene {
      * If no such die exists, prepare to rotate the viewer as the mouse is dragged.
      * @param xPosition the x-coordinate of the mouse on the screen
      */
-    private void handleSelectDie(double xPosition) {
+    private void handleSelectDie(double xPosition, double yPosition) {
         mouseDown = true;
         selectedTiles.clear();
         selectedTiles.add(mouseOverTile);
@@ -161,6 +173,7 @@ public class GuiBoard extends SubScene {
 
         selectedDie = null;
         mouseX = xPosition;
+        mouseY = yPosition;
     }
 
     /**
@@ -178,9 +191,18 @@ public class GuiBoard extends SubScene {
      * Rotate the board relative to how far the mouse has been dragged
      * @param xPosition the x-coordinate of the mouse on the screen
      */
-    private void handleBoardRotate(double xPosition) {
-        root.setRotate(root.getRotate() + (mouseX - xPosition)/10);
+    private void handleBoardRotate(double xPosition, double yPosition) {
+        cameraYaw += (mouseX-xPosition)/10;
+        cameraPitch += (mouseY-yPosition)/10;
+        if (cameraPitch > -15) cameraPitch = -15;
+        if (cameraPitch < -89) cameraPitch = -89;
         mouseX = xPosition;
+        mouseY = yPosition;
+
+        boardRoot.setRotate(cameraYaw);
+        camera.setRotate(cameraPitch);
+        camera.setTranslateZ(-700*Math.cos(Math.toRadians(cameraPitch))+362);
+        camera.setTranslateY(250*Math.sin(Math.toRadians(cameraPitch)) - 400);
     }
 
     /**
@@ -289,8 +311,12 @@ public class GuiBoard extends SubScene {
      */
     public static PhongMaterial makePhongFromAsset(String path) {
         PhongMaterial result = new PhongMaterial();
-        result.setDiffuseMap(new Image(new File(URI_BASE + path).toURI().toString()));
+        result.setDiffuseMap(imageFromAsset(path));
         return result;
+    }
+
+    public static Image imageFromAsset(String path) {
+        return new Image(new File(URI_BASE + path).toURI().toString());
     }
 
     private static class InvalidSetupException extends Exception {
