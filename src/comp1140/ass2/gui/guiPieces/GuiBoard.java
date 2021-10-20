@@ -124,7 +124,7 @@ public class GuiBoard extends SubScene {
         camera.setTranslateY(100-VIEWER_HEIGHT*0.75);
         camera.setTranslateZ(-250);
         camera.setTranslateX(-VIEWER_WIDTH*0.5);
-        camera.setRotate(-30);
+        camera.setRotate(-25);
         setCamera(camera);
 
         // Establish soft white lighting to remove shading and shadows
@@ -249,7 +249,9 @@ public class GuiBoard extends SubScene {
         Game.GameResult result = game.getWinner();
         if (result == Game.GameResult.UNFINISHED) {
             turnLabel.setText(controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].getName() + "'s turn.");
-            controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].requestMove(game,this);
+            new Thread(() -> {
+                controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].requestMove(game,this);
+            }).start();
         } else {
             permitsMoveMaking = false;
             switch(result) {
