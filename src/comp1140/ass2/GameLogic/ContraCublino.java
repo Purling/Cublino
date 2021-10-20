@@ -56,21 +56,34 @@ public class ContraCublino extends Game implements Serializable {
      */
     @Override
     public void applyStep(Die die, String endPosition) {
+
         if (die.isWhite() != getCurrentPlayer().isWhite()) return;
 
         Boards clone = board.deepClone();
-        boolean firstEntry = getStepHistory().isEmpty();
+        boolean firstEntry = true;
+        for (Move x : getStepHistory()) {
+            if (x.getType() != MoveType.ORIGIN && x.getType() != MoveType.INVALID) {
+                firstEntry = false;
+                break;
+            }
+        }
 
         if (board.getAt(endPosition) != null) return;
-        if (firstEntry) addToStepHistory(new Move(clone, MoveType.ORIGIN));
         String diePosition = die.getPosition();
         boolean correctDistance = Boards.getManhattanDistance(diePosition, endPosition) == TIP_DISTANCE;
+
+        if (firstEntry) {
+            clearStepHistory();
+            addToStepHistory(new Move(clone, MoveType.ORIGIN));
+        }
 
         if (!isMoveBackwards(diePosition, endPosition) && correctDistance && isDieCorrect(die) && firstEntry) {
             applyTip(die, endPosition);
             addToStepHistory(new Move(clone, TIP));
             setCurrentMoveDie(die.deepClone());
         }
+
+
 
         if (board.getAdjacentDie(die) != null && !(board.getAdjacentDie(die).length == 0)) {
             battle(die);
