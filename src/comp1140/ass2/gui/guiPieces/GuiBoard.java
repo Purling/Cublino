@@ -128,7 +128,11 @@ public class GuiBoard extends SubScene {
         setCamera(camera);
 
         // Establish soft white lighting to remove shading and shadows
-        root.getChildren().add(new AmbientLight(Color.WHITE));
+        root.getChildren().add(new AmbientLight(Color.rgb(175, 175, 175)));
+        // Use a stronger light to draw attention towards the board
+        PointLight pointLight = new PointLight(Color.rgb(200, 200, 225));
+        pointLight.setTranslateY(-125);
+        root.getChildren().add(pointLight);
 
         root.getChildren().add(new GuiAvatar(this, 180, controllers[0].getName()));
         root.getChildren().add(new GuiAvatar(this, 0, controllers[1].getName()));
