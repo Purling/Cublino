@@ -5,7 +5,6 @@ import comp1140.ass2.GameLogic.Game;
 import comp1140.ass2.State.Boards;
 import comp1140.ass2.helperclasses.RoseNode;
 
-import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -51,7 +50,7 @@ public class DifficultAI {
     /**
      * Multithreading the MCTS
      */
-    public Game monteCarloMain() {
+    public int monteCarloMain() {
         ExecutorService executor = Executors.newFixedThreadPool(4);
         List<Integer> indices = new ArrayList<>();
         List<RoseNode<ContraCublino>> trees = new ArrayList<>();
@@ -74,17 +73,15 @@ public class DifficultAI {
         HashSet<Integer> nodes = new HashSet<>(indices);
         if (nodes.size() == indices.size()) {
             List<Integer> wins = trees.stream().map(RoseNode::getWinCount).collect(toList());
-            int bestChild = wins.indexOf(wins.stream().max(Integer::compareTo).orElse(0));
-            return trees.get(bestChild).getState();
+            return wins.indexOf(wins.stream().max(Integer::compareTo).orElse(0));
         } else {
             List<Integer> frequencies = indices.stream().map((x) -> Collections.frequency(indices, x)).collect(Collectors.toList());
-            if (frequencies.stream().allMatch((x) -> x == 2)) {
+            if (frequencies.stream().allMatch((x) -> x == 2)) { // TODO fix this so it actually sums up the relevant (i.e., most voted) choices instead of all
                 List<Integer> wins = trees.stream().map(RoseNode::getWinCount).collect(toList());
-                int bestChild = wins.indexOf(wins.stream().max(Integer::compareTo).orElse(0));
-                return trees.get(bestChild).getState();
+                return wins.indexOf(wins.stream().max(Integer::compareTo).orElse(0));
             }
             int maxFrequency = frequencies.stream().max(Integer::compareTo).orElse(0);
-            return trees.get(indices.get(frequencies.indexOf(maxFrequency))).getState();
+            return indices.get(frequencies.indexOf(maxFrequency));
         }
     }
 

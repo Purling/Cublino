@@ -112,7 +112,7 @@ public class ContraCublino extends Game implements Serializable {
                 if (isDirectionClear(direction, die)) {
                     ContraCublino clone = deepClone();
                     Die dieClone = die.deepClone();
-                    clone.applyStep(dieClone, dieClone.getPositionOver(direction,1));
+                    clone.applyStep(dieClone, dieClone.getPositionOver(direction, 1));
                     clone.endTurn();
                     // FIXME Remove the magic numbers below
                     ContraMove move = new ContraMove(clone, Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1));
@@ -129,16 +129,25 @@ public class ContraCublino extends Game implements Serializable {
      * @return A deep copy the ContraCublino
      */
     public ContraCublino deepClone() {
+        ObjectOutputStream oos = null;
+        ObjectInputStream ois = null;
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos = new ObjectOutputStream(baos);
             oos.writeObject(this);
 
             ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bais);
+            ois = new ObjectInputStream(bais);
             return (ContraCublino) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             return null;
+        } finally {
+            try {
+                if (oos != null) oos.close();
+                if (ois != null) ois.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -68,8 +68,27 @@ public class Controller {
                 }
 
                 case DIFFICULT_AI -> {
+                    ContraCublino.ContraMove[] moves = ((ContraCublino) game).generateLegalMoves();
                     DifficultAI difficultAI = new DifficultAI(game);
-                    difficultAI.monteCarloMain();
+                    ContraCublino.ContraMove move = moves[difficultAI.monteCarloMain()];
+                    System.out.println(move.getEncodedMove());
+                    int startX = move.getEncodedMove().charAt(0)-97;
+                    int startY = move.getEncodedMove().charAt(1)-49;
+                    int endX   = move.getEncodedMove().charAt(2)-97;
+                    int endY   = move.getEncodedMove().charAt(3)-49;
+                    System.out.println(startX +"," + startY + " -> " + endX + "," + endY);
+                    Die movingDie = game.getBoard().getAt(startX, startY);
+                    game.applyStep(movingDie, endX + "" + endY);
+                    for (Die d : game.getCurrentPlayer().getDice()) {
+                        if (d != movingDie && move.getPossibleState().getBoard().getAt(d.getX(), d.getY()) == null) {
+                            d.delete();
+                        }
+                    }
+                    for (Die d : game.getOtherPlayer().getDice()) {
+                        if (d != movingDie && move.getPossibleState().getBoard().getAt(d.getX(), d.getY()) == null) {
+                            d.delete();
+                        }
+                    }
                     gui.moveComplete();
                 }
             }

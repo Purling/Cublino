@@ -1,5 +1,4 @@
 package comp1140.ass2.State;
-import comp1140.ass2.Controller.DifficultAI;
 
 import java.io.*;
 import java.util.ArrayList;
