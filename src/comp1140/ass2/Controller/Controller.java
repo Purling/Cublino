@@ -45,7 +45,7 @@ public class Controller {
         } else {
             switch (type) {
                 case EASY_AI -> {
-                    ContraCublino.ContraMove move = EasyAI.moveOnly((ContraCublino) game.deepClone());
+                    ContraCublino.ContraMove move = EasyAI.greedyAIMoveOnly((ContraCublino) game.deepClone());
                     System.out.println(move.getEncodedMove());
                     int startX = move.getEncodedMove().charAt(0)-97;
                     int startY = move.getEncodedMove().charAt(1)-49;

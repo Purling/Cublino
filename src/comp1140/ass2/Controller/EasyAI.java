@@ -56,6 +56,14 @@ public class EasyAI { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
         return legalMoves[generatedMoveIndex].getPossibleState();
     }
 
+    public static ContraCublino.ContraMove greedyAIMoveOnly(ContraCublino currentGameState) {
+        ContraCublino.ContraMove[] legalMoves = currentGameState.generateLegalMoves();
+        List<Integer> evaluatedMoves = Arrays.stream(legalMoves).map((x) -> greedyEvaluation(x.getPossibleState())).collect(Collectors.toList());
+        int generatedMoveIndex = evaluatedMoves.indexOf(evaluatedMoves.stream().max(Integer::compareTo).orElse(0));
+        assert generatedMoveIndex != -1;
+        return legalMoves[generatedMoveIndex];
+    }
+
     /**
      * "AI" which just generates a random move
      *
