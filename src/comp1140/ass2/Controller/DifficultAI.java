@@ -15,8 +15,8 @@ import static java.util.stream.Collectors.toList;
 /**
  * A difficult AI controller
  */
-public class DifficultAI implements Serializable {
-    private static final long RUN_TIME = 30000;
+public class DifficultAI {
+    private static final long RUN_TIME = 20000;
     private RoseNode<ContraCublino> contraGameTree;
     private Game game;
 
@@ -26,8 +26,7 @@ public class DifficultAI implements Serializable {
     public DifficultAI(Game game) {
         this.game = game;
         if (game instanceof ContraCublino) {
-            RoseNode<ContraCublino> gameTree = new RoseNode<>((ContraCublino) game);
-            this.contraGameTree = gameTree;
+            this.contraGameTree = new RoseNode<>((ContraCublino) game);
         }
     }
 
@@ -46,17 +45,7 @@ public class DifficultAI implements Serializable {
      * @return a deep copy of the DifficultAI object
      */
     public DifficultAI deepClone() {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(this);
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            return (DifficultAI) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            return null;
-        }
+        return new DifficultAI(this.game.deepClone());
     }
 
     /**
@@ -77,11 +66,11 @@ public class DifficultAI implements Serializable {
 
                 indices.add(getMaxChildIndex(future.get()));
                 trees.add(future.get());
-                executor.shutdown();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
+        executor.shutdown();
         HashSet<Integer> nodes = new HashSet<>(indices);
         if (nodes.size() == indices.size()) {
             List<Integer> wins = trees.stream().map(RoseNode::getWinCount).collect(toList());

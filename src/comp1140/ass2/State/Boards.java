@@ -66,17 +66,17 @@ public class Boards implements Serializable{
      * @return A deep copy the board
      */
     public Boards deepClone() {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(this);
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            return (Boards) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            return null;
+        Boards object = new Boards();
+        object.whitePlayer = this.whitePlayer != null ? this.whitePlayer.deepClone() : null;
+        object.blackPlayer = this.blackPlayer != null ? this.blackPlayer.deepClone() : null;
+        for (int i =0; i< BOARD_DIMENSION; i++) {
+            for (int j =0; j< BOARD_DIMENSION; j++) {
+                if (this.board[i][j] != null) {
+                    object.board[i][j] = this.board[i][j].deepClone();
+                }
+            }
         }
+        return object;
     }
 
     @Override
