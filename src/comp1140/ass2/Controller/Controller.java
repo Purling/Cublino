@@ -7,7 +7,7 @@ import comp1140.ass2.gui.guiPieces.GuiBoard;
 import comp1140.ass2.gui.guiPieces.GuiDie;
 
 public class Controller {
-    public enum ControllerType {HUMAN, EASY_AI, DIFFICULT_AI};
+    public enum ControllerType {HUMAN, EASY_AI, DIFFICULT_AI}
 
     ControllerType type;
     String name;
@@ -44,19 +44,23 @@ public class Controller {
         } else {
             switch (type) {
                 case EASY_AI -> {
+                    System.out.println(gui.getGame());
                     System.out.println(EasyAI.greedyAI((ContraCublino) gui.getGame()));
-                    System.out.println(gui.getGame().getCurrentPlayer());
-                    gui.setGame(EasyAI.greedyAI((ContraCublino) gui.getGame()));
-                    System.out.println(("\n"));
-                    System.out.println(EasyAI.greedyAI((ContraCublino) gui.getGame()));
-                    System.out.println(gui.getGame().getCurrentPlayer());
+//                    System.out.println(gui.getGame().getCurrentPlayer());
+                    Game.DieMove move = Game.findMove(gui.getGame(), EasyAI.greedyAI((ContraCublino) gui.getGame().deepClone()));
+                    System.out.println("Move: " + move.getDie() + " " + move.getEndPosition());
+                    System.out.println("Game: " + gui.getGame() + " Dice: " + gui.getGame().getCurrentPlayer().getDice() + "\n"
+                            + gui.getGame().getOtherPlayer().getDice());
+                    System.out.println(gui.getGame().getCurrentPlayer().getDice().contains(move.getDie()));
+                    gui.getGame().applyStep(move.getDie(), move.getEndPosition());
+                    System.out.println(gui.getGame());
                     gui.moveComplete();
                 }
 
                 case DIFFICULT_AI -> {
                     DifficultAI difficultAI = new DifficultAI(gui.getGame());
                     difficultAI.monteCarloMain();
-                    gui.moveCompleteAI();
+                    gui.moveComplete();
                 }
             }
         }

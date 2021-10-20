@@ -416,7 +416,7 @@ public class Die implements Serializable {
         this.right = right;
     }
 
-    static class SortByColour implements Comparator<Die> {
+    public static class SortByColour implements Comparator<Die> {
 
         @Override
         public int compare(Die dieA, Die dieB) {

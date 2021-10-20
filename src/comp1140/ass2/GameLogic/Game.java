@@ -8,6 +8,7 @@ import comp1140.ass2.gui.Board;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -240,12 +241,94 @@ public abstract class Game implements Serializable {
 
     public abstract GameResult getWinner();
 
+    /**
+     * Given a new state and an old one (assuming that the new state results from a *step* applied to the old state) the methods finds the step
+     *
+     * @param originalGame The original game
+     * @param newGame      The new game after a step has been applied to the original
+     * @return The step in DieMove form
+     */
+    public static DieMove findMove(Game originalGame, Game newGame) {
+        DieMove dieMove = new DieMove();
+        List<Die> originalCurrentPlayer = originalGame.currentPlayer.getDice();
+        List<Die> otherOpponentPlayer = newGame.otherPlayer.getDice();
+        Iterator<Die> iter = originalCurrentPlayer.iterator();
+        Iterator<Die> iter1 = otherOpponentPlayer.iterator();
+
+        while (iter.hasNext()) {
+            Die die = iter.next();
+
+            while (iter1.hasNext()) {
+                Die die1 = iter1.next();
+                if (die.equals(die1)) {
+                    iter.remove();
+                    iter1.remove();
+                }
+            }
+        }
+        dieMove.setDie(originalCurrentPlayer.get(0));
+        dieMove.setEndPosition(otherOpponentPlayer.get(0).getPosition());
+        return dieMove;
+    }
+
     public enum MoveType {
         TIP, JUMP, ORIGIN, INVALID
     }
 
     public enum GameResult {
         UNFINISHED, WHITE_WINS, BLACK_WINS, TIE
+    }
+
+    public static class DieMove {
+        Die die;
+        String endPosition;
+
+        /**
+         * Empty constructor
+         */
+        public DieMove() {
+        }
+
+        public DieMove(Die die, String endPosition) {
+            this.die = die;
+            this.endPosition = endPosition;
+        }
+
+        /**
+         * Getter for endPosition
+         */
+        public String getEndPosition() {
+            return endPosition;
+        }
+
+        /**
+         * Setter for endPosition
+         */
+        public void setEndPosition(String endPosition) {
+            this.endPosition = endPosition;
+        }
+
+        /**
+         * Getter for possibleState
+         */
+        public Die getDie() {
+            return die;
+        }
+
+        /**
+         * Setter for possibleState
+         */
+        public void setDie(Die die) {
+            this.die = die;
+        }
+
+        /**
+         * To string method
+         */
+        @Override
+        public String toString() {
+            return endPosition;
+        }
     }
 
     public class Move implements Serializable {

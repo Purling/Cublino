@@ -35,9 +35,9 @@ public class DifficultAI implements Serializable {
         Boards board = new Boards("CWa1Wb1Wc1Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
 //        Boards board = new Boards("cWa1Wb1Lc2Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
         ContraCublino contra = new ContraCublino(true, board); // remember to switch isWhite to false if black is the current player
-        RoseNode<ContraCublino> tree = new RoseNode(contra);
-//        DifficultAI difficultAI = new DifficultAI(tree);
-//        difficultAI.monteCarloMain();
+//        RoseNode<ContraCublino> tree = new RoseNode(contra);
+        DifficultAI difficultAI = new DifficultAI(contra);
+        difficultAI.monteCarloMain();
     }
 
     /**
@@ -62,7 +62,7 @@ public class DifficultAI implements Serializable {
     /**
      * Multithreading the MCTS
      */
-    public void monteCarloMain() {
+    public Game monteCarloMain() {
         ExecutorService executor = Executors.newFixedThreadPool(4);
         List<Integer> indices = new ArrayList<>();
         List<RoseNode<ContraCublino>> trees = new ArrayList<>();
@@ -74,6 +74,7 @@ public class DifficultAI implements Serializable {
         }
         for(Future<RoseNode<ContraCublino>> future : futures){
             try {
+
                 indices.add(getMaxChildIndex(future.get()));
                 trees.add(future.get());
                 executor.shutdown();
@@ -85,11 +86,16 @@ public class DifficultAI implements Serializable {
         if (nodes.size() == indices.size()) {
             List<Integer> wins = trees.stream().map(RoseNode::getWinCount).collect(toList());
             int bestChild = wins.indexOf(wins.stream().max(Integer::compareTo).orElse(0));
-            game = trees.get(bestChild).getState();
+            return trees.get(bestChild).getState();
         } else {
             List<Integer> frequencies = indices.stream().map((x) -> Collections.frequency(indices, x)).collect(Collectors.toList());
+            if (frequencies.stream().allMatch((x) -> x == 2)) {
+                List<Integer> wins = trees.stream().map(RoseNode::getWinCount).collect(toList());
+                int bestChild = wins.indexOf(wins.stream().max(Integer::compareTo).orElse(0));
+                return trees.get(bestChild).getState();
+            }
             int maxFrequency = frequencies.stream().max(Integer::compareTo).orElse(0);
-            game = trees.get(indices.get(frequencies.indexOf(maxFrequency))).getState();
+            return trees.get(indices.get(frequencies.indexOf(maxFrequency))).getState();
         }
     }
 
@@ -138,7 +144,7 @@ public class DifficultAI implements Serializable {
      * @param treeNode The node from which to get the best child node
      * @return The best child node
      */
-    private int getMaxChildIndex(RoseNode<ContraCublino> treeNode) { // Can also make this based on percentages
+    private int getMaxChildIndex(RoseNode<ContraCublino> treeNode) { // Can also make this based on percentages think about the case of more than 1 "best"
         List<Integer> winScores = treeNode.getChildren().stream().map(RoseNode::getWinCount).collect(toList());
         return winScores.indexOf(winScores.stream().max(Integer::compareTo).orElseThrow());
     }

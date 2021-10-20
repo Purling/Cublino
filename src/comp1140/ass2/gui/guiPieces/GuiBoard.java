@@ -262,11 +262,6 @@ public class GuiBoard extends SubScene {
         haveCurrentPlayerMakeMove();
     }
 
-    public void moveCompleteAI() {
-        redrawSelection();
-//        haveCurrentPlayerMakeMove();
-    }
-
     /**
      * Checks whether or not a particular die is selected by the user.
      * (NB: this is essentially a get method for selectedDie)

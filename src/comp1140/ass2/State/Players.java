@@ -1,4 +1,6 @@
 package comp1140.ass2.State;
+import comp1140.ass2.Controller.DifficultAI;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,25 @@ public class Players implements Serializable{
 
     public List<Die> getDice() {
         return myDice;
+    }
+
+    /**
+     * Create a deep copy of the Players object
+     *
+     * @return a deep copy of the Players object
+     */
+    public Players deepClone() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (Players) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            return null;
+        }
     }
 
     public void addToDice(Die die) {
