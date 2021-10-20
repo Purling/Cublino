@@ -4,9 +4,11 @@ import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.gui.guiPieces.GuiBoard;
 import comp1140.ass2.gui.guiPieces.Menu;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 /**
@@ -46,11 +48,17 @@ public class Board extends Application {
         root.getChildren().clear();
 
         Label turnDisplayer = new Label("White");
-        turnDisplayer.setTranslateX(200);
-        root.getChildren().add(turnDisplayer);
+        turnDisplayer.setAlignment(Pos.TOP_LEFT);
+        turnDisplayer.setTextAlignment(TextAlignment.LEFT);
+        turnDisplayer.setLayoutX(40);
+        turnDisplayer.setLayoutY(20);
+        turnDisplayer.setPrefWidth(100);
+        turnDisplayer.setStyle("-fx-background-color: white;");
+        turnDisplayer.setScaleX(1.5);
+        turnDisplayer.setScaleY(1.5);
 
         game = new GuiBoard((isPur ? "P" : "C") + "Wa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", controllers, isPur,true, turnDisplayer);
 
-        root.getChildren().add(game);
+        root.getChildren().addAll(game, turnDisplayer);
     }
 }
