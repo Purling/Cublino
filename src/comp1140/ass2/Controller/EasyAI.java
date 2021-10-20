@@ -68,6 +68,12 @@ public class EasyAI { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
         return currentGameState.generateLegalMoves()[randomMove].getPossibleState();
     }
 
+    public static ContraCublino.ContraMove moveOnly(ContraCublino currentGameState) {
+        Random rand = new Random();
+        int randomMove = rand.nextInt(currentGameState.generateLegalMoves().length);
+        return currentGameState.generateLegalMoves()[randomMove];
+    }
+
     /**
      * If the player is AI, then automatically choose the move;
      */

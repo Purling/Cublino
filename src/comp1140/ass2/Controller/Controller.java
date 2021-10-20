@@ -3,6 +3,7 @@ package comp1140.ass2.Controller;
 import comp1140.ass2.GameLogic.ContraCublino;
 import comp1140.ass2.GameLogic.Game;
 import comp1140.ass2.GameLogic.PurCublino;
+import comp1140.ass2.State.Die;
 import comp1140.ass2.gui.guiPieces.GuiBoard;
 import comp1140.ass2.gui.guiPieces.GuiDie;
 
@@ -44,8 +45,25 @@ public class Controller {
         } else {
             switch (type) {
                 case EASY_AI -> {
-                    Game.DieMove move = Game.findMove(game, EasyAI.greedyAI((ContraCublino) game.deepClone()));
-                    game.applyStep(move.getDie(), move.getEndPosition());
+                    ContraCublino.ContraMove move = EasyAI.moveOnly((ContraCublino) game.deepClone());
+                    System.out.println(move.getEncodedMove());
+                    int startX = move.getEncodedMove().charAt(0)-97;
+                    int startY = move.getEncodedMove().charAt(1)-49;
+                    int endX   = move.getEncodedMove().charAt(2)-97;
+                    int endY   = move.getEncodedMove().charAt(3)-49;
+                    System.out.println(startX +"," + startY + " -> " + endX + "," + endY);
+                    Die movingDie = game.getBoard().getAt(startX, startY);
+                    game.applyStep(movingDie, endX + "" + endY);
+                    for (Die d : game.getCurrentPlayer().getDice()) {
+                        if (d != movingDie && move.getPossibleState().getBoard().getAt(d.getX(), d.getY()) == null) {
+                            d.delete();
+                        }
+                    }
+                    for (Die d : game.getOtherPlayer().getDice()) {
+                        if (d != movingDie && move.getPossibleState().getBoard().getAt(d.getX(), d.getY()) == null) {
+                            d.delete();
+                        }
+                    }
                     gui.moveComplete();
                 }
 
