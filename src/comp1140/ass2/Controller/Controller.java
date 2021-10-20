@@ -38,27 +38,19 @@ public class Controller {
      * If the player is AI, then automatically choose the move;
      * @param gui The UI components
      */
-    public void requestMove(GuiBoard gui) {
-        if (gui.getGame() instanceof PurCublino) {
+    public void requestMove(Game game, GuiBoard gui) {
+        if (game instanceof PurCublino) {
             if (type != ControllerType.HUMAN) gui.moveComplete();
         } else {
             switch (type) {
                 case EASY_AI -> {
-                    System.out.println(gui.getGame());
-                    System.out.println(EasyAI.greedyAI((ContraCublino) gui.getGame()));
-//                    System.out.println(gui.getGame().getCurrentPlayer());
-                    Game.DieMove move = Game.findMove(gui.getGame(), EasyAI.greedyAI((ContraCublino) gui.getGame().deepClone()));
-                    System.out.println("Move: " + move.getDie() + " " + move.getEndPosition());
-                    System.out.println("Game: " + gui.getGame() + " Dice: " + gui.getGame().getCurrentPlayer().getDice() + "\n"
-                            + gui.getGame().getOtherPlayer().getDice());
-                    System.out.println(gui.getGame().getCurrentPlayer().getDice().contains(move.getDie()));
-                    gui.getGame().applyStep(move.getDie(), move.getEndPosition());
-                    System.out.println(gui.getGame());
+                    Game.DieMove move = Game.findMove(game, EasyAI.greedyAI((ContraCublino) game.deepClone()));
+                    game.applyStep(move.getDie(), move.getEndPosition());
                     gui.moveComplete();
                 }
 
                 case DIFFICULT_AI -> {
-                    DifficultAI difficultAI = new DifficultAI(gui.getGame());
+                    DifficultAI difficultAI = new DifficultAI(game);
                     difficultAI.monteCarloMain();
                     gui.moveComplete();
                 }
