@@ -6,6 +6,7 @@ import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Die;
 import comp1140.ass2.gui.guiPieces.GuiBoard;
 import comp1140.ass2.gui.guiPieces.GuiDie;
+import javafx.application.Platform;
 
 public class Controller {
     public enum ControllerType {HUMAN, EASY_AI, DIFFICULT_AI}
@@ -41,7 +42,7 @@ public class Controller {
      */
     public void requestMove(Game game, GuiBoard gui) {
         if (game instanceof PurCublino) {
-            if (type != ControllerType.HUMAN) gui.moveComplete();
+            //if (type != ControllerType.HUMAN) gui.moveComplete();
         } else {
             switch (type) {
                 case EASY_AI -> {
@@ -64,7 +65,6 @@ public class Controller {
                             d.delete();
                         }
                     }
-                    gui.moveComplete();
                 }
 
                 case DIFFICULT_AI -> {
@@ -89,10 +89,10 @@ public class Controller {
                             d.delete();
                         }
                     }
-                    gui.moveComplete();
                 }
             }
         }
-            //TODO: make the move
+
+        if (type != ControllerType.HUMAN) Platform.runLater(() -> gui.moveComplete());
     }
 }
