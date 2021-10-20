@@ -267,7 +267,11 @@ public abstract class Game implements Serializable {
             }
         }
         dieMove.setDie(originalCurrentPlayer.get(0));
-        dieMove.setEndPosition(otherOpponentPlayer.get(0).getPosition());
+        if (otherOpponentPlayer.isEmpty()) {
+            dieMove.setEndPosition(null);
+        } else {
+            dieMove.setEndPosition(otherOpponentPlayer.get(0).getPosition());
+        }
         return dieMove;
     }
 

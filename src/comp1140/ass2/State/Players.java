@@ -16,11 +16,6 @@ public class Players implements Serializable{
 
     boolean isWhite;
 
-    /**
-     * store the current number of turns the player has already done
-     */
-    int turn;
-
     public List<Die> getDice() {
         return myDice;
     }
@@ -31,17 +26,9 @@ public class Players implements Serializable{
      * @return a deep copy of the Players object
      */
     public Players deepClone() {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(this);
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            return (Players) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            return null;
-        }
+        Players obj = new Players(this.isWhite);
+        this.myDice.forEach((die) -> obj.addToDice(die.deepClone()));
+        return obj;
     }
 
     public void addToDice(Die die) {
