@@ -105,6 +105,19 @@ public class RoseNode<T> implements Serializable {
     }
 
     /**
+     * Get leaves of a tree
+     */
+    public List<RoseNode<T>> getLeaves(List<RoseNode<T>> leaves) {
+        if (getChildren().isEmpty()) {
+            leaves.add(this);
+            return leaves;
+        } else {
+            getChildren().forEach((x) -> x.getLeaves(leaves));
+        }
+        return leaves;
+    }
+
+    /**
      * toString for RoseNode
      */
     @Override
