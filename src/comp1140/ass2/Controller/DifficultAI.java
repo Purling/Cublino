@@ -141,7 +141,7 @@ public class DifficultAI {
      *
      * @param treeNode The node to be expanded
      */
-    private void monteCarloExpansion(RoseNode<ContraCublino> treeNode) { // Consider where this should be
+    public static void monteCarloExpansion(RoseNode<ContraCublino> treeNode) { // Consider where this should be
         ContraCublino nodeToExpand = treeNode.getState();
         List<ContraCublino> children = Arrays.stream(nodeToExpand.generateLegalMoves()).map(ContraCublino.ContraMove::getPossibleState)
                 .collect(toList());
@@ -168,12 +168,13 @@ public class DifficultAI {
         // Random moves is probably a bit too slow,
         // greedy with lookahead of 1 is probably too stupid. Maybe try greedy with a lookahead of 2 or 3 in combination with random
         int counter = 1;
+        EasyAI easy = new EasyAI();
         while (contra.getWinner().equals(Game.GameResult.UNFINISHED)) {
             boolean everyThird = (counter % 3) == 0;
             // Can be any move making mechanism. e.g., minimax, greedy, etc
             // Currently a combination of random and greedy
             if (everyThird) contra = EasyAI.randomMove(contra);
-            if (contra.getWinner().equals(Game.GameResult.UNFINISHED)) contra = EasyAI.greedyAI(contra);
+            if (contra.getWinner().equals(Game.GameResult.UNFINISHED)) contra = easy.greedyAI(contra);
             if (contra.getWinner().equals(Game.GameResult.UNFINISHED) && everyThird) contra = EasyAI.randomMove(contra);
             counter++;
         }

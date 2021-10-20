@@ -4,7 +4,9 @@ import comp1140.ass2.GameLogic.ContraCublino;
 import comp1140.ass2.GameLogic.Game;
 import comp1140.ass2.State.Die;
 import comp1140.ass2.gui.guiPieces.GuiDie;
+import comp1140.ass2.helperclasses.RoseNode;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -27,7 +29,27 @@ public class EasyAI { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
      * @param currentGameState The current condition of the game
      * @return A numerical evaluation of the game state
      */
-    public static int greedyEvaluation(ContraCublino currentGameState) {
+    public static double greedyEvaluation(ContraCublino currentGameState) {
+        boolean isWhite = currentGameState.getCurrentPlayer().isWhite();
+        List<Die> playerDice = currentGameState.getCurrentPlayer().getDice();
+        List<Die> opponentDice = currentGameState.getOtherPlayer().getDice();
+        Random randomness = new Random();
+
+        if (isWhite) {
+            if (playerDice.stream().anyMatch(Die::isWhiteDieFinished)) return Double.MAX_VALUE;
+            if (opponentDice.stream().anyMatch(Die::isBlackDieFinished)) return -Double.MAX_VALUE;
+            int weightedExploration = playerDice.stream().map((x) -> 7 - x.getY() * (x.getY())).reduce(0, Integer::sum) * 10;
+            return playerDice.stream().mapToInt((x) -> 7 - x.getY()).max().orElse(-99) * (100 / 7) * weightedExploration * randomness.nextInt(20);
+        } else {
+            if (playerDice.stream().anyMatch(Die::isBlackDieFinished)) return Double.MAX_VALUE;
+            if (opponentDice.stream().anyMatch(Die::isWhiteDieFinished)) return -Double.MAX_VALUE;
+            double getOut = playerDice.stream().map(Die::getY).filter(y -> y != 0).reduce(0, Integer::sum);
+            double weightedExploration = playerDice.stream().map((x) -> x.getY() * (7 - x.getY())).reduce(0, Integer::sum) * 10;
+            return playerDice.stream().mapToInt(Die::getY).max().orElse(-99) * (100 / 7) * weightedExploration * randomness.nextInt(20);
+        }
+    }
+
+    public static double badEvaluation(ContraCublino currentGameState) {
         boolean isWhite = currentGameState.getCurrentPlayer().isWhite();
         List<Die> playerDice = currentGameState.getCurrentPlayer().getDice();
 
@@ -48,20 +70,42 @@ public class EasyAI { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
      * @param currentGameState The current condition of the game
      * @return The board after the move determined by the AI is played
      */
-    public static ContraCublino greedyAI(ContraCublino currentGameState) {
+    public ContraCublino greedyAI(ContraCublino currentGameState) {
+//        RoseNode<ContraCublino> gameTree = new RoseNode<>(currentGameState);
+//        DifficultAI.monteCarloExpansion(gameTree);
+//        gameTree.getChildren().forEach(DifficultAI::monteCarloExpansion);
+//        List<RoseNode<ContraCublino>> leaves = gameTree.getLeaves(new ArrayList<>());
+//        List<Double> evaluatedMoves = leaves.stream().map((x) -> greedyEvaluation(x.getState())).collect(Collectors.toList());
+//        int generatedMoveIndex = evaluatedMoves.indexOf(evaluatedMoves.stream().max(Double::compareTo).orElse(0D));
+//        RoseNode<ContraCublino> wanted = leaves.get(generatedMoveIndex);
+//        while (wanted.getParent().getParent() != null) {
+//            wanted = wanted.getParent();
+//        }
+//        return wanted.getState();
+
         ContraCublino.ContraMove[] legalMoves = currentGameState.generateLegalMoves();
-        List<Integer> evaluatedMoves = Arrays.stream(legalMoves).map((x) -> greedyEvaluation(x.getPossibleState())).collect(Collectors.toList());
-        int generatedMoveIndex = evaluatedMoves.indexOf(evaluatedMoves.stream().max(Integer::compareTo).orElse(0));
+        List<Double> evaluatedMoves = Arrays.stream(legalMoves).map((x) -> badEvaluation(x.getPossibleState())).collect(Collectors.toList());
+        int generatedMoveIndex = evaluatedMoves.indexOf(evaluatedMoves.stream().max(Double::compareTo).orElse(0D));
         assert generatedMoveIndex != -1;
         return legalMoves[generatedMoveIndex].getPossibleState();
     }
 
     public static ContraCublino.ContraMove greedyAIMoveOnly(ContraCublino currentGameState) {
-        ContraCublino.ContraMove[] legalMoves = currentGameState.generateLegalMoves();
-        List<Integer> evaluatedMoves = Arrays.stream(legalMoves).map((x) -> greedyEvaluation(x.getPossibleState())).collect(Collectors.toList());
-        int generatedMoveIndex = evaluatedMoves.indexOf(evaluatedMoves.stream().max(Integer::compareTo).orElse(0));
-        assert generatedMoveIndex != -1;
-        return legalMoves[generatedMoveIndex];
+        RoseNode<ContraCublino> gameTree = new RoseNode<>(currentGameState);
+        DifficultAI.monteCarloExpansion(gameTree);
+        gameTree.getChildren().forEach(DifficultAI::monteCarloExpansion);
+        List<ContraCublino.ContraMove> legalMoves = List.of(currentGameState.generateLegalMoves());
+        List<RoseNode<ContraCublino>> leaves = gameTree.getLeaves(new ArrayList<>());
+        List<Double> evaluatedMoves = leaves.stream().map((x) -> greedyEvaluation(x.getState())).collect(Collectors.toList());
+        System.out.println(evaluatedMoves);
+        int generatedMoveIndex = evaluatedMoves.indexOf(evaluatedMoves.stream().max(Double::compareTo).orElse(0D));
+        RoseNode<ContraCublino> wanted = leaves.get(generatedMoveIndex);
+        while (wanted.getParent().getParent() != null) {
+            wanted = wanted.getParent();
+        }
+        int generatedIndex = legalMoves.stream().map((x) -> x.getPossibleState().getBoard()).collect(Collectors.toList()).indexOf(wanted.getState().getBoard());
+        assert generatedIndex != -1;
+        return legalMoves.get(generatedIndex);
     }
 
     /**

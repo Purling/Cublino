@@ -10,6 +10,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The player will be allowed to decide which version of cublino he or she wants to play.
@@ -27,20 +28,6 @@ public abstract class Game implements Serializable {
      * the current board two players are playing on
      */
     Boards board;
-    /**
-     * the status of the two players
-     */
-    Controller whitePlayer;
-    Controller blackPlayer;
-    /**
-     * Check whether a player has made moves or not.
-     * if the player has possible legal moves then at least one move should be made by the player
-     */
-    boolean hasMadeMove;
-    /**
-     * the result in terms of winning and tie when the game is finished
-     */
-    GameResult result;
     /**
      * store the current player that is making his moves
      */
