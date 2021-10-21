@@ -146,8 +146,10 @@ public class GuiBoard extends SubScene {
         boardRoot.getChildren().add(new GuiSkybox(locale));
 
         // Add avatars at each end of the board to represent the player 'sitting' at that position
-        boardRoot.getChildren().add(new GuiAvatar(this, 180, controllers[0].getName()));
-        boardRoot.getChildren().add(new GuiAvatar(this, 0, controllers[1].getName()));
+        if (controllers != null && controllers.length == 2) {
+            boardRoot.getChildren().add(new GuiAvatar(this, 180, controllers[0].getName()));
+            boardRoot.getChildren().add(new GuiAvatar(this, 0, controllers[1].getName()));
+        }
 
         // Prepare sound effects
         moveSfx = playableFromAsset("sfx/woodenThump.mp3");

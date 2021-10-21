@@ -1,7 +1,9 @@
 package comp1140.ass2.gui;
 
 
+import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.gui.guiPieces.GuiBoard;
+import comp1140.ass2.gui.guiPieces.GuiDie;
 import comp1140.ass2.gui.guiPieces.GuiSkybox;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -33,6 +35,9 @@ public class Viewer extends Application {
 
     private GuiBoard boardSubscene;
 
+    private final Controller p1 = new Controller(Controller.ControllerType.HUMAN, "Player 1", GuiDie.Skin.PLAIN_WHITE);
+    private final Controller p2 = new Controller(Controller.ControllerType.HUMAN, "Player 2", GuiDie.Skin.PLAIN_BLACK);
+
     /**
      * Draw a placement in the window, removing any previously drawn one
      *
@@ -40,7 +45,7 @@ public class Viewer extends Application {
      */
     void makePlacement(String placement) throws Exception {
         root.getChildren().remove(boardSubscene);
-        boardSubscene = new GuiBoard(placement, GuiSkybox.Locale.NONE, null, true, false, null);
+        boardSubscene = new GuiBoard(placement, GuiSkybox.Locale.NONE, new Controller[] {p1, p2}, true, false, null);
         root.getChildren().add(boardSubscene);
     }
 
@@ -77,15 +82,13 @@ public class Viewer extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         // Use a 3D sub scene for rendering the board alongside (behind) the controls
-        boardSubscene = new GuiBoard("", GuiSkybox.Locale.RANDOM, null, true, false, null);
+
+        boardSubscene = new GuiBoard("", GuiSkybox.Locale.NONE, new Controller[] {p1, p2}, true, false, null);
 
         primaryStage.setTitle("Cublino Viewer");
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
-        root.getChildren().add(controls);
-
         makeControls();
-
-        root.getChildren().add(boardSubscene);
+        root.getChildren().addAll(boardSubscene, controls);
 
         primaryStage.setScene(scene);
         primaryStage.show();
