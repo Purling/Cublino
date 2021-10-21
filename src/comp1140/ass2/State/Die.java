@@ -11,21 +11,55 @@ import static comp1140.ass2.State.Direction.*;
  * @author Whole group
  */
 public class Die implements Serializable {
-    private final boolean isWhite;
+
     /**
-     * x and y represents the coordinate of the dice on a board
+     * Colour of Die. True if white, false if black
+     */
+    private final boolean isWhite;
+
+    /**
+     * x coordinate of Die
      */
     private int x;
-    private int y;
+
     /**
-     * The value on each side of a die values will vary when the position/ orientation of the dice changes
+     * y coordinate of Die
+     */
+    private int y;
+
+    /**
+     * Value displayed at the top of the die
      */
     private int top;
+
+    /**
+     * Value displayed at the bottom of the die
+     */
     private int down;
+
+    /**
+     * Value displayed at the front of the die i.e., facing away from the white player
+     */
     private int front;
+
+    /**
+     * Value displayed at the back of the die i.e., facing the white player
+     */
     private int back;
+
+    /**
+     * Value displayed on the left of the die (relative to the white player)
+     */
     private int left;
+
+    /**
+     * Value displayed on the right of the die (relative to the white player)
+     */
     private int right;
+
+    /**
+     * Boolean which stores if the die has been deleted (for dieMesh reasons)
+     */
     private boolean deleted = false;
 
     /**
@@ -44,6 +78,9 @@ public class Die implements Serializable {
         this.isWhite = isWhite;
     }
 
+    /**
+     * Constructor for Die
+     */
     public Die(String placement) {
         boolean added = false;
         int orientation = placement.charAt(0);
@@ -62,7 +99,7 @@ public class Die implements Serializable {
 
         this.front = frontTemp;
         this.back = 7 - this.front;
-        int polyEquation = (int) (3*top*front*(Math.pow(top,2) - Math.pow(front,2)));
+        int polyEquation = (int) (3 * top * front * (Math.pow(top, 2) - Math.pow(front, 2)));
         BigInteger polynomial = new BigInteger(String.valueOf(polyEquation));
         this.left = polynomial.mod(BigInteger.valueOf(7)).intValue();
         this.right = 7 - this.left;
@@ -70,6 +107,12 @@ public class Die implements Serializable {
         this.y = placement.charAt(2) - '1';
     }
 
+    /**
+     * Converts a Die to string encoding
+     *
+     * @param die The die to be encoded
+     * @return String encoding of die
+     */
     public static String dieToEnc(Die die) { // FIXME If there is time, please also change this to not be hardcoded
         int[][] orientations = new int[][]{
                 {1, 2, 3},
@@ -112,7 +155,6 @@ public class Die implements Serializable {
         } else {
             zero = (char) (index + 97);
         }
-        //String z = current.toString();
 
         one = (char) (die.getX() + 'a');
         two = (char) (die.getY() + '1');
@@ -135,7 +177,7 @@ public class Die implements Serializable {
     }
 
     /**
-     * Given a die, create the same die
+     * Given a die, shallow clone the die
      */
     public void setDie(Die die) {
         this.top = die.top;
@@ -149,17 +191,22 @@ public class Die implements Serializable {
     }
 
     /**
-     * Obtain the value on the top of the dice
-     * The value will vary when the orientation of dice changes
+     * Getter for top
      */
     public int getTop() {
         return this.top;
     }
 
+    /**
+     * Setter for top
+     */
     public void setTop(int top) {
         this.top = top;
     }
 
+    /**
+     * Overriding equals() method
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -170,48 +217,31 @@ public class Die implements Serializable {
     }
 
     /**
-     * Get the value of the die on a particular side
-     *
-     * @param d The side of the die the value is on
-     * @return The int value on the particular side of the die or -1 if not valid
+     * toString method
      */
-    public int getSide(Direction d) {
-        return switch (d) {
-            case UP -> back;
-            case DOWN -> front;
-            case LEFT -> left;
-            case RIGHT -> right;
-        };
-    }
-
     @Override
     public String toString() {
         return (isWhite ? "White" : "Black") + " (" + getX() + "," + getY() + ")";
     }
 
     /**
-     * Get the current position of the dice in the form of a string
-     *
-     * @return string x+""+y
+     * Getter for position
      */
     public String getPosition() {
         return x + "" + y;
     }
 
+    /**
+     * Setter for position
+     */
     public void setPosition(String position) {
         this.x = Integer.parseInt(position.substring(0, 1));
         this.y = Integer.parseInt(position.substring(1));
     }
 
-    public String getFaces() {
-        return "Top: " + top +
-                " Down: " + down +
-                " Front: " + front +
-                " Back: " + back +
-                " Left: " + left +
-                " Right: " + right;
-    }
-
+    /**
+     * Setter for position
+     */
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
@@ -228,22 +258,41 @@ public class Die implements Serializable {
         return object;
     }
 
+    /**
+     * Getter for x
+     */
     public int getX() {
         return x;
     }
 
+    /**
+     * Getter for y
+     */
     public int getY() {
         return y;
     }
 
+    /**
+     * Find out if the die is in white's "goal" area
+     *
+     * @return True if the die is in white's "goal", false otherwise
+     */
     public boolean isWhiteDieFinished() {
         return getY() == 6;
     }
 
+    /**
+     * Find out if the die is in black's "goal" area
+     *
+     * @return True if the die is in black's "goal", false otherwise
+     */
     public boolean isBlackDieFinished() {
         return getY() == 0;
     }
 
+    /**
+     * Getter for isWhite
+     */
     public boolean isWhite() {
         return isWhite;
     }
@@ -264,7 +313,6 @@ public class Die implements Serializable {
      * @param direction The direction the die will roll in
      */
     public void tip(Direction direction) {
-
         switch (direction) {
             case UP -> {
                 int temp = getTop();
@@ -301,8 +349,12 @@ public class Die implements Serializable {
         }
     }
 
+    /**
+     * Moves the die two units in the direction that is specified
+     *
+     * @param direction The direction which is specified
+     */
     public void jump(Direction direction) {
-
         switch (direction) {
             case UP -> setPosition(getX(), getY() + 2);
             case DOWN -> setPosition(getX(), getY() - 2);
@@ -327,10 +379,14 @@ public class Die implements Serializable {
         };
     }
 
+    /**
+     * Gets the direction that a position is relative to the die
+     *
+     * @param endPosition The position whose direction the die will calculate
+     * @return The direction of the position relative to the die
+     */
     public Direction getDirection(String endPosition) {
-
         Boards.Positions end = new Boards.Positions(endPosition);
-
         if (getX() > end.getX()) {
             return LEFT;
         } else if (getX() < end.getX()) {
@@ -351,51 +407,93 @@ public class Die implements Serializable {
     public int evaluateApproachingDie() {
         if (this.isWhite()) {
             return this.getY() == 6 ? this.getBack() - 3 : 0;
-        } else return this.getY() == 1 ? this.getFront() - 3 : 0;
+        } else {
+            return this.getY() == 1 ? this.getFront() - 3 : 0;
+        }
+
     }
 
+    /**
+     * Getter for down
+     */
     public int getDown() {
         return down;
     }
 
+    /**
+     * Setter for down
+     */
     public void setDown(int down) {
         this.down = down;
     }
 
+    /**
+     * Getter for front
+     */
     public int getFront() {
         return front;
     }
 
+    /**
+     * Setter for front
+     */
     public void setFront(int front) {
         this.front = front;
     }
 
+    /**
+     * Getter for back
+     */
     public int getBack() {
         return back;
     }
 
+    /**
+     * Setter for back
+     */
     public void setBack(int back) {
         this.back = back;
     }
 
+    /**
+     * Getter for left
+     */
     public int getLeft() {
         return left;
     }
 
+    /**
+     * Setter for left
+     */
     public void setLeft(int left) {
         this.left = left;
     }
 
+    /**
+     * Getter for right
+     */
     public int getRight() {
         return right;
     }
 
+    /**
+     * Setter for right
+     */
     public void setRight(int right) {
         this.right = right;
     }
 
+    /**
+     * Class which implements a comparator for Die
+     *
+     * @author Ziling Ouyang
+     */
     public static class SortByColour implements Comparator<Die> {
 
+        /**
+         * Compares its two arguments for order. Returns a negative integer, zero, or a positive integer as the first argument
+         * is less than, equal to, or greater than the second.
+         */
         @Override
         public int compare(Die dieA, Die dieB) {
             int a = (dieA.getX() + dieA.getY()) * Boards.BOARD_DIMENSION;
