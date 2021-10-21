@@ -5,7 +5,7 @@ package comp1140.ass2.gui.guipieces;
  * Differs from the Position class used in State classes by having clamp checks to disallow off-board moves
  * but with less unnecessary functionality elsewhere.
  *
- * Author: Zane Gates
+ * @author Zane Gates
  */
 public class Position {
     public int x;

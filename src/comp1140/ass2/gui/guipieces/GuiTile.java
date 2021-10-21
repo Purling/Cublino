@@ -9,14 +9,12 @@ import javafx.scene.shape.Box;
 /**
  * A class representing one of the tiles on the 7x7 Cublino board
  *
- * Author: Zane Gates
+ * @author Zane Gates
  */
 public class GuiTile extends Group {
 
     final static PhongMaterial whiteTileMaterial = GuiBoard.makePhongFromAsset("tile/whiteTile.png");
     final static PhongMaterial blackTileMaterial = GuiBoard.makePhongFromAsset("tile/blackTile.png");
-    final static PhongMaterial darkRedTileMaterial = GuiBoard.makePhongFromAsset("tile/previousSelectedTile.png");
-    final static PhongMaterial redTileMaterial = GuiBoard.makePhongFromAsset("tile/selectedTile.png");
 
     Position position;
 

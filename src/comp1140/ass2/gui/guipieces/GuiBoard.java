@@ -70,6 +70,9 @@ public class GuiBoard extends SubScene {
     private MediaPlayer moveSfx;
     private MediaPlayer stepSfx;
 
+    final static Image player1Logo = imageFromAsset("avatar/player1Logo.png");
+    final static Image player2Logo = imageFromAsset("avatar/player2Logo.png");
+
     private final ArrayList<Game> stateHistory = new ArrayList<>();
 
     private boolean playingInitialAnimation = true;
@@ -147,13 +150,15 @@ public class GuiBoard extends SubScene {
             tableBase.setRadius(650);
             tableBase.setHeight(40);
             tableBase.setTranslateY(80);
-            tableBase.setMaterial(makePhongFromAsset("spruce.jpg"));
+            tableBase.setMaterial(makePhongFromAsset("table.jpg"));
+            tableBase.setRotate(-25);
+            tableBase.setRotationAxis(new Point3D(0, 1, 0));
             boardRoot.getChildren().add(tableBase);
             Cylinder tableLeg = new Cylinder();
             tableLeg.setRadius(50);
             tableLeg.setHeight(500);
             tableLeg.setTranslateY(325);
-            tableLeg.setMaterial(makePhongFromAsset("spruce.jpg"));
+            tableLeg.setMaterial(makePhongFromAsset("table.jpg"));
             boardRoot.getChildren().add(tableLeg);
 
             Box gameBoardEdge = new Box(890, 15, 890);
@@ -372,9 +377,6 @@ public class GuiBoard extends SubScene {
         // Check if the game has finished
         Game.GameResult result = game.getWinner();
 
-        Image player1Logo = imageFromAsset("avatar/player1Logo.png");
-        Image player2Logo = imageFromAsset("avatar/player2Logo.png");
-
         if (result == Game.GameResult.UNFINISHED) {
             // If it hasn't, asynchronously request a move from this player, and indicate this in the GUI
             turnLabel.setImage(game.getCurrentPlayer().isWhite() ? player1Logo : player2Logo);
@@ -385,7 +387,10 @@ public class GuiBoard extends SubScene {
         } else {
             // If the game is over, stop anyone from making moves, and show the result in the UI
             permitsMoveMaking = false;
-            turnLabel.setOpacity(0);
+            turnLabel.setOpacity(1);
+            if (result == Game.GameResult.TIE) turnLabel.setOpacity(0);
+            else if (result == Game.GameResult.WHITE_WINS) turnLabel.setImage(player1Logo);
+            else turnLabel.setImage(player2Logo);
         }
     }
 

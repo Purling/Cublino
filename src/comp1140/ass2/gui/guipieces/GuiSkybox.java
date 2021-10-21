@@ -11,7 +11,7 @@ import java.util.Random;
 /**
  * A skybox surrounding the board, implemented through cubemaps, with various preset locations
  *
- * Author: Zane Gates
+ * @author Zane Gates
  */
 public class GuiSkybox extends Group {
 
@@ -24,7 +24,7 @@ public class GuiSkybox extends Group {
 
     // An array containing the options for the randomly chosen skyboxes
     // which contains every available skybox, except for the more extreme Mars
-    private final static Locale[] randomLocales = {Locale.LAKE, Locale.TUNDRA, Locale.SKY, Locale.WHEAT};
+    private final static Locale[] randomLocales = {Locale.LAKE, Locale.TUNDRA, Locale.SKY};
 
     // Top, Bottom, Back, Left, Front, Right
     private final ImageView[] faces = new ImageView[6];

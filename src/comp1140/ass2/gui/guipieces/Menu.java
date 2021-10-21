@@ -4,14 +4,16 @@ import comp1140.ass2.controller.Controller;
 import comp1140.ass2.gui.Board;
 import javafx.scene.Group;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
 /**
  * A menu containing all the options for the game,
  * displayed at the start of the program and in between every game
  *
- * Author: Zane Gates
+ * @author Zane Gates
  */
 public class Menu extends Group {
 
@@ -29,46 +31,80 @@ public class Menu extends Group {
 
         this.board = board;
 
+        // Create text showing the game's title
+        Text title = new Text();
+        title.setText("Cublino");
+        title.setScaleX(4);
+        title.setScaleY(4);
+        title.setLayoutX(230);
+        title.setLayoutY(110);
+
+        // Create text showing the authors
+        Text authors = new Text();
+        authors.setText("Yuechen Liu / Zane Gates / Ziling Ouyang");
+        authors.setScaleX(1.5);
+        authors.setScaleY(1.5);
+        authors.setLayoutX(395);
+        authors.setLayoutY(120);
+
         // A dropdown menu containing the options for the skybox
         skybox = new ChoiceBox<>();
-        skybox.getItems().addAll("Random", "Placid", "Tuscan", "Siberian", "Martian", "Overcast");
+        skybox.getItems().addAll("Random", "Placid", "Siberian", "Martian", "Overcast");
         skybox.getSelectionModel().select(0);
-        skybox.setLayoutX(100);
-        skybox.setPrefWidth(150);
-        skybox.setLayoutY(50);
+        skybox.setLayoutX(520);
+        skybox.setPrefWidth(200);
+        skybox.setLayoutY(250);
 
         // The menus containing the options for each player controller
         p1Menu = new PlayerMenu(0);
         p2Menu = new PlayerMenu(1);
-        p1Menu.setLayoutY(100);
-        p2Menu.setLayoutY(150);
+        p1Menu.setLayoutY(150);
+        p2Menu.setLayoutY(200);
+
+        // Create icon images for each of the players
+        ImageView icon1 = new ImageView();
+        icon1.setImage(GuiBoard.imageFromAsset("avatar/player1logo.png"));
+        icon1.setScaleX(0.1);
+        icon1.setScaleY(0.1);
+        icon1.setLayoutX(190-256);
+        icon1.setLayoutY(150+10-256);
+        ImageView icon2 = new ImageView();
+        icon2.setImage(GuiBoard.imageFromAsset("avatar/player2logo.png"));
+        icon2.setScaleX(0.1);
+        icon2.setScaleY(0.1);
+        icon2.setLayoutX(190-256);
+        icon2.setLayoutY(200+10-256);
 
         // A dropdown menu for the two available game modes
         gameMode = new ChoiceBox<>();
         gameMode.getItems().addAll("Pur Cublino", "Contra Cublino");
         gameMode.getSelectionModel().select(0);
-        gameMode.setLayoutX(100);
-        gameMode.setPrefWidth(250);
-        gameMode.setLayoutY(200);
+        gameMode.setLayoutX(200);
+        gameMode.setPrefWidth(300);
+        gameMode.setLayoutY(250);
 
         // A button that starts the game when pressed
         Button beginButton = new Button("Begin");
         beginButton.setOnAction(actionEvent -> { startGame(); });
-        beginButton.setLayoutX(400);
-        beginButton.setLayoutY(200);
+        beginButton.setLayoutX(600);
+        beginButton.setPrefWidth(120);
+        beginButton.setLayoutY(300);
 
+        // Create a multiline text to show the instructions
         Text instructions = new Text();
-        instructions.setText("Instructions\n" +
-                "Hold LMB and drag your mouse to rotate the view\n" +
-                "Hold LMB over a tile with a die on it to select it,\n" +
-                "While holding LMB, press RMB on another tile to\n" +
-                "move your die to it, and repeat to make further\n" +
-                "steps, then release LMB to complete your turn.\n" +
-                "Press Escape to bring up the pause menu\n");
-        instructions.setLayoutX(100);
-        instructions.setLayoutY(400);
+        instructions.setText("Instructions:\n" +
+                "Hold LMB and drag your mouse to rotate the view. \n" +
+                "Press and hold LMB over a tile with a die to select it,\n" +
+                "then press RMB on another tile to make a move\n" +
+                "and repeat to make further steps, then release LMB\n" +
+                "to complete your turn. Press Escape to bring up \n" +
+                "the pause menu with further options.\n");
+        instructions.setLayoutX(250);
+        instructions.setWrappingWidth(400);
+        instructions.setLayoutY(425);
+        instructions.setTextAlignment(TextAlignment.CENTER);
 
-        getChildren().addAll(skybox, p1Menu, p2Menu, gameMode, beginButton, instructions);
+        getChildren().addAll(title, authors, skybox, icon1, p1Menu, icon2, p2Menu, gameMode, beginButton, instructions);
     }
 
     // Stores settings relevant to each player
@@ -107,13 +143,13 @@ public class Menu extends Group {
             // A text field for the player's name
             name = new TextField();
             name.setText(nameFromControllerSetting(index) + " " + (index + 1));
-            name.setPrefWidth(300);
+            name.setPrefWidth(310);
 
             // A horizontal box to contain each of these settings
             HBox hb = new HBox();
             hb.getChildren().addAll(controller, skin, name);
             hb.setSpacing(10);
-            hb.setLayoutX(100);
+            hb.setLayoutX(200);
             getChildren().add(hb);
         }
 
@@ -197,10 +233,9 @@ public class Menu extends Group {
         return switch (i) {
             case 0 -> GuiSkybox.Locale.RANDOM;
             case 1 -> GuiSkybox.Locale.LAKE;
-            case 2 -> GuiSkybox.Locale.WHEAT;
-            case 3 -> GuiSkybox.Locale.TUNDRA;
-            case 4 -> GuiSkybox.Locale.MARS;
-            case 5 -> GuiSkybox.Locale.SKY;
+            case 2 -> GuiSkybox.Locale.TUNDRA;
+            case 3 -> GuiSkybox.Locale.MARS;
+            case 4 -> GuiSkybox.Locale.SKY;
             default -> GuiSkybox.Locale.NONE;
         };
     }
