@@ -4,14 +4,42 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * An implementation of the rose tree abstract data structure
+ *
+ * @author Ziling Ouyang
+ */
 public class RoseNode<T> implements Serializable {
 
+    /**
+     * The visit count of that particular node (for MCTS)
+     */
     int visitCount = 0;
+
+    /**
+     * The win count of that particular node (for MCTS)
+     */
     int winCount = 0;
+
+    /**
+     * The information contained within the node
+     */
     T state;
+
+    /**
+     * The parent of the current node. If null, node is the root
+     */
     RoseNode<T> parent;
+
+    /**
+     * The depth of the current node
+     */
     int depth;
-    private List<RoseNode<T>> children = new ArrayList<>();
+
+    /**
+     * The children of the roseNode
+     */
+    private final List<RoseNode<T>> children = new ArrayList<>();
 
     /**
      * Constructor for RoseTree
@@ -25,13 +53,11 @@ public class RoseNode<T> implements Serializable {
      * Adds a child to the RoseTree node
      *
      * @param child The child to be added to the RoseTree
-     * @return The child added
      */
-    public RoseNode<T> addChild(RoseNode<T> child) {
+    public void addChild(RoseNode<T> child) {
         child.parent = this;
         children.add(child);
         child.setDepth(depth + 1);
-        return child;
     }
 
     /**
@@ -53,20 +79,6 @@ public class RoseNode<T> implements Serializable {
      */
     public void setDepth(int depth) {
         this.depth = depth;
-    }
-
-    /**
-     * Setter for parent
-     */
-    public void setParent(RoseNode<T> parent) {
-        this.parent = parent;
-    }
-
-    /**
-     * Setter for children
-     */
-    public void addChildren(List<RoseNode<T>> children) {
-        this.children = children;
     }
 
     /**
@@ -131,7 +143,6 @@ public class RoseNode<T> implements Serializable {
             result.insert(0, "\n").append(wins).append(" ").append(visits).append(state.toString()); // \n appended at the start because of replaceAll quirk
         }
         result = new StringBuilder(result.toString().replaceAll("\n", "\n" + "    ".repeat(depth)));
-        if (children == null) return state.toString();
 
         for (RoseNode<T> child : children) {
             result.append(child);

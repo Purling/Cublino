@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 import static comp1140.ass2.state.Boards.BOARD_DIMENSION;
 
 /**
- * A gamemode of Cublino that extends from the Game class
+ * A gamemode of Cublino that extends from the Game class. It represents the game which is currently being played by the user
  *
  * @author Ziling Ouyang, Yuechen Liu
  */
