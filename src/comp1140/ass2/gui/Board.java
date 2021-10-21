@@ -4,6 +4,7 @@ import comp1140.ass2.controller.Controller;
 import comp1140.ass2.gui.guipieces.GuiBoard;
 import comp1140.ass2.gui.guipieces.GuiSkybox;
 import comp1140.ass2.gui.guipieces.Menu;
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -39,6 +40,12 @@ public class Board extends Application {
 
     boolean inGame = false;
     boolean pauseMenuVisible = false;
+
+    boolean startingFadeNow = false;
+    double initialTime = 0;
+    FadeAction fadingTo;
+
+    enum FadeAction {NONE, MENU, GAME};
 
     /**
      * Starts the application
@@ -100,6 +107,36 @@ public class Board extends Application {
         pauseBackground.setFill(Color.BLACK);
         pauseBackground.setOpacity(0.5);
 
+        // Construct a translucent gray rectangle as a background for the pause menu
+        Rectangle fadeBackground = new Rectangle();
+        fadeBackground.setLayoutX(0);
+        fadeBackground.setLayoutY(0);
+        fadeBackground.setWidth(VIEWER_WIDTH);
+        fadeBackground.setHeight(VIEWER_HEIGHT);
+        fadeBackground.setFill(Color.BLACK);
+        fadeBackground.setOpacity(0);
+
+
+        new AnimationTimer() {
+            @Override
+            public void handle(long l) {
+                if (startingFadeNow) {
+                    initialTime = l;
+                    startingFadeNow = false;
+                }
+                double progress = (l-initialTime)/1e9;
+                double opacity = 2*(0.5-Math.abs(progress-0.5));
+                fadeBackground.setOpacity(opacity);
+                if (opacity <= 0 && root.getChildren().contains(fadeBackground)) {
+                    root.getChildren().remove(fadeBackground);
+                } else if (opacity > 0 && !root.getChildren().contains(fadeBackground)) {
+                    root.getChildren().add(fadeBackground);
+                }
+
+
+            }
+        }.start();
+
         // When ESCAPE is pressed while in a game, toggle the visibility of the pause menu
         scene.setOnKeyPressed(e -> {
             if (inGame && e.getCode() == KeyCode.ESCAPE) {
@@ -117,6 +154,8 @@ public class Board extends Application {
         inGame = false;
         root.getChildren().clear();
         root.getChildren().add(menu);
+        startingFadeNow = true;
+        fadingTo = FadeAction.MENU;
     }
 
     /**
@@ -132,5 +171,7 @@ public class Board extends Application {
         root.getChildren().clear();
         game = new GuiBoard((isPur ? "P" : "C") + "Wa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", locale, controllers, isPur,true, turnDisplayer);
         root.getChildren().addAll(game, turnDisplayer);
+        startingFadeNow = true;
+        fadingTo = FadeAction.GAME;
     }
 }
