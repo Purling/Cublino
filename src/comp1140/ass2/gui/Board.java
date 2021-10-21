@@ -154,9 +154,7 @@ public class Board extends Application {
                             try {
                                 game = new GuiBoard((isPur ? "P" : "C") + "Wa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", locale, controllers, isPur,true, turnDisplayer);
                             } catch (Exception e) { }
-                            System.out.println(game);
                             root.getChildren().addAll(game, turnDisplayer, fadeBackground);
-                            System.out.println(root.getChildren());
                             fadingTo = FadeAction.NONE;
                             return;
                         }
