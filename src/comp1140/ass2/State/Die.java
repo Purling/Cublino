@@ -1,5 +1,7 @@
 package comp1140.ass2.State;
 
+import comp1140.ass2.helperclasses.DeepCloneable;
+
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Comparator;
@@ -11,7 +13,7 @@ import static comp1140.ass2.State.Direction.*;
  *
  * @author Whole group
  */
-public class Die implements Serializable {
+public class Die implements Serializable, DeepCloneable<Die> {
 
     /**
      * Colour of Die. True if white, false if black
@@ -212,9 +214,7 @@ public class Die implements Serializable {
     }
 
     /**
-     * Creates a deep copy of the die
-     *
-     * @return A deep copy the die
+     * Implements the deepClone method from DeepCloneable interface
      */
     public Die deepClone() {
         Die object = new Die(this.top, this.down, this.front, this.back, this.left, this.right, this.x, this.y, this.isWhite);
