@@ -42,6 +42,8 @@ public class GuiDie extends MeshView {
 
     List<Position> animationQueue = new ArrayList<>();
 
+    boolean isAnimating = false;
+
     /**
      * Constructs and transforms a die mesh to provide an
      * accurate visual model of any die.
@@ -89,8 +91,19 @@ public class GuiDie extends MeshView {
                         currentAnimation = null;
                         getTransforms().set(1, necessaryRotations());
                         getTransforms().set(0, zeroTransform());
+                        if (isAnimating) {
+                            if (!viewer.isDieSelected(die)) viewer.playMoveSfx();
+                            isAnimating = false;
+                        }
                     }
-                    else currentAnimation = generateAnimationTo(animationQueue.remove(0));
+                    else {
+                        currentAnimation = generateAnimationTo(animationQueue.remove(0));
+                        if (currentAnimation != null) {
+                            isAnimating = true;
+                            viewer.playStepSfx();
+                        }
+
+                    }
                 }
                 if (currentAnimation != null) currentAnimation.start(l);
 

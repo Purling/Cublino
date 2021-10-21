@@ -10,6 +10,8 @@ import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 
@@ -41,8 +43,8 @@ public class GuiBoard extends SubScene {
 
     private double mouseX = 0;
     private double mouseY = 0;
-    private double cameraYaw = 0;
-    private double cameraPitch = 0;
+    private double cameraYaw = 10; public double getCameraYaw() {return cameraYaw;};
+    private double cameraPitch = -30;
     private GuiDie selectedDie = null;
 
     private final GuiTile[][] boardTiles;
@@ -57,6 +59,9 @@ public class GuiBoard extends SubScene {
     PerspectiveCamera camera;
 
     private final Group boardRoot = new Group();
+
+    private MediaPlayer moveSfx;
+    private MediaPlayer stepSfx;
 
     /**
      * Constructs a board and all reliant 3D elements to represent a game position
@@ -115,7 +120,6 @@ public class GuiBoard extends SubScene {
             }
         });
         // If the mouse is dragged across the screen without die selected, rotate the board
-        // TODO: allow the user to rotate the board if they M1 outside of the board model
         setEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
             if (selectedDie == null) handleBoardRotate(e.getSceneX(), e.getSceneY());
         });
@@ -144,6 +148,11 @@ public class GuiBoard extends SubScene {
 
         boardRoot.getChildren().add(new GuiAvatar(this, 180, controllers[0].getName()));
         boardRoot.getChildren().add(new GuiAvatar(this, 0, controllers[1].getName()));
+
+        moveSfx = playableFromAsset("sfx/woodenThump.mp3");
+        stepSfx = playableFromAsset("sfx/woodenHit.mp3");
+        moveSfx.setVolume(0.2);
+        stepSfx.setVolume(0.2);
 
         boardRoot.setTranslateX(450);
 
@@ -203,6 +212,16 @@ public class GuiBoard extends SubScene {
         camera.setRotate(cameraPitch);
         camera.setTranslateZ(-700*Math.cos(Math.toRadians(cameraPitch))+362);
         camera.setTranslateY(250*Math.sin(Math.toRadians(cameraPitch)) - 400);
+    }
+
+    public void playMoveSfx() {
+        moveSfx.stop();
+        moveSfx.play();
+    }
+
+    public void playStepSfx() {
+        stepSfx.stop();
+        stepSfx.play();
     }
 
     /**
@@ -317,6 +336,10 @@ public class GuiBoard extends SubScene {
 
     public static Image imageFromAsset(String path) {
         return new Image(new File(URI_BASE + path).toURI().toString());
+    }
+
+    public static MediaPlayer playableFromAsset(String path) {
+        return new MediaPlayer(new Media(new File(URI_BASE + path).toURI().toString()));
     }
 
     private static class InvalidSetupException extends Exception {

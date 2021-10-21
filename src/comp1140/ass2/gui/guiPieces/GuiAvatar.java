@@ -34,7 +34,7 @@ public class GuiAvatar extends Group {
         new AnimationTimer() {
             @Override
             public void handle(long l) {
-                double difference = viewer.getRoot().getRotate() - angle;
+                double difference = viewer.getCameraYaw() - angle;
 
                 // Find the smallest angle difference
                 while (difference <= 0) difference += 360;
