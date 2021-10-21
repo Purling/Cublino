@@ -35,7 +35,8 @@ declaration: >-
 # I wish to submit the following methods as entirely my own (remove this if
 # you want to just submit classes):
 #method:
-# isValidJumpDirectionhttps://gitlab.cecs.anu.edu.au/u7312578/comp1140-ass2-tue12s/-/blob/master/src/comp1140/ass2/gamelogic/PurCublino.java#L334-349
+# 
+-isValidJumpDirection https://gitlab.cecs.anu.edu.au/u7312578/comp1140-ass2-tue12s/-/blob/master/src/comp1140/ass2/gamelogic/PurCublino.java#L334-349
 
 # sign *your* name and uid here
 name: Yuechen Liu
