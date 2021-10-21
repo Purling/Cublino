@@ -146,7 +146,7 @@ public class GuiBoard extends SubScene {
         pointLight.setTranslateY(-125);
         root.getChildren().add(pointLight);
 
-        boardRoot.getChildren().add(new GuiSkybox(imageFromAsset("skybox1.png")));
+        boardRoot.getChildren().add(new GuiSkybox(imageFromAsset("skybox2.png")));
 
         boardRoot.getChildren().add(new GuiAvatar(this, 180, controllers[0].getName()));
         boardRoot.getChildren().add(new GuiAvatar(this, 0, controllers[1].getName()));
@@ -207,7 +207,7 @@ public class GuiBoard extends SubScene {
     private void handleBoardRotate(double xPosition, double yPosition) {
         cameraYaw += (mouseX-xPosition)/10;
         cameraPitch += (mouseY-yPosition)/10;
-        if (cameraPitch > -15) cameraPitch = -15;
+        if (cameraPitch > -2) cameraPitch = -2;
         if (cameraPitch < -89) cameraPitch = -89;
         mouseX = xPosition;
         mouseY = yPosition;

@@ -23,6 +23,8 @@ public class GuiSkybox extends Group {
             getChildren().add(faces[i]);
         }
 
+        setTranslateY(1000);
+
         // Position all six faces
         faces[0].setTranslateX(-SIZE);
         faces[0].setTranslateY(-2*SIZE);
