@@ -5,6 +5,7 @@ import comp1140.ass2.gui.Board;
 import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 
 /**
  * A menu containing all the options for the game,
@@ -53,7 +54,18 @@ public class Menu extends Group {
         beginButton.setLayoutX(400);
         beginButton.setLayoutY(200);
 
-        getChildren().addAll(skybox, p1Menu, p2Menu, gameMode, beginButton);
+        Text instructions = new Text();
+        instructions.setText("Instructions\n" +
+                "Hold LMB and drag your mouse to rotate the view\n" +
+                "Hold LMB over a tile with a die on it to select it,\n" +
+                "While holding LMB, press RMB on another tile to\n" +
+                "move your die to it, and repeat to make further\n" +
+                "steps, then release LMB to complete your turn.\n" +
+                "Press Escape to bring up the pause menu\n");
+        instructions.setLayoutX(100);
+        instructions.setLayoutY(400);
+
+        getChildren().addAll(skybox, p1Menu, p2Menu, gameMode, beginButton, instructions);
     }
 
     // Stores settings relevant to each player
