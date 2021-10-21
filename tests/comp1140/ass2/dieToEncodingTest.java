@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
             for(char one = 'a'; one<'g'; one++){
                 for(char two = '1'; two < '7'; two++){
                     String die = ""+zero+one+two;
-                    Die dice = new Die(die, null, null);
+                    Die dice = new Die(die);
 
                     assertEquals(die, dieToEnc(dice), "Die with string \"" + die + " returns the string \"" + die + " which is valid.");
 
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
             for(char one = 'a'; one<'g'; one++){
                 for(char two = '1'; two < '7'; two++){
                     String die = ""+zero+one+two;
-                    Die dice = new Die(die, null, null);
+                    Die dice = new Die(die);
 
                     assertEquals(die, dieToEnc(dice), "Die with string \"" + die + " returns the string \"" + die + " which is valid.");
 

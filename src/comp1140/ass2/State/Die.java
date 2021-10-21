@@ -1,6 +1,7 @@
 package comp1140.ass2.State;
 
-import java.io.*;
+import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -43,59 +44,33 @@ public class Die implements Serializable {
         this.isWhite = isWhite;
     }
 
-    public Die(String placement, Players whitePlayer, Players blackPlayer) {
-        assert placement.length() == 3;
+    public Die(String placement) {
+        boolean added = false;
         int orientation = placement.charAt(0);
-        if (Character.isLowerCase(orientation)) {
-            isWhite = false;
-            orientation -= 97;
-        } else {
-            isWhite = true;
-            orientation -= 65;
-        }
-        assert 0 <= orientation && orientation < 24;
-
-        // All 24 orientations in the order {top}{front}{left},
-        // manually determined by yours truly
-        int[][] orientations = new int[][]{
-                {1, 2, 3},
-                {1, 3, 5},
-                {1, 4, 2},
-                {1, 5, 4},
-                {2, 1, 4},
-                {2, 3, 1},
-                {2, 4, 6},
-                {2, 6, 3},
-                {3, 1, 2},
-                {3, 2, 6},
-                {3, 5, 1},
-                {3, 6, 5},
-                {4, 1, 5},
-                {4, 2, 1},
-                {4, 5, 6},
-                {4, 6, 2},
-                {5, 1, 3},
-                {5, 3, 6},
-                {5, 4, 1},
-                {5, 6, 4},
-                {6, 2, 4},
-                {6, 3, 2},
-                {6, 4, 5},
-                {6, 5, 3}
-        };
-
-        this.top = orientations[orientation][0];
+        isWhite = !Character.isLowerCase(orientation);
+        orientation = Character.toLowerCase(orientation) - 'a';
+        int frontTemp = (orientation % 4) + 1;
+        this.top = (orientation / 4) + 1;
         this.down = 7 - this.top;
-        this.front = orientations[orientation][1];
-        this.back = 7 - this.front;
-        this.left = orientations[orientation][2];
-        this.right = 7 - this.left;
 
+        if (frontTemp >= down) {
+            frontTemp++;
+            added = true;
+        }
+        if (frontTemp >= top) frontTemp++;
+        if (frontTemp >= down && !added) frontTemp++;
+
+        this.front = frontTemp;
+        this.back = 7 - this.front;
+        int polyEquation = (int) (3*top*front*(Math.pow(top,2) - Math.pow(front,2)));
+        BigInteger polynomial = new BigInteger(String.valueOf(polyEquation));
+        this.left = polynomial.mod(BigInteger.valueOf(7)).intValue();
+        this.right = 7 - this.left;
         this.x = placement.charAt(1) - 'a';
         this.y = placement.charAt(2) - '1';
     }
 
-    public static String dieToEnc(Die die) {
+    public static String dieToEnc(Die die) { // FIXME If there is time, please also change this to not be hardcoded
         int[][] orientations = new int[][]{
                 {1, 2, 3},
                 {1, 3, 5},
@@ -370,13 +345,13 @@ public class Die implements Serializable {
 
     /**
      * Evaluate the position of a die when it is approaching the edge
+     *
      * @return
      */
-    public int evaluateApproachingDie(){
-        if(this.isWhite()){
+    public int evaluateApproachingDie() {
+        if (this.isWhite()) {
             return this.getY() == 6 ? this.getBack() - 3 : 0;
-        }
-        else return this.getY() == 1 ? this.getFront() - 3: 0;
+        } else return this.getY() == 1 ? this.getFront() - 3 : 0;
     }
 
     public int getDown() {
