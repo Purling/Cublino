@@ -36,7 +36,7 @@ declaration: >-
 # you want to just submit classes):
 #method:
 # 
--isValidJumpDirection https://gitlab.cecs.anu.edu.au/u7312578/comp1140-ass2-tue12s/-/blob/master/src/comp1140/ass2/gamelogic/PurCublino.java#L334-349
+- generatePurMoves https://gitlab.cecs.anu.edu.au/u7312578/comp1140-ass2-tue12s/-/blob/master/src/comp1140/ass2/gamelogic/PurCublino.java#L228-368
 
 # sign *your* name and uid here
 name: Yuechen Liu
