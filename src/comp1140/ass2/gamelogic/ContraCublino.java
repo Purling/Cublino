@@ -1,5 +1,6 @@
 package comp1140.ass2.gamelogic;
 
+import comp1140.ass2.helperclasses.DeepCloneable;
 import comp1140.ass2.state.Boards;
 import comp1140.ass2.state.Die;
 import comp1140.ass2.state.Direction;
@@ -16,8 +17,11 @@ import static comp1140.ass2.state.Boards.BOARD_DIMENSION;
  *
  * @author Ziling Ouyang, Yuechen Liu
  */
-public class ContraCublino extends Game implements Serializable {
+public class ContraCublino extends Game implements Serializable, DeepCloneable<Game> {
 
+    /**
+     * Empty constructor
+     */
     public ContraCublino() {
     }
 
@@ -28,6 +32,11 @@ public class ContraCublino extends Game implements Serializable {
         super(isWhite, board);
     }
 
+    /**
+     * Returns if each player has a legal amount of dice
+     *
+     * @return True if the dice amount is valid, False otherwise
+     */
     @Override
     public boolean isDiceAmountCorrect(Boards board) {
         return (board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() <= 2 * BOARD_DIMENSION
@@ -83,8 +92,6 @@ public class ContraCublino extends Game implements Serializable {
             setCurrentMoveDie(die.deepClone());
         }
 
-
-
         if (board.getAdjacentDie(die) != null && !(board.getAdjacentDie(die).length == 0)) {
             battle(die);
         }
@@ -116,7 +123,7 @@ public class ContraCublino extends Game implements Serializable {
      *
      * @return An array of games which represent each possible move that can be made by the player
      */
-    public ContraMove[] generateLegalMoves() { // Can probably be abstracted
+    public ContraMove[] generateLegalMoves() {
         List<Die> possibleDie = getCurrentPlayer().getDice();
         List<ContraMove> possibleMoves = new ArrayList<>();
 
@@ -127,7 +134,6 @@ public class ContraCublino extends Game implements Serializable {
                     Die dieClone = die.deepClone();
                     clone.applyStep(dieClone, dieClone.getPositionOver(direction, 1));
                     clone.endTurn();
-                    // FIXME Remove the magic numbers below
                     ContraMove move = new ContraMove(clone, Die.dieToEncoding(die).substring(1) + Die.dieToEncoding(dieClone).substring(1));
                     possibleMoves.add(move);
                 }
@@ -137,9 +143,7 @@ public class ContraCublino extends Game implements Serializable {
     }
 
     /**
-     * Creates a deep copy of the ContraCublino
-     *
-     * @return A deep copy the ContraCublino
+     * Implements the deepClone method from DeepCloneable interface
      */
     public ContraCublino deepClone() {
         ObjectOutputStream oos = null;
@@ -214,20 +218,36 @@ public class ContraCublino extends Game implements Serializable {
         return (isDiceAmountCorrect(board) && hasBothNotWon(board));
     }
 
+    /**
+     * Overriding toString method
+     */
     @Override
     public String toString() {
         return board.getStringRepresentation();
     }
 
     public class ContraMove {
+        /**
+         * The actual move that has been played in Game form
+         */
         ContraCublino possibleState;
+
+        /**
+         * The move to be played in an encoded form
+         */
         String encodedMove;
 
+        /**
+         * Constructor for ContraMove
+         */
         public ContraMove(ContraCublino possibleState, String encodedMove) {
             this.possibleState = possibleState;
             this.encodedMove = encodedMove;
         }
 
+        /**
+         * Getter for encodedMove
+         */
         public String getEncodedMove() {
             return encodedMove;
         }
