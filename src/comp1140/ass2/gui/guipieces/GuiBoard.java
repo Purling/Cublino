@@ -147,13 +147,15 @@ public class GuiBoard extends SubScene {
             tableBase.setRadius(650);
             tableBase.setHeight(40);
             tableBase.setTranslateY(80);
-            tableBase.setMaterial(makePhongFromAsset("spruce.jpg"));
+            tableBase.setMaterial(makePhongFromAsset("table.jpg"));
+            tableBase.setRotate(-25);
+            tableBase.setRotationAxis(new Point3D(0, 1, 0));
             boardRoot.getChildren().add(tableBase);
             Cylinder tableLeg = new Cylinder();
             tableLeg.setRadius(50);
             tableLeg.setHeight(500);
             tableLeg.setTranslateY(325);
-            tableLeg.setMaterial(makePhongFromAsset("spruce.jpg"));
+            tableLeg.setMaterial(makePhongFromAsset("table.jpg"));
             boardRoot.getChildren().add(tableLeg);
 
             Box gameBoardEdge = new Box(890, 15, 890);
