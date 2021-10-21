@@ -10,6 +10,7 @@ import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -44,7 +45,7 @@ public class GuiBoard extends SubScene {
     private static final double MOUSE_SENSITIVITY = 0.1;
 
     Game game;
-    Label turnLabel;
+    ImageView turnLabel;
     private boolean permitsMoveMaking;
 
     private double mouseX = 0;
@@ -81,7 +82,7 @@ public class GuiBoard extends SubScene {
      * @param turnLabel the text label in the HUD to be updated with info about the game
      * @throws Exception if an incorrect configuration is provided (e.g. moves can be made but no label is given)
      */
-    public GuiBoard(String placement, GuiSkybox.Locale locale, Controller[] controllers, boolean isPur, boolean playable, Label turnLabel) throws Exception {
+    public GuiBoard(String placement, GuiSkybox.Locale locale, Controller[] controllers, boolean isPur, boolean playable, ImageView turnLabel) throws Exception {
         super(new Group(), VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
 
         // Initialise fields
@@ -370,20 +371,26 @@ public class GuiBoard extends SubScene {
     private void haveCurrentPlayerMakeMove() {
         // Check if the game has finished
         Game.GameResult result = game.getWinner();
+
+        Image player1Logo = imageFromAsset("avatar/player1Logo.png");
+        Image player2Logo = imageFromAsset("avatar/player2Logo.png");
+
         if (result == Game.GameResult.UNFINISHED) {
             // If it hasn't, asynchronously request a move from this player, and indicate this in the GUI
-            turnLabel.setText(controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].getName() + "'s turn.");
+            turnLabel.setImage(game.getCurrentPlayer().isWhite() ? player1Logo : player2Logo);
+            turnLabel.setOpacity(0.4);
             new Thread(() -> {
                 controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].requestMove(game,this);
             }).start();
         } else {
             // If the game is over, stop anyone from making moves, and show the result in the UI
             permitsMoveMaking = false;
-            switch(result) {
-                case TIE: turnLabel.setText("Tie!"); return;
-                case WHITE_WINS: turnLabel.setText(controllers[0].getName() + " wins!"); return;
-                case BLACK_WINS: turnLabel.setText(controllers[1].getName() + " wins!");
-            }
+            /*switch(result) {
+                case TIE: turnLabel.setOpacity(0); return;
+                case WHITE_WINS: turnLabel.setOpacity(0); return;
+                case BLACK_WINS: turnLabel.setOpacity(0);
+            }*/
+            turnLabel.setOpacity(0);
         }
     }
 

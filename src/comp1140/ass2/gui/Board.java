@@ -9,7 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -32,7 +32,7 @@ public class Board extends Application {
 
     Group root;
 
-    Label turnDisplayer;
+    ImageView turnDisplayer;
     Button takeBack;
     Button toMenu;
 
@@ -59,15 +59,12 @@ public class Board extends Application {
         primaryStage.show();
 
         // Construct the label that shows whose turn it is currently
-        turnDisplayer = new Label("");
-        turnDisplayer.setAlignment(Pos.TOP_LEFT);
-        turnDisplayer.setTextAlignment(TextAlignment.LEFT);
-        turnDisplayer.setLayoutX(40);
+        turnDisplayer = new ImageView();
+        turnDisplayer.setFitWidth(64);
+        turnDisplayer.setFitHeight(64);
+        turnDisplayer.setSmooth(true);
+        turnDisplayer.setLayoutX(20);
         turnDisplayer.setLayoutY(20);
-        turnDisplayer.setPrefWidth(100);
-        turnDisplayer.setStyle("-fx-background-color: white;");
-        turnDisplayer.setScaleX(1.5);
-        turnDisplayer.setScaleY(1.5);
 
         // Construct the take-back button
         takeBack = new Button("Takeback");
