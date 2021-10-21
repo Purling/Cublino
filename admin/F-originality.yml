@@ -89,6 +89,12 @@ assets:
   - comment: Further skyboxes
     url: https://skyboxes.weebly.com/
     licence: CC0 1.0
+  - comment: Move partially made sound effect
+    url: https://soundbible.com/893-Button-Click.html
+    licence: CC0 1.0
+  - comment: Move completed sound effect
+    url: https://soundbible.com/1086-Wooden-Thump.html
+    licence: CC0 1.0
 
 
 # Sign *your* name and uids here. (Remove entries if you have fewer
