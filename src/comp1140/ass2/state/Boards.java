@@ -1,5 +1,7 @@
 package comp1140.ass2.state;
 
+import comp1140.ass2.helperclasses.DeepCloneable;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -8,21 +10,36 @@ import java.util.stream.Stream;
 import static comp1140.ass2.state.Die.dieToEncoding;
 
 /**
+ * Representation of the board including all the players and their die
+ *
  * @author Whole group
  */
-public class Boards implements Serializable {
+public class Boards implements Serializable, DeepCloneable<Boards> {
+
+    /**
+     * The length and width of the board
+     */
     public static final int BOARD_DIMENSION = 7;
-    private Players whitePlayer = new Players(true);
-    private Players blackPlayer = new Players(false);
+
     /**
      * A 2d array to represent the current status of the board
      */
     private final Die[][] board = new Die[BOARD_DIMENSION][BOARD_DIMENSION];
 
-    public Boards(String encodedState) {
-        //Assumes the encoded state is valid and well-formed
+    /**
+     * The white player
+     */
+    private Players whitePlayer = new Players(true);
 
-        assert encodedState.length() % 3 == 1;
+    /**
+     * The black player
+     */
+    private Players blackPlayer = new Players(false);
+
+    /**
+     * Constructor for Boards
+     */
+    public Boards(String encodedState) {
         for (int i = 1; i < encodedState.length(); i += 3) {
             Die d = new Die(encodedState.substring(i, i + 3));
             if (d.isWhite() == whitePlayer.isWhite) whitePlayer.addToDice(d);
@@ -44,7 +61,6 @@ public class Boards implements Serializable {
      * @return String array of board positions indicating steps
      */
     public static Positions[] moveToPositions(String move) {
-
         int even = 2;
         char xPositionLowerRange = 'a';
         char yPositionLowerRange = '1';
@@ -62,14 +78,27 @@ public class Boards implements Serializable {
         return Arrays.stream(sb.toString().split(twoSplit)).map(Positions::new).collect(Collectors.toList()).toArray(Positions[]::new);
     }
 
+    /**
+     * Helper function to get the first character in a 2 character String which represents coordinates
+     */
     public static int getPositionX(String x) {
         return Integer.parseInt(x.substring(0, 1));
     }
 
+    /**
+     * Helper function to get the second character in a 2 character String which represents coordinates
+     */
     public static int getPositionY(String x) {
         return Integer.parseInt(x.substring(1));
     }
 
+    /**
+     * Returns the manhattan distance between two points
+     *
+     * @param startPosition Point A
+     * @param endPosition   Point B
+     * @return The manhattan distance between A and B
+     */
     public static int getManhattanDistance(String startPosition, String endPosition) {
         return Math.abs(getPositionX(startPosition) - getPositionX(endPosition)) + Math.abs(getPositionY(startPosition) - getPositionY(endPosition));
     }
@@ -133,19 +162,15 @@ public class Boards implements Serializable {
             }
             return o1.charAt(0) - o2.charAt(0);
         });
-
         StringBuilder str = new StringBuilder();
         for (String r : b) {
             str.append(r);
         }
-
         return str.toString();
     }
 
     /**
-     * Creates a deep copy of the board
-     *
-     * @return A deep copy the board
+     * Implements the deepClone method from DeepCloneable interface
      */
     public Boards deepClone() {
         Boards object = new Boards();
@@ -161,6 +186,9 @@ public class Boards implements Serializable {
         return object;
     }
 
+    /**
+     * Overriding equals method
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -200,32 +228,35 @@ public class Boards implements Serializable {
     }
 
     /**
-     * Gets the die at the specified location on the board
-     *
-     * @param x x-coordinate on board
-     * @param y y-coordinate on board
-     * @return A die or null if there is no die at particular location
+     * Overloaded getter for the die at a certain position
      */
     public Die getAt(int x, int y) {
         return board[y][x];
     }
 
+    /**
+     * Getter for the die at a certain position
+     */
     public Die getAt(String position) {
         int x = Integer.parseInt(position.substring(0, 1));
         int y = Integer.parseInt(position.substring(1));
         return board[y][x];
     }
 
+    /**
+     * Setter for the die at a certain position
+     */
     public void setAt(String position, Die die) {
         int x = Integer.parseInt(position.substring(0, 1));
         int y = Integer.parseInt(position.substring(1));
         board[y][x] = die;
     }
 
-    public Die getAtPosition(String position) {
-        return getAt(Boards.getPositionX(position), Boards.getPositionY(position));
-    }
-
+    /**
+     * Returns if there are multiple die stored on the same position
+     *
+     * @return True if multiple die have the same position, false otherwise
+     */
     public boolean containsOverlappingPieces() {
         List<String> white = whitePlayer.getDice().stream().map(Die::getPosition).collect(Collectors.toList());
         List<String> black = blackPlayer.getDice().stream().map(Die::getPosition).collect(Collectors.toList());
@@ -235,27 +266,16 @@ public class Boards implements Serializable {
         return allPieces.size() != (white.size() + black.size());
     }
 
-    @Deprecated
-    public void setWhiteAndBlackPlayer(String encodedState) {
-
-        String tripleSplit = "(?<=\\G.{3})";
-        encodedState = encodedState.substring(1);
-        String[] diceList = encodedState.split(tripleSplit);
-
-        for (String dieStr : diceList) {
-            Die die = new Die(dieStr);
-            if (die.isWhite()) {
-                whitePlayer.addToDice(die);
-            } else {
-                blackPlayer.addToDice(die);
-            }
-        }
-    }
-
+    /**
+     * Getter for whitePlayer
+     */
     public Players getWhitePlayer() {
         return whitePlayer;
     }
 
+    /**
+     * Getter for blackPlayer
+     */
     public Players getBlackPlayer() {
         return blackPlayer;
     }
@@ -279,21 +299,40 @@ public class Boards implements Serializable {
         return whitePlayer.getDice().toString() + "\n" + blackPlayer.getDice();
     }
 
+    /**
+     * The representation of a coordinate
+     */
     public static class Positions {
+
+        /**
+         * The coordinate which this class represents
+         */
         private final String coordinate;
 
+        /**
+         * Constructor for Positions
+         */
         public Positions(String coordinate) {
             this.coordinate = coordinate;
         }
 
+        /**
+         * Getter for x
+         */
         public int getX() {
             return Integer.parseInt(coordinate.substring(0, 1));
         }
 
+        /**
+         * Getter for y
+         */
         public int getY() {
             return Integer.parseInt(coordinate.substring(1, 2));
         }
 
+        /**
+         * Overriding equals method
+         */
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -302,6 +341,9 @@ public class Boards implements Serializable {
             return Objects.equals(coordinate, positions.coordinate);
         }
 
+        /**
+         * Overriding toString method
+         */
         @Override
         public String toString() {
             return coordinate;

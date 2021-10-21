@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A representation of a player by their colour and dice
+ *
  * @author Ziling Ouyang, Zane Gates
  */
 public class Players implements Serializable, DeepCloneable<Players> {
