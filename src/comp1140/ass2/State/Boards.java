@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static comp1140.ass2.State.Die.dieToEnc;
+import static comp1140.ass2.State.Die.dieToEncoding;
 
 /**
  * @author Whole group
@@ -261,7 +261,7 @@ public class Boards implements Serializable{
                 Die die;
                 if(board.getAt(x,y) != null){
                     die = board.getAt(x,y);
-                    b.add(dieToEnc(die));
+                    b.add(dieToEncoding(die));
                 }
             }
         }
@@ -293,8 +293,7 @@ public class Boards implements Serializable{
         String formattedCorrectly = boardRepresentation.replaceAll("(?<=[]])", "\n");
         String noCommas = formattedCorrectly.replaceAll("\n, ", "\n");
         String noFirstBracket = noCommas.substring(1);
-        String noLastBracket = noFirstBracket.substring(0,noFirstBracket.length() - 2); // subtract 2 to account for the extra "\n" character
-        return noLastBracket; // \n for formatting in trees
+        return noFirstBracket.substring(0,noFirstBracket.length() - 2); // Gets rid of the last bracket
     }
 
     /**

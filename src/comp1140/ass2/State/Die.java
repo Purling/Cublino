@@ -8,6 +8,8 @@ import java.util.Comparator;
 import static comp1140.ass2.State.Direction.*;
 
 /**
+ * Represents a Die in Cublino
+ *
  * @author Whole group
  */
 public class Die implements Serializable {
@@ -113,53 +115,16 @@ public class Die implements Serializable {
      * @param die The die to be encoded
      * @return String encoding of die
      */
-    public static String dieToEnc(Die die) { // FIXME If there is time, please also change this to not be hardcoded
-        int[][] orientations = new int[][]{
-                {1, 2, 3},
-                {1, 3, 5},
-                {1, 4, 2},
-                {1, 5, 4},
-                {2, 1, 4},
-                {2, 3, 1},
-                {2, 4, 6},
-                {2, 6, 3},
-                {3, 1, 2},
-                {3, 2, 6},
-                {3, 5, 1},
-                {3, 6, 5},
-                {4, 1, 5},
-                {4, 2, 1},
-                {4, 5, 6},
-                {4, 6, 2},
-                {5, 1, 3},
-                {5, 3, 6},
-                {5, 4, 1},
-                {5, 6, 4},
-                {6, 2, 4},
-                {6, 3, 2},
-                {6, 4, 5},
-                {6, 5, 3}
-        };
-        char zero;
-        char one;
-        char two;
-        int[] current = {die.getTop(), die.getFront(), die.getLeft()};
-        int index = -1;
-        for (int i = 0; i < orientations.length; i++) {
-            if (Arrays.equals(orientations[i], current)) {
-                index = i;
-            }
-        }
-        if (die.isWhite()) {
-            zero = (char) (index + 65);
-        } else {
-            zero = (char) (index + 97);
-        }
-
-        one = (char) (die.getX() + 'a');
-        two = (char) (die.getY() + '1');
-
-        return "" + zero + one + two;
+    public static String dieToEncoding(Die die) {
+        char letter = (char) ('a' + (die.getTop() - 1) * 4);
+        int original = die.getFront() - 1;
+        if (die.getFront() >= die.getTop()) original--;
+        if (die.getFront() >= 7 - die.getTop()) original--;
+        letter = (char) (letter + original);
+        letter = (die.isWhite()) ? Character.toUpperCase(letter) : Character.toLowerCase(letter);
+        char xPosition = (char) (die.getX() + 'a');
+        char yPosition = (char) (die.getY() + '1');
+        return "" + letter + xPosition + yPosition;
     }
 
     /**
