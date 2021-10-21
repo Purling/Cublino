@@ -22,6 +22,7 @@ import java.util.List;
 import comp1140.ass2.State.Boards;
 
 import javafx.scene.*;
+import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
 
 /**
@@ -134,6 +135,19 @@ public class GuiBoard extends SubScene {
         camera.setRotationAxis(new Point3D(1, 0, 0));
         setCamera(camera);
 
+        // Constructs two cylinders to serve as a one-legged table on which the game board is set
+        Cylinder tableBase = new Cylinder();
+        tableBase.setRadius(650);
+        tableBase.setHeight(40);
+        tableBase.setTranslateY(80);
+        tableBase.setMaterial(GuiTile.blackTileMaterial);
+        boardRoot.getChildren().add(tableBase);
+        Cylinder tableLeg = new Cylinder();
+        tableLeg.setRadius(50);
+        tableLeg.setHeight(500);
+        tableLeg.setTranslateY(325);
+        tableLeg.setMaterial(GuiTile.blackTileMaterial);
+        boardRoot.getChildren().add(tableLeg);
 
         // Establish soft white lighting to remove shading and shadows
         root.getChildren().add(new AmbientLight(Color.rgb(175, 175, 175)));
