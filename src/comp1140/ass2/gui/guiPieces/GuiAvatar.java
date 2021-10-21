@@ -1,5 +1,6 @@
 package comp1140.ass2.gui.guiPieces;
 
+import comp1140.ass2.Controller.Controller;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
@@ -24,9 +25,9 @@ public class GuiAvatar extends Group {
      * Generate an avatar for a player
      * @param viewer the viewer on which this avatar lies
      * @param angle the angle around the board anticlockwise from row 7 to place this avatar at
-     * @param name the in-game name of this player
+     * @param controller the controller of this player, containing a name and type
      */
-    public GuiAvatar(GuiBoard viewer, double angle, String name) {
+    public GuiAvatar(GuiBoard viewer, double angle, Controller controller) {
         this.viewer = viewer;
         this.angle = angle;
         Group subGroup = new Group();
@@ -36,17 +37,18 @@ public class GuiAvatar extends Group {
         text.setFont(new Font(40));
         text.setWrappingWidth(600);
         text.setLayoutX(-300);
-        text.setText(name);
+        text.setText(controller.getName());
         text.setTextAlignment(TextAlignment.CENTER);
         text.setMouseTransparent(true);
         subGroup.getChildren().add(text);
 
+        // Also create an image containing an icon showing if a given player is a human or AI
         ImageView view = new ImageView();
         view.setScaleX(0.25);
         view.setScaleY(0.25);
         view.setLayoutX(-260);
         view.setLayoutY(-400);
-        view.setImage(GuiBoard.imageFromAsset("humanLogo.png"));
+        view.setImage(GuiBoard.imageFromAsset("avatar/" + imageSourceFromControllerType(controller.getType()) + ".png"));
         view.setMouseTransparent(true);
         subGroup.getChildren().add(view);
 
@@ -78,5 +80,18 @@ public class GuiAvatar extends Group {
                 view.setOpacity(opacity);
             }
         }.start();
+    }
+
+    /**
+     * Finds the relevant icon image for any given controller type
+     * @param type the controller type
+     * @return the correct image relative to avatar/*.png
+     */
+    private String imageSourceFromControllerType(Controller.ControllerType type) {
+        return switch(type) {
+            case HUMAN -> "humanLogo";
+            case EASY_AI -> "robot1Logo";
+            case DIFFICULT_AI -> "robot2Logo";
+        };
     }
 }
