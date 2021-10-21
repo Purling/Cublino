@@ -35,6 +35,7 @@ public class Board extends Application {
     ImageView turnDisplayer;
     Button takeBack;
     Button toMenu;
+    Button restart;
 
     boolean inGame = false;
     boolean pauseMenuVisible = false;
@@ -67,19 +68,27 @@ public class Board extends Application {
         turnDisplayer.setLayoutY(20);
 
         // Construct the take-back button
-        takeBack = new Button("Takeback");
+        takeBack = new Button("Takeback move");
         takeBack.setOnMouseClicked(e -> {game.takeBack();});
-        takeBack.setLayoutX(VIEWER_WIDTH*0.5-50);
-        takeBack.setLayoutY(VIEWER_HEIGHT*0.5-20);
-        takeBack.setPrefWidth(100);
+        takeBack.setLayoutX(VIEWER_WIDTH*0.5-100);
+        takeBack.setLayoutY(VIEWER_HEIGHT*0.5-50);
+        takeBack.setPrefWidth(200);
         takeBack.setTextAlignment(TextAlignment.CENTER);
 
+        // Construct a button to restart the game without returning to the menu
+        restart = new Button("Restart game");
+        restart.setOnMouseClicked(e -> {showMenu(); menu.startGame();});
+        restart.setLayoutX(VIEWER_WIDTH*0.5-100);
+        restart.setLayoutY(VIEWER_HEIGHT*0.5);
+        restart.setPrefWidth(200);
+        restart.setTextAlignment(TextAlignment.CENTER);
+
         // Construct a button to return to the menu
-        toMenu = new Button("Menu");
+        toMenu = new Button("Return to menu");
         toMenu.setOnMouseClicked(e -> {showMenu();});
-        toMenu.setLayoutX(VIEWER_WIDTH*0.5-50);
-        toMenu.setLayoutY(VIEWER_HEIGHT*0.5+20);
-        toMenu.setPrefWidth(100);
+        toMenu.setLayoutX(VIEWER_WIDTH*0.5-100);
+        toMenu.setLayoutY(VIEWER_HEIGHT*0.5+50);
+        toMenu.setPrefWidth(200);
         toMenu.setTextAlignment(TextAlignment.CENTER);
 
         // Construct a translucent gray rectangle as a background for the pause menu
@@ -95,8 +104,8 @@ public class Board extends Application {
         scene.setOnKeyPressed(e -> {
             if (inGame && e.getCode() == KeyCode.ESCAPE) {
                 pauseMenuVisible = !pauseMenuVisible;
-                if (pauseMenuVisible) root.getChildren().addAll(pauseBackground, takeBack, toMenu);
-                else root.getChildren().removeAll(pauseBackground, takeBack, toMenu);
+                if (pauseMenuVisible) root.getChildren().addAll(pauseBackground, takeBack, toMenu, restart);
+                else root.getChildren().removeAll(pauseBackground, takeBack, toMenu, restart);
             }
         });
     }

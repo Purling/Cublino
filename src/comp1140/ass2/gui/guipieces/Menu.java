@@ -14,13 +14,23 @@ import javafx.scene.text.Text;
  * Author: Zane Gates
  */
 public class Menu extends Group {
+
+    Board board;
+    ChoiceBox<String> gameMode;
+    ChoiceBox<String> skybox;
+    PlayerMenu p1Menu;
+    PlayerMenu p2Menu;
+
     /**
      * Constructs a menu
      * @param board the board GUI to which this menu belongs
      */
     public Menu(Board board) {
+
+        this.board = board;
+
         // A dropdown menu containing the options for the skybox
-        ChoiceBox<String> skybox = new ChoiceBox<>();
+        skybox = new ChoiceBox<>();
         skybox.getItems().addAll("Random", "Placid", "Tuscan", "Siberian", "Martian", "Overcast");
         skybox.getSelectionModel().select(0);
         skybox.setLayoutX(100);
@@ -28,13 +38,13 @@ public class Menu extends Group {
         skybox.setLayoutY(50);
 
         // The menus containing the options for each player controller
-        PlayerMenu p1Menu = new PlayerMenu(0);
-        PlayerMenu p2Menu = new PlayerMenu(1);
+        p1Menu = new PlayerMenu(0);
+        p2Menu = new PlayerMenu(1);
         p1Menu.setLayoutY(100);
         p2Menu.setLayoutY(150);
 
         // A dropdown menu for the two available game modes
-        ChoiceBox<String> gameMode = new ChoiceBox<>();
+        gameMode = new ChoiceBox<>();
         gameMode.getItems().addAll("Pur Cublino", "Contra Cublino");
         gameMode.getSelectionModel().select(0);
         gameMode.setLayoutX(100);
@@ -43,14 +53,7 @@ public class Menu extends Group {
 
         // A button that starts the game when pressed
         Button beginButton = new Button("Begin");
-        beginButton.setOnAction(actionEvent -> {
-            try {
-                board.startGame(gameMode.getSelectionModel().getSelectedIndex() == 0,
-                        skyboxFromDropdown(skybox.getSelectionModel().getSelectedIndex()),
-                        new Controller[] {p1Menu.asController(), p2Menu.asController()});
-            } catch (Exception e) {
-                e.printStackTrace();
-            }});
+        beginButton.setOnAction(actionEvent -> { startGame(); });
         beginButton.setLayoutX(400);
         beginButton.setLayoutY(200);
 
@@ -118,7 +121,7 @@ public class Menu extends Group {
          * Constructs a controller from the player settings
          * @return a corresponding Controller
          */
-        private Controller asController() {
+        public Controller asController() {
             return new Controller(typeFromDropdown(controller.getSelectionModel().getSelectedIndex()),
                     name.getText(), skinFromDropdown(skin.getSelectionModel().getSelectedIndex()));
         }
@@ -200,5 +203,18 @@ public class Menu extends Group {
             case 5 -> GuiSkybox.Locale.SKY;
             default -> GuiSkybox.Locale.NONE;
         };
+    }
+
+    /**
+     * Starts the game.
+     */
+    public void startGame() {
+        try {
+            board.startGame(gameMode.getSelectionModel().getSelectedIndex() == 0,
+                    skyboxFromDropdown(skybox.getSelectionModel().getSelectedIndex()),
+                    new Controller[] {p1Menu.asController(), p2Menu.asController()});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -385,11 +385,6 @@ public class GuiBoard extends SubScene {
         } else {
             // If the game is over, stop anyone from making moves, and show the result in the UI
             permitsMoveMaking = false;
-            /*switch(result) {
-                case TIE: turnLabel.setOpacity(0); return;
-                case WHITE_WINS: turnLabel.setOpacity(0); return;
-                case BLACK_WINS: turnLabel.setOpacity(0);
-            }*/
             turnLabel.setOpacity(0);
         }
     }
