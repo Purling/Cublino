@@ -45,6 +45,18 @@ code:
   - comment: Modified to format the toString() method of a tree
     url: https://stackoverflow.com/a/27265035
     licence: CC BY-SA 3.0
+  - comment: UV coordinates for a 3D cube for task 5
+    url: https://stackoverflow.com/a/34663339
+    licence: CC-BY-SA
+  - comment: Used for splitting String into substrings
+    url: https://stackoverflow.com/a/3761521
+    licence: CC-BY-SA 3.0
+  - comment: Used to deep copy objects
+    url: https://stackoverflow.com/a/7596565
+    licence: CC BY-SA 3.0
+  - comment: Used to sort the array
+    url: https://stackoverflow.com/revisions/369867/5
+    licence: CC BY-SA 3.0
 
 # Use this to list any assets (artwork, sound, etc) that you used.
 # Provide a comment explaining your use of that asset and the URL
@@ -52,11 +64,13 @@ code:
 #
 # Add as many "url+licence+comment" entries as necessary
 # (or remove it altogether if you haven't used any external assets)
-#assets:
-#  - comment:
-#    url:
-#    licence:
-
+assets:
+  - comment: Die image for demonstrative GUI design use
+    url: https://svgsilh.com/9e9e9e/image/41187.html
+    licence: CC0 1.0 
+  - comment: Image of two dice for demonstrative GUI design use
+    url: https://svgsilh.com/9e9e9e/image/2027245.html
+    licence: CC0 1.0 
 
 # Sign *your* name and uids here. (Remove entries if you have fewer
 # than three members.)
