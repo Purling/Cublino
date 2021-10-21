@@ -169,7 +169,6 @@ public class ContraCublino extends Game implements Serializable {
      *
      * @return True if the game is over and false otherwise
      */
-    @Override
     public boolean isGameOver() {
         List<Die> white = board.getWhitePlayer().getDice();
         List<Die> black = board.getBlackPlayer().getDice();

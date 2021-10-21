@@ -215,13 +215,6 @@ public abstract class Game implements Serializable {
         return otherPlayer;
     }
 
-    /**
-     * Determine whether the game is over or not
-     *
-     * @return True if the game is over and false otherwise
-     */
-    protected abstract boolean isGameOver();
-
     public abstract GameResult getWinner();
 
     /**
