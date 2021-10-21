@@ -226,7 +226,7 @@ public class ContraCublino extends Game implements Serializable, DeepCloneable<G
         return board.getStringRepresentation();
     }
 
-    public class ContraMove {
+    public class ContraMove extends GameMove {
         /**
          * The actual move that has been played in Game form
          */

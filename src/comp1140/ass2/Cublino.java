@@ -300,8 +300,8 @@ public class Cublino {
         char turnInformation = state.charAt(0);
         PurCublino pur = new PurCublino(Character.isUpperCase(turnInformation), board);
         Random rand = new Random();
-        int randomMove = rand.nextInt(pur.generatePurMoves().length);
-        return pur.generatePurMoves()[randomMove].getEncodedMove();
+        int randomMove = rand.nextInt(pur.generateLegalMoves().length);
+        return pur.generateLegalMoves()[randomMove].getEncodedMove();
     }
 
     /**

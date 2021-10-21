@@ -60,9 +60,9 @@ public class Controller {
                 }
 
                 case DIFFICULT_AI -> {
-                    PurCublino.PurMove[] moves = ((PurCublino) game).generatePurMoves();
+                    PurCublino.PurMove[] moves = ((PurCublino) game).generateLegalMoves();
                     DifficultAI difficultAI = new DifficultAI(game);
-                    PurCublino.PurMove move = moves[difficultAI.monteCarloMainPur()];
+                    PurCublino.PurMove move = moves[difficultAI.monteCarloMain()];
                     applyGeneratedMove(move.getEncodedMove(), game, move.getPossibleState());
                 }
             }
@@ -77,7 +77,7 @@ public class Controller {
                 case DIFFICULT_AI -> {
                     ContraCublino.ContraMove[] moves = ((ContraCublino) game).generateLegalMoves();
                     DifficultAI difficultAI = new DifficultAI(game);
-                    ContraCublino.ContraMove move = moves[difficultAI.monteCarloMainContra()];
+                    ContraCublino.ContraMove move = moves[difficultAI.monteCarloMain()];
                     applyGeneratedMove(move.getEncodedMove(), game, move.getPossibleState());
                 }
             }

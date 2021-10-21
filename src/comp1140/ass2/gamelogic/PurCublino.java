@@ -250,7 +250,7 @@ public class PurCublino extends Game implements Serializable, DeepCloneable<Game
      *
      * @return Every possible move from the current board state
      */
-    public PurMove[] generatePurMoves() {
+    public PurMove[] generateLegalMoves() {
         List<PurMove> basicMoves = Stream.concat(generatePurJump().stream(), generatePurTip().stream()).collect(Collectors.toList());
         List<List<PurCublino.PurMove>> expanded = basicMoves.stream().map((x) -> x.getPossibleState().generatePurJump(x.getEncodedMove())).collect(Collectors.toList());
         List<PurCublino.PurMove> flat = expanded.stream().flatMap(List::stream).collect(Collectors.toList());
@@ -373,7 +373,7 @@ public class PurCublino extends Game implements Serializable, DeepCloneable<Game
      *
      * @author Ziling Ouyang, Modified by Yuechen Liu
      */
-    public class PurMove {
+    public class PurMove extends GameMove {
 
         /**
          * The actual move that has been played in Game form
@@ -389,6 +389,7 @@ public class PurCublino extends Game implements Serializable, DeepCloneable<Game
          * Constructor for PurMove
          */
         public PurMove(PurCublino possibleState, String encodedMove) {
+            super();
             this.possibleState = possibleState;
             this.encodedMove = encodedMove;
         }

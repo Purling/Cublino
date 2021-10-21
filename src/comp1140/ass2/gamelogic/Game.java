@@ -79,6 +79,11 @@ public abstract class Game implements Serializable, DeepCloneable<Game> {
     abstract protected boolean hasBothNotWon(Boards board);
 
     /**
+     * Generates all legal moves that can be played in the current state of the game
+     */
+    public abstract GameMove[] generateLegalMoves();
+
+    /**
      * Returns if each player has a legal amount of dice
      *
      * @return True if the dice amount is valid, False otherwise
@@ -295,4 +300,58 @@ public abstract class Game implements Serializable, DeepCloneable<Game> {
         }
     }
 
+    /**
+     * Class to allow for potential moves to be easily read by the GUI and Cublino.java
+     *
+     * @author Ziling Ouyang, Modified by Yuechen Liu
+     */
+    public abstract class GameMove {
+
+        /**
+         * The actual move that has been played in Game form
+         */
+        Game possibleState;
+
+        /**
+         * The move to be played in an encoded form
+         */
+        String encodedMove;
+
+        /**
+         * Constructor for PurMove
+         */
+        public GameMove(PurCublino possibleState, String encodedMove) {
+            this.possibleState = possibleState;
+            this.encodedMove = encodedMove;
+        }
+
+        /**
+         * Empty constructor
+         */
+        public GameMove() {
+        }
+
+        /**
+         * Getter for encodedMove
+         */
+        public String getEncodedMove() {
+            return encodedMove;
+        }
+
+        /**
+         * Getter for possibleState
+         */
+        public Game getPossibleState() {
+            return possibleState;
+        }
+
+        /**
+         * To string method
+         */
+        @Override
+        public String toString() {
+            return encodedMove;
+        }
+
+    }
 }

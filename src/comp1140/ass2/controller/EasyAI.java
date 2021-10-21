@@ -1,6 +1,7 @@
 package comp1140.ass2.controller;
 
 import comp1140.ass2.gamelogic.ContraCublino;
+import comp1140.ass2.gamelogic.Game;
 import comp1140.ass2.gamelogic.PurCublino;
 import comp1140.ass2.state.Die;
 import comp1140.ass2.helperclasses.RoseNode;
@@ -92,15 +93,15 @@ public class EasyAI {
     }
 
     public static ContraCublino.ContraMove greedyAIMoveOnly(ContraCublino currentGameState) {
-        RoseNode<ContraCublino> gameTree = new RoseNode<>(currentGameState);
-        DifficultAI.monteCarloExpansionContra(gameTree);
-        gameTree.getChildren().forEach(DifficultAI::monteCarloExpansionContra);
+        RoseNode<Game> gameTree = new RoseNode<>(currentGameState);
+        DifficultAI.monteCarloExpansion(gameTree);
+        gameTree.getChildren().forEach(DifficultAI::monteCarloExpansion);
         List<ContraCublino.ContraMove> legalMoves = List.of(currentGameState.generateLegalMoves());
-        List<RoseNode<ContraCublino>> leaves = gameTree.getLeaves(new ArrayList<>());
-        List<Double> evaluatedMoves = leaves.stream().map((x) -> greedyEvaluation(x.getState())).collect(Collectors.toList());
+        List<RoseNode<Game>> leaves = gameTree.getLeaves(new ArrayList<>());
+        List<Double> evaluatedMoves = leaves.stream().map((x) -> greedyEvaluation((ContraCublino) x.getState())).collect(Collectors.toList());
         System.out.println(evaluatedMoves);
         int generatedMoveIndex = evaluatedMoves.indexOf(evaluatedMoves.stream().max(Double::compareTo).orElse(0D));
-        RoseNode<ContraCublino> wanted = leaves.get(generatedMoveIndex);
+        RoseNode<Game> wanted = leaves.get(generatedMoveIndex);
         while (wanted.getParent().getParent() != null) {
             wanted = wanted.getParent();
         }
@@ -123,8 +124,8 @@ public class EasyAI {
 
     public static PurCublino randomMove(PurCublino currentGameState) {
         Random rand = new Random();
-        int randomMove = rand.nextInt(currentGameState.generatePurMoves().length);
-        PurCublino returnState = currentGameState.generatePurMoves()[randomMove].getPossibleState();
+        int randomMove = rand.nextInt(currentGameState.generateLegalMoves().length);
+        PurCublino returnState = (PurCublino) currentGameState.generateLegalMoves()[randomMove].getPossibleState();
         returnState.endTurn();
         return returnState;
     }
@@ -148,11 +149,11 @@ public class EasyAI {
     }
 
     public static PurCublino greedyAIPur(PurCublino currentGameState){
-        PurCublino.PurMove[] legalMoves = currentGameState.generatePurMoves();
-        List<Double> evaluatedMoves = Arrays.stream(legalMoves).map((x) -> greedyEvaluationPur(x.getPossibleState())).collect(Collectors.toList());
+        PurCublino.PurMove[] legalMoves = currentGameState.generateLegalMoves();
+        List<Double> evaluatedMoves = Arrays.stream(legalMoves).map((x) -> greedyEvaluationPur((PurCublino) x.getPossibleState())).collect(Collectors.toList());
         int generatedMoveIndex = evaluatedMoves.indexOf(evaluatedMoves.stream().max(Double::compareTo).orElse(0D));
         assert generatedMoveIndex != -1;
-        return legalMoves[generatedMoveIndex].getPossibleState();
+        return (PurCublino) legalMoves[generatedMoveIndex].getPossibleState();
     }
 
     /**
@@ -162,14 +163,14 @@ public class EasyAI {
      * @return The potential move to be made
      */
     public static PurCublino.PurMove purGreedyMove(PurCublino currentState) {
-        RoseNode<PurCublino> gameTree = new RoseNode<>(currentState);
-        DifficultAI.monteCarloExpansionPur(gameTree);
-        gameTree.getChildren().forEach(DifficultAI::monteCarloExpansionPur);
-        List<PurCublino.PurMove> legalMoves = List.of(currentState.generatePurMoves());
-        List<RoseNode<PurCublino>> leaves = gameTree.getLeaves(new ArrayList<>());
-        List<Double> evaluatedMoves = leaves.stream().map((x) -> greedyEvaluationPur(x.getState())).collect(Collectors.toList());
+        RoseNode<Game> gameTree = new RoseNode<>(currentState);
+        DifficultAI.monteCarloExpansion(gameTree);
+        gameTree.getChildren().forEach(DifficultAI::monteCarloExpansion);
+        List<PurCublino.PurMove> legalMoves = List.of(currentState.generateLegalMoves());
+        List<RoseNode<Game>> leaves = gameTree.getLeaves(new ArrayList<>());
+        List<Double> evaluatedMoves = leaves.stream().map((x) -> greedyEvaluationPur((PurCublino) x.getState())).collect(Collectors.toList());
         int generatedMoveIndex = evaluatedMoves.indexOf(evaluatedMoves.stream().max(Double::compareTo).orElse(0D));
-        RoseNode<PurCublino> wanted = leaves.get(generatedMoveIndex);
+        RoseNode<Game> wanted = leaves.get(generatedMoveIndex);
         while (wanted.getParent().getParent() != null) {
             wanted = wanted.getParent();
         }
