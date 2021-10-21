@@ -130,8 +130,7 @@ public class Cublino {
             return false;
 
         char gameMode = state.toLowerCase().charAt(0);
-        Boards board = new Boards();
-        board.setWhiteAndBlackPlayer(state);
+        Boards board = new Boards(state);
         PurCublino purCublino = new PurCublino();
         ContraCublino contraCublino = new ContraCublino();
 
@@ -201,10 +200,10 @@ public class Cublino {
         String start = positions[0].toString();
         String end = positions[positions.length - 1].toString();
 
-        if (board.getAtPosition(end) != null) return false;
+        if (board.getAt(end) != null) return false;
 
         if (board.isAdjacent(start, end)) {
-            return !purCublino.isMoveBackwards(start, end);
+            return purCublino.isMoveNotBackwards(start, end);
         } else if (Boards.getManhattanDistance(start, end) == jumpDistance) {
             return purCublino.isJumpValid(start, end);
         } else {

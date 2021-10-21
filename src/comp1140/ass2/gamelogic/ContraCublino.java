@@ -41,10 +41,10 @@ public class ContraCublino extends Game implements Serializable {
      * @return True if both players have simultaneously won, false otherwise
      */
     @Override
-    public boolean hasBothWon(Boards board) {
+    public boolean hasBothNotWon(Boards board) {
         List<Die> white = board.getWhitePlayer().getDice();
         List<Die> black = board.getBlackPlayer().getDice();
-        return white.stream().filter(Die::isWhiteDieFinished).count() + black.stream().filter(Die::isBlackDieFinished).count() > 1;
+        return white.stream().filter(Die::isWhiteDieFinished).count() + black.stream().filter(Die::isBlackDieFinished).count() <= 1;
     }
 
     /**
@@ -77,7 +77,7 @@ public class ContraCublino extends Game implements Serializable {
             addToStepHistory(new Move(clone, MoveType.ORIGIN));
         }
 
-        if (!isMoveBackwards(diePosition, endPosition) && correctDistance && isDieCorrect(die) && firstEntry) {
+        if (isMoveNotBackwards(diePosition, endPosition) && correctDistance && isDieCorrect(die) && firstEntry) {
             applyTip(die, endPosition);
             addToStepHistory(new Move(clone, TIP));
             setCurrentMoveDie(die.deepClone());
@@ -169,7 +169,6 @@ public class ContraCublino extends Game implements Serializable {
      *
      * @return True if the game is over and false otherwise
      */
-    @Override
     public boolean isGameOver() {
         List<Die> white = board.getWhitePlayer().getDice();
         List<Die> black = board.getBlackPlayer().getDice();
@@ -212,7 +211,7 @@ public class ContraCublino extends Game implements Serializable {
      * @return True if the game is valid, false otherwise
      */
     public boolean isGameValid(Boards board) {
-        return (isDiceAmountCorrect(board) && !hasBothWon(board));
+        return (isDiceAmountCorrect(board) && hasBothNotWon(board));
     }
 
     @Override

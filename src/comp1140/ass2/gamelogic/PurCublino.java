@@ -1,5 +1,6 @@
 package comp1140.ass2.gamelogic;
 
+import comp1140.ass2.helperclasses.DeepCloneable;
 import comp1140.ass2.state.Boards;
 import comp1140.ass2.state.Die;
 import comp1140.ass2.state.Direction;
@@ -14,19 +15,28 @@ import java.util.stream.Stream;
 import static comp1140.ass2.state.Boards.BOARD_DIMENSION;
 
 /**
- * A gamemode of Cublino that extends from the Game class
+ * A game mode of Cublino that extends from the Game class. It represents the game which is currently being played by the user
  *
  * @author Ziling Ouyang, Yuechen Liu
  */
 
-public class PurCublino extends Game implements Serializable {
+public class PurCublino extends Game implements Serializable, DeepCloneable<Game> {
 
+    /**
+     * The distance of a jump
+     */
     private static final int JUMP_DISTANCE = 2;
 
+    /**
+     * Constructor for PurCublino
+     */
     public PurCublino() {
         super();
     }
 
+    /**
+     * Constructor for PurCublino
+     */
     public PurCublino(boolean isWhite, Boards board) {
         super(isWhite, board);
     }
@@ -39,7 +49,7 @@ public class PurCublino extends Game implements Serializable {
      * @param endPosition The coordinates to move the die to
      */
     @Override
-    public void applyStep(Die die, String endPosition) { //TODO Implement a deep copy of the currentMove into Move array
+    public void applyStep(Die die, String endPosition) {
         if (die.isWhite() != getCurrentPlayer().isWhite()) return;
 
         Boards clone = board.deepClone();
@@ -61,7 +71,7 @@ public class PurCublino extends Game implements Serializable {
         MoveType moveType;
         boolean correctDie = firstEntry || isDieCorrect(die);
 
-        if (!isMoveBackwards(diePosition, endPosition) && distance == TIP_DISTANCE && correctDie && firstEntry) {
+        if (isMoveNotBackwards(diePosition, endPosition) && distance == TIP_DISTANCE && correctDie && firstEntry) {
             applyTip(die, endPosition);
             setCurrentMoveDie(die);
             moveType = MoveType.TIP;
@@ -80,11 +90,6 @@ public class PurCublino extends Game implements Serializable {
         addToStepHistory(new Move(clone, moveType));
     }
 
-    @Override
-    protected boolean isGameOver() {
-        return false;
-    }
-
     /**
      * A boolean function to evaluate if the correct number of dice is on the board.
      *
@@ -96,20 +101,31 @@ public class PurCublino extends Game implements Serializable {
         return (board.getBlackPlayer().getDice().size() + board.getWhitePlayer().getDice().size() == 2 * BOARD_DIMENSION);
     }
 
+    /**
+     * Check if both players have simultaneously won
+     *
+     * @param board The board to be checked
+     * @return True if both players have simultaneously won, false otherwise
+     */
     @Override
-    public boolean hasBothWon(Boards board) {
+    public boolean hasBothNotWon(Boards board) {
 
         List<Die> white = board.getWhitePlayer().getDice();
         List<Die> black = board.getBlackPlayer().getDice();
 
-        return white.stream().allMatch(Die::isWhiteDieFinished) && black.stream().allMatch(Die::isBlackDieFinished);
+        return !white.stream().allMatch(Die::isWhiteDieFinished) || !black.stream().allMatch(Die::isBlackDieFinished);
     }
 
+    /**
+     * Checks if a jump can be performed i.e., the end position is null, it is not moving backwards, there is a die to jump over and the axis is the same
+     *
+     * @param startPosition The position of the die which will jump
+     * @param endPosition   The position the die will jump to
+     * @return True if the jump is valid, false otherwise
+     */
     public boolean isJumpValid(String startPosition, String endPosition) {
-
         String middle = Boards.getMiddlePosition(startPosition, endPosition);
-
-        return !isMoveBackwards(startPosition, endPosition)
+        return isMoveNotBackwards(startPosition, endPosition)
                 && (board.getAt(Boards.getPositionX(middle), Boards.getPositionY(middle)) != null)
                 && (Boards.sameAxis(startPosition, endPosition));
     }
@@ -120,24 +136,33 @@ public class PurCublino extends Game implements Serializable {
      * @param initial     The die
      * @param endPosition The position the die will jump to
      */
-    public void applyJump(Die initial, String endPosition) { // This might still be incorrect and not actually move the die
+    public void applyJump(Die initial, String endPosition) {
         String start = initial.getPosition();
         int index = getCurrentPlayer().getDice().indexOf(initial);
-        assert index != -1;
-
         if (board.getAt(endPosition) == null) {
             Die realDie = getCurrentPlayer().getDice().get(index);
-            realDie.jump(realDie.getDirection(endPosition)); //realDie.setPosition(endPosition);
+            realDie.jump(realDie.getDirection(endPosition));
             initial.setDie(realDie);
             board.setAt(endPosition, realDie);
             board.setAt(start, null);
         }
     }
 
+    /**
+     * Checks if the most basic rules (correct number of dice and both players haven't simultaneously won)
+     *
+     * @param board The board to be checked
+     * @return True if the board has no violated rules, false otherwise
+     */
     public boolean isGameValid(Boards board) {
-        return (isDiceAmountCorrect(board) && !hasBothWon(board));
+        return (isDiceAmountCorrect(board) && hasBothNotWon(board));
     }
 
+    /**
+     * Gets the winner from a completed Pur game
+     *
+     * @return An enum representing the winner
+     */
     public GameResult getWinner() {
         int p1 = 0;
         int p2 = 0;
@@ -166,21 +191,32 @@ public class PurCublino extends Game implements Serializable {
     }
 
     /**
-     * Create a deep copy of the PurCublino object
-     *
-     * @return a deep copy of the PurCublino object
+     * Implements the deepClone method from DeepCloneable interface
      */
     public PurCublino deepClone() {
+        ObjectOutputStream oos = null;
+        ObjectInputStream ois = null;
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos = new ObjectOutputStream(baos);
             oos.writeObject(this);
 
             ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bais);
+            ois = new ObjectInputStream(bais);
             return (PurCublino) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             return null;
+        } finally {
+            try {
+                if (oos != null) {
+                    oos.close();
+                }
+                if (ois != null) {
+                    ois.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -222,13 +258,25 @@ public class PurCublino extends Game implements Serializable {
         return Stream.concat(concat.stream(), generatePurMovesRecursion(flat).stream()).toArray(PurMove[]::new);
     }
 
-    public List<PurMove> generatePurMovesRecursion(List<PurMove> moveToExpand) {
-        if (moveToExpand.isEmpty()) return new ArrayList<>();
-        List<List<PurCublino.PurMove>> expanded = moveToExpand.stream().map((x) -> x.getPossibleState().generatePurJump(x.getEncodedMove())).collect(Collectors.toList());
+    /**
+     * A method to house the recursion required to generate moves for Pur
+     *
+     * @param movesToExpand A list of moves to expand into further states
+     * @return moveToExpand but expanded by another branch of moves
+     */
+    public List<PurMove> generatePurMovesRecursion(List<PurMove> movesToExpand) {
+        if (movesToExpand.isEmpty()) return new ArrayList<>();
+        List<List<PurCublino.PurMove>> expanded = movesToExpand.stream().map((x) -> x.getPossibleState().generatePurJump(x.getEncodedMove())).collect(Collectors.toList());
         List<PurCublino.PurMove> flat = expanded.stream().flatMap(List::stream).collect(Collectors.toList());
         return Stream.concat(flat.stream(), generatePurMovesRecursion(flat).stream()).collect(Collectors.toList());
     }
 
+    /**
+     * Overloading generatePurJump so that it keeps track of moves that have already been played
+     *
+     * @param historicalMoves The moves which have already been played, in String form
+     * @return The list of moves conditioned on the fact that they can't repeat moves that have already taken place
+     */
     public List<PurMove> generatePurJump(String historicalMoves) {
         List<PurMove> possibleMoves = new ArrayList<>();
         Boards.Positions[] givenMoves = Boards.moveToPositions(historicalMoves);
@@ -237,7 +285,7 @@ public class PurCublino extends Game implements Serializable {
 
         for (Direction direction : Direction.values()) {
             if (isValidJumpDirection(direction, die)) {
-                String move = historicalMoves.substring(0, historicalMoves.length() - 2); // TODO refactor so that move and historicalMoves aren't used anymore
+                String move = historicalMoves.substring(0, historicalMoves.length() - 2);
                 PurCublino clone = deepClone();
                 Die dieClone = die.deepClone();
                 clone.applyJump(dieClone, dieClone.getPositionOver(direction, 2));
@@ -251,6 +299,11 @@ public class PurCublino extends Game implements Serializable {
         return possibleMoves;
     }
 
+    /**
+     * Generates all possible future Game's which can be achieved from 1 jump step from the current game state
+     *
+     * @return All possible future Game's which can be achieved from 1 jump step from the current game state
+     */
     public List<PurMove> generatePurJump() {
         List<Die> possibleDie = getCurrentPlayer().getDice();
         List<PurMove> possibleMoves = new ArrayList<>();
@@ -271,6 +324,13 @@ public class PurCublino extends Game implements Serializable {
         return possibleMoves;
     }
 
+    /**
+     * Confirms whether a jump in the selected direction is possible
+     *
+     * @param direction The direction of the jump
+     * @param die       The die that will jump
+     * @return True if possible, false otherwise
+     */
     public boolean isValidJumpDirection(Direction direction, Die die) {
         return switch (direction) {
             case UP -> die.isWhite() && die.getY() + 2 < BOARD_DIMENSION
@@ -289,7 +349,7 @@ public class PurCublino extends Game implements Serializable {
     }
 
     /**
-     * Confirms whether a tip is the selected direction would be possible
+     * Confirms whether a tip in the selected direction would be possible
      *
      * @param direction The selected direction
      * @param die       The die to be tipped
@@ -309,17 +369,33 @@ public class PurCublino extends Game implements Serializable {
 
 
     /**
-     * Written by Ziling, Modified by Yuechen
+     * Class to allow for potential moves to be easily read by the GUI and Cublino.java
+     *
+     * @author Ziling Ouyang, Modified by Yuechen Liu
      */
     public class PurMove {
+
+        /**
+         * The actual move that has been played in Game form
+         */
         PurCublino possibleState;
+
+        /**
+         * The move to be played in an encoded form
+         */
         String encodedMove;
 
+        /**
+         * Constructor for PurMove
+         */
         public PurMove(PurCublino possibleState, String encodedMove) {
             this.possibleState = possibleState;
             this.encodedMove = encodedMove;
         }
 
+        /**
+         * Getter for encodedMove
+         */
         public String getEncodedMove() {
             return encodedMove;
         }
