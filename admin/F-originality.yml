@@ -70,7 +70,14 @@ assets:
     licence: CC0 1.0 
   - comment: Image of two dice for demonstrative GUI design use
     url: https://svgsilh.com/9e9e9e/image/2027245.html
-    licence: CC0 1.0 
+    licence: CC0 1.0
+  - comment: Image of spruce wood for board tiles (lightly modified)
+    url: https://us.123rf.com/450wm/dmitr1ch/dmitr1ch1705/dmitr1ch170500017/77459809-old-spruce-wood-planks-texture-on-exterior-wall-of-a-wooden-church.jpg?ver=6
+    licence: CC0 1.0
+  - comment: Image of light spruce wood for board tiles (lightly modified)
+    url: https://cdn.pixabay.com/photo/2016/02/18/01/35/wood-1206421_1280.jpg
+    licence: CC0 1.0
+
 
 # Sign *your* name and uids here. (Remove entries if you have fewer
 # than three members.)
