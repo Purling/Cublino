@@ -32,7 +32,7 @@ class dieRotationTests {
                 for (char y = '1'; y < '7'; y++) {
                     // Construct the die and its model
                     String placementString = "" + o + x + y;
-                    Die d = new Die(placementString, null, null);
+                    Die d = new Die(placementString);
                     t = new GuiDie(d, null, null).necessaryRotations();
 
                     // Make sure every face on the model is positioned where the die class suggests it should be
@@ -54,14 +54,14 @@ class dieRotationTests {
 
     // The initial position of the die model before any rotation (e.g. the number 3 is on the front face)
     public Point3D startingPositionOfNumber(int n) {
-        switch(n) {
-            case 1: return right;
-            case 2: return down;
-            case 3: return front;
-            case 4: return back;
-            case 5: return up;
-            default: return left;
-        }
+        return switch (n) {
+            case 1 -> right;
+            case 2 -> down;
+            case 3 -> front;
+            case 4 -> back;
+            case 5 -> up;
+            default -> left;
+        };
     }
 
     // Allows for the comparison of points despite floating-point errors

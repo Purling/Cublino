@@ -54,7 +54,7 @@ public class Boards implements Serializable{
 
         assert encodedState.length() % 3 == 1;
         for (int i = 1; i < encodedState.length(); i += 3) {
-            Die d = new Die(encodedState.substring(i, i+3), whitePlayer, blackPlayer);
+            Die d = new Die(encodedState.substring(i, i+3));
             if (d.isWhite() == whitePlayer.isWhite) whitePlayer.addToDice(d);
             else blackPlayer.addToDice(d);
             board[d.getY()][d.getX()] = d;
@@ -231,7 +231,7 @@ public class Boards implements Serializable{
         String[] diceList = encodedState.split(tripleSplit);
 
         for (String dieStr : diceList) {
-            Die die = new Die(dieStr, whitePlayer, blackPlayer);
+            Die die = new Die(dieStr);
             if (die.isWhite()){
                whitePlayer.addToDice(die);
             }
