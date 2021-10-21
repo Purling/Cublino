@@ -43,9 +43,13 @@ public class Board extends Application {
 
     boolean startingFadeNow = false;
     double initialTime = 0;
-    FadeAction fadingTo;
+    FadeAction fadingTo = FadeAction.NONE;
 
     enum FadeAction {NONE, MENU, GAME};
+
+    Boolean isPur;
+    GuiSkybox.Locale locale;
+    Controller[] controllers;
 
     /**
      * Starts the application
@@ -60,8 +64,6 @@ public class Board extends Application {
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
 
         menu = new Menu(this);
-
-        showMenu();
 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -116,24 +118,56 @@ public class Board extends Application {
         fadeBackground.setFill(Color.BLACK);
         fadeBackground.setOpacity(0);
 
+        root.getChildren().addAll(menu, fadeBackground);
 
         new AnimationTimer() {
             @Override
             public void handle(long l) {
-                if (startingFadeNow) {
+                // If a fade is queued but has not started, start it
+                if (startingFadeNow && initialTime == 0) {
                     initialTime = l;
                     startingFadeNow = false;
                 }
-                double progress = (l-initialTime)/1e9;
+
+                // Calculate and apply the target opacity using an inverted absolute curve
+                double progress = (l-initialTime)/2e9;
                 double opacity = 2*(0.5-Math.abs(progress-0.5));
                 fadeBackground.setOpacity(opacity);
+
                 if (opacity <= 0 && root.getChildren().contains(fadeBackground)) {
                     root.getChildren().remove(fadeBackground);
                 } else if (opacity > 0 && !root.getChildren().contains(fadeBackground)) {
                     root.getChildren().add(fadeBackground);
                 }
 
+                // If a fade has finished, reset so you can run another fade
+                if (progress >= 2) initialTime = 0;
 
+                // Once the fade is halfway complete (fully black), change scenes as queued
+                if (progress > 0.5) {
+                    switch (fadingTo) {
+                        case NONE: return;
+                        case GAME: {
+                            inGame = true;
+                            pauseMenuVisible = false;
+                            root.getChildren().clear();
+                            try {
+                                game = new GuiBoard((isPur ? "P" : "C") + "Wa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", locale, controllers, isPur,true, turnDisplayer);
+                            } catch (Exception e) { }
+                            System.out.println(game);
+                            root.getChildren().addAll(game, turnDisplayer, fadeBackground);
+                            System.out.println(root.getChildren());
+                            fadingTo = FadeAction.NONE;
+                            return;
+                        }
+                        case MENU: {
+                            inGame = false;
+                            root.getChildren().clear();
+                            root.getChildren().addAll(menu, fadeBackground);
+                            fadingTo = FadeAction.NONE;
+                        }
+                    }
+                }
             }
         }.start();
 
@@ -148,29 +182,24 @@ public class Board extends Application {
     }
 
     /**
-     * Shows the menu, and hides anything else currently visible, including the game and the pause menu
+     * Shows the menu, and hides anything else currently visible, after a fade
      */
     public void showMenu() {
-        inGame = false;
-        root.getChildren().clear();
-        root.getChildren().add(menu);
         startingFadeNow = true;
         fadingTo = FadeAction.MENU;
     }
 
     /**
-     * Starts a game using settings read from the menu
+     * Starts a game using settings read from the menu, after a fade
      * @param isPur whether the game-mode is Pur or Contra
      * @param locale the skybox for this game
      * @param controllers the controllers for each players
      * @throws Exception if an invalid combination of parameters is given
      */
     public void startGame(boolean isPur, GuiSkybox.Locale locale, Controller[] controllers) throws Exception {
-        inGame = true;
-        pauseMenuVisible = false;
-        root.getChildren().clear();
-        game = new GuiBoard((isPur ? "P" : "C") + "Wa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", locale, controllers, isPur,true, turnDisplayer);
-        root.getChildren().addAll(game, turnDisplayer);
+        this.isPur = isPur;
+        this.locale = locale;
+        this.controllers = controllers;
         startingFadeNow = true;
         fadingTo = FadeAction.GAME;
     }
