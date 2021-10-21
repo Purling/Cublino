@@ -1,4 +1,4 @@
-package comp1140.ass2.gui.guiPieces;
+package comp1140.ass2.gui.guipieces;
 
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;

@@ -1,4 +1,4 @@
-package comp1140.ass2.gui.guiPieces;
+package comp1140.ass2.gui.guipieces;
 
 /**
  * A simple helper class, representing a position in Board space.

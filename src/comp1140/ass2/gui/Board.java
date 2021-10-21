@@ -1,9 +1,9 @@
 package comp1140.ass2.gui;
 
-import comp1140.ass2.Controller.Controller;
-import comp1140.ass2.gui.guiPieces.GuiBoard;
-import comp1140.ass2.gui.guiPieces.GuiSkybox;
-import comp1140.ass2.gui.guiPieces.Menu;
+import comp1140.ass2.controller.Controller;
+import comp1140.ass2.gui.guipieces.GuiBoard;
+import comp1140.ass2.gui.guipieces.GuiSkybox;
+import comp1140.ass2.gui.guipieces.Menu;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Group;

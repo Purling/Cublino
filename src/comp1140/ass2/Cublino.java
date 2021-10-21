@@ -1,20 +1,21 @@
 package comp1140.ass2;
 
-import comp1140.ass2.GameLogic.ContraCublino;
-import comp1140.ass2.GameLogic.Game;
-import comp1140.ass2.GameLogic.PurCublino;
-import comp1140.ass2.State.Boards;
-import comp1140.ass2.State.Die;
+import comp1140.ass2.gamelogic.ContraCublino;
+import comp1140.ass2.gamelogic.Game;
+import comp1140.ass2.gamelogic.PurCublino;
+import comp1140.ass2.state.Boards;
+import comp1140.ass2.state.Die;
 
 import java.util.Random;
 
-import static comp1140.ass2.State.Boards.boardToString;
+import static comp1140.ass2.state.Boards.boardToString;
 
 /**
  * @author Ziling Ouyang, Yuechen Liu
  */
 public class Cublino {
 
+    // TODO Remove in production
     // Dice orientation
     // Applies for both black and white players
     // a - Top: 1 Forward: 2 Left: 3

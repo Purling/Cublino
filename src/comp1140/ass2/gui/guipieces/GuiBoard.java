@@ -1,10 +1,10 @@
-package comp1140.ass2.gui.guiPieces;
+package comp1140.ass2.gui.guipieces;
 
-import comp1140.ass2.Controller.Controller;
-import comp1140.ass2.GameLogic.ContraCublino;
-import comp1140.ass2.GameLogic.Game;
-import comp1140.ass2.GameLogic.PurCublino;
-import comp1140.ass2.State.Die;
+import comp1140.ass2.controller.Controller;
+import comp1140.ass2.gamelogic.ContraCublino;
+import comp1140.ass2.gamelogic.Game;
+import comp1140.ass2.gamelogic.PurCublino;
+import comp1140.ass2.state.Die;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
@@ -20,7 +20,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import comp1140.ass2.State.Boards;
+import comp1140.ass2.state.Boards;
 
 import javafx.scene.*;
 import javafx.scene.shape.Box;

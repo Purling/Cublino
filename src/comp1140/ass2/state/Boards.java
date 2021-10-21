@@ -1,60 +1,30 @@
-package comp1140.ass2.State;
+package comp1140.ass2.state;
 
-import java.io.*;
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static comp1140.ass2.State.Die.dieToEncoding;
+import static comp1140.ass2.state.Die.dieToEncoding;
 
 /**
  * @author Whole group
  */
-public class Boards implements Serializable{
+public class Boards implements Serializable {
+    public static final int BOARD_DIMENSION = 7;
     private Players whitePlayer = new Players(true);
     private Players blackPlayer = new Players(false);
-    public static final int BOARD_DIMENSION = 7;
-
-    public static class Positions {
-        private String coordinate;
-
-        public Positions(String coordinate) {
-            this.coordinate = coordinate;
-        }
-
-        public int getX() {
-            return Integer.parseInt(coordinate.substring(0,1));
-        }
-
-        public int getY() {
-            return Integer.parseInt(coordinate.substring(1,2));
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Positions positions = (Positions) o;
-            return Objects.equals(coordinate, positions.coordinate);
-        }
-
-        @Override
-        public String toString() {
-            return coordinate;
-        }
-    }
-
     /**
      * A 2d array to represent the current status of the board
      */
-    private Die[][] board = new Die[BOARD_DIMENSION][BOARD_DIMENSION];
+    private final Die[][] board = new Die[BOARD_DIMENSION][BOARD_DIMENSION];
 
     public Boards(String encodedState) {
         //Assumes the encoded state is valid and well-formed
 
         assert encodedState.length() % 3 == 1;
         for (int i = 1; i < encodedState.length(); i += 3) {
-            Die d = new Die(encodedState.substring(i, i+3));
+            Die d = new Die(encodedState.substring(i, i + 3));
             if (d.isWhite() == whitePlayer.isWhite) whitePlayer.addToDice(d);
             else blackPlayer.addToDice(d);
             board[d.getY()][d.getX()] = d;
@@ -62,15 +32,127 @@ public class Boards implements Serializable{
     }
 
     /**
+     * Empty constructor for Boards
+     */
+    public Boards() {
+    }
+
+    /**
+     * Converts a move String into an array of String containing positions
+     *
+     * @param move Encoded String of positions
+     * @return String array of board positions indicating steps
+     */
+    public static Positions[] moveToPositions(String move) {
+
+        int even = 2;
+        char xPositionLowerRange = 'a';
+        char yPositionLowerRange = '1';
+        String twoSplit = "(?<=\\G.{2})";
+        char[] encodedCh = move.toCharArray();
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < encodedCh.length; i++) {
+            if (i % even == 0) {
+                sb.append((int) encodedCh[i] - xPositionLowerRange);
+            } else {
+                sb.append((int) encodedCh[i] - yPositionLowerRange);
+            }
+        }
+        return Arrays.stream(sb.toString().split(twoSplit)).map(Positions::new).collect(Collectors.toList()).toArray(Positions[]::new);
+    }
+
+    public static int getPositionX(String x) {
+        return Integer.parseInt(x.substring(0, 1));
+    }
+
+    public static int getPositionY(String x) {
+        return Integer.parseInt(x.substring(1));
+    }
+
+    public static int getManhattanDistance(String startPosition, String endPosition) {
+        return Math.abs(getPositionX(startPosition) - getPositionX(endPosition)) + Math.abs(getPositionY(startPosition) - getPositionY(endPosition));
+    }
+
+    /**
+     * Gets the position of the middle of two dice with a Manhattan distance of 2
+     *
+     * @param startPosition position of first die
+     * @param endPosition   position of second die
+     * @return The position which is between the two dice
+     */
+    public static String getMiddlePosition(String startPosition, String endPosition) {
+        if (getPositionX(startPosition) == getPositionX(endPosition)) {
+            return "" + getPositionX(startPosition)
+                    + (getPositionY(startPosition) > getPositionY(endPosition)
+                    ? getPositionY(startPosition) - 1
+                    : getPositionY(endPosition) - 1);
+        } else {
+            return (getPositionX(startPosition) > getPositionX(endPosition))
+                    ? "" + (getPositionX(startPosition) - 1) + getPositionY(startPosition)
+                    : "" + (getPositionX(endPosition) - 1) + getPositionY(startPosition);
+        }
+    }
+
+    /**
+     * Returns whether two positions are horizontal or vertical to each other
+     *
+     * @param position1 Position on board
+     * @param position2 Position on board
+     * @return True if positions are on the same axis(column/row), false otherwise
+     */
+    public static boolean sameAxis(String position1, String position2) {
+        return getPositionX(position1) == getPositionX(position2) || getPositionY(position1) == getPositionY(position2);
+    }
+
+    /**
+     * Returns the String representation of a board
+     *
+     * @param board The board being played on
+     * @return The String representation of said parameter board
+     */
+    public static String boardToString(Boards board) {
+        List<String> b = new ArrayList<>();
+        for (int x = 0; x < 7; x++) {
+            for (int y = 0; y < 7; y++) {
+                Die die;
+                if (board.getAt(x, y) != null) {
+                    die = board.getAt(x, y);
+                    b.add(dieToEncoding(die));
+                }
+            }
+        }
+        b.sort((o1, o2) -> {
+            int a = o1.charAt(2) - o2.charAt(2);
+            if (a != 0) {
+                return a;
+            }
+            int b1 = o1.charAt(1) - o2.charAt(1);
+            if (b1 != 0) {
+                return b1;
+            }
+            return o1.charAt(0) - o2.charAt(0);
+        });
+
+        StringBuilder str = new StringBuilder();
+        for (String r : b) {
+            str.append(r);
+        }
+
+        return str.toString();
+    }
+
+    /**
      * Creates a deep copy of the board
+     *
      * @return A deep copy the board
      */
     public Boards deepClone() {
         Boards object = new Boards();
         object.whitePlayer = this.whitePlayer != null ? this.whitePlayer.deepClone() : null;
         object.blackPlayer = this.blackPlayer != null ? this.blackPlayer.deepClone() : null;
-        for (int i =0; i< BOARD_DIMENSION; i++) {
-            for (int j =0; j< BOARD_DIMENSION; j++) {
+        for (int i = 0; i < BOARD_DIMENSION; i++) {
+            for (int j = 0; j < BOARD_DIMENSION; j++) {
                 if (this.board[i][j] != null) {
                     object.board[i][j] = this.board[i][j].deepClone();
                 }
@@ -95,70 +177,10 @@ public class Boards implements Serializable{
     }
 
     /**
-     * Empty constructor for Boards
-     */
-    public Boards() {
-    }
-
-    /**
-     * Converts a move String into an array of String containing positions
-     * @param move Encoded String of positions
-     * @return String array of board positions indicating steps
-     */
-    public static Positions[] moveToPositions(String move) {
-
-        int even = 2;
-        char xPositionLowerRange = 'a';
-        char yPositionLowerRange = '1';
-        String twoSplit = "(?<=\\G.{2})";
-        char[] encodedCh = move.toCharArray();
-        StringBuilder sb = new StringBuilder();
-
-        for(int i = 0; i < encodedCh.length; i++){
-            if (i % even == 0) {
-                sb.append((int) encodedCh[i] - xPositionLowerRange);
-            } else {
-                sb.append((int) encodedCh[i] - yPositionLowerRange);
-            }
-        }
-        return Arrays.stream(sb.toString().split(twoSplit)).map(Positions::new).collect(Collectors.toList()).toArray(Positions[]::new);
-    }
-
-    public static int getPositionX(String x) {
-        return Integer.parseInt(x.substring(0,1));
-    }
-
-    public static int getPositionY(String x) {
-        return Integer.parseInt(x.substring(1));
-    }
-
-    public static int getManhattanDistance(String startPosition, String endPosition) {
-        return Math.abs(getPositionX(startPosition) - getPositionX(endPosition)) + Math.abs(getPositionY(startPosition) - getPositionY(endPosition));
-    }
-
-    /**
-     * Gets the position of the middle of two dice with a Manhattan distance of 2
-     * @param startPosition position of first die
-     * @param endPosition position of second die
-     * @return The position which is between the two dice
-     */
-    public static String getMiddlePosition(String startPosition, String endPosition) {
-        if (getPositionX(startPosition) == getPositionX(endPosition)) {
-            return "" + getPositionX(startPosition)
-                    + (getPositionY(startPosition) > getPositionY(endPosition)
-                        ? getPositionY(startPosition) - 1
-                        : getPositionY(endPosition) - 1);
-        } else {
-            return (getPositionX(startPosition) > getPositionX(endPosition))
-                    ? "" + (getPositionX(startPosition) - 1) + getPositionY(startPosition)
-                    : "" + (getPositionX(endPosition) - 1) + getPositionY(startPosition);
-        }
-    }
-
-    /**
      * Evaluates if a coordinate is adjacent to another coordinate
+     *
      * @param startPosition First coordinate
-     * @param endPosition Other coordinate
+     * @param endPosition   Other coordinate
      * @return True if adjacent coordinates, false otherwise
      */
     public boolean isAdjacent(String startPosition, String endPosition) {
@@ -167,29 +189,19 @@ public class Boards implements Serializable{
 
     /**
      * Returns any adjacent die
+     *
      * @param die The die from which adjacency is determined
      * @return Any die which are adjacent to the specified die
      */
     public Die[] getAdjacentDie(Die die) {
-        ArrayList<Die> allDice = (ArrayList<Die>) Stream.concat(whitePlayer.getDice().stream(),blackPlayer.getDice().stream()).collect(Collectors.toList());
+        ArrayList<Die> allDice = (ArrayList<Die>) Stream.concat(whitePlayer.getDice().stream(), blackPlayer.getDice().stream()).collect(Collectors.toList());
         ArrayList<Die> adjacentDice = (ArrayList<Die>) allDice.stream().filter(die::isAdjacent).collect(Collectors.toList());
         return adjacentDice.toArray(Die[]::new);
     }
 
-
-
-    /**
-     * Returns whether two positions are horizontal or vertical to each other
-     * @param position1 Position on board
-     * @param position2 Position on board
-     * @return True if positions are on the same axis(column/row), false otherwise
-     */
-    public static boolean sameAxis(String position1, String position2) {
-        return getPositionX(position1) == getPositionX(position2) || getPositionY(position1) == getPositionY(position2);
-    }
-
     /**
      * Gets the die at the specified location on the board
+     *
      * @param x x-coordinate on board
      * @param y y-coordinate on board
      * @return A die or null if there is no die at particular location
@@ -199,13 +211,13 @@ public class Boards implements Serializable{
     }
 
     public Die getAt(String position) {
-        int x = Integer.parseInt(position.substring(0,1));
+        int x = Integer.parseInt(position.substring(0, 1));
         int y = Integer.parseInt(position.substring(1));
         return board[y][x];
     }
 
     public void setAt(String position, Die die) {
-        int x = Integer.parseInt(position.substring(0,1));
+        int x = Integer.parseInt(position.substring(0, 1));
         int y = Integer.parseInt(position.substring(1));
         board[y][x] = die;
     }
@@ -232,10 +244,9 @@ public class Boards implements Serializable{
 
         for (String dieStr : diceList) {
             Die die = new Die(dieStr);
-            if (die.isWhite()){
-               whitePlayer.addToDice(die);
-            }
-            else{
+            if (die.isWhite()) {
+                whitePlayer.addToDice(die);
+            } else {
                 blackPlayer.addToDice(die);
             }
         }
@@ -250,42 +261,6 @@ public class Boards implements Serializable{
     }
 
     /**
-     * Returns the String representation of a board
-     * @param board The board being played on
-     * @return The String representation of said parameter board
-     */
-    public static String boardToString(Boards board){
-        List<String> b = new ArrayList<>();
-        for(int x = 0; x < 7; x++){
-            for(int y = 0; y < 7; y++){
-                Die die;
-                if(board.getAt(x,y) != null){
-                    die = board.getAt(x,y);
-                    b.add(dieToEncoding(die));
-                }
-            }
-        }
-        b.sort((o1, o2) -> {
-            int a = o1.charAt(2) - o2.charAt(2);
-            if (a != 0) {
-                return a;
-            }
-            int b1 = o1.charAt(1) - o2.charAt(1);
-            if (b1 != 0) {
-                return b1;
-            }
-            return o1.charAt(0) - o2.charAt(0);
-        });
-
-        StringBuilder str = new StringBuilder();
-        for(String r : b) {
-            str.append(r);
-        }
-
-        return str.toString();
-    }
-
-    /**
      * Akin to a toString method for Boards
      */
     public String getStringRepresentation() {
@@ -293,7 +268,7 @@ public class Boards implements Serializable{
         String formattedCorrectly = boardRepresentation.replaceAll("(?<=[]])", "\n");
         String noCommas = formattedCorrectly.replaceAll("\n, ", "\n");
         String noFirstBracket = noCommas.substring(1);
-        return noFirstBracket.substring(0,noFirstBracket.length() - 2); // Gets rid of the last bracket
+        return noFirstBracket.substring(0, noFirstBracket.length() - 2); // Gets rid of the last bracket
     }
 
     /**
@@ -302,5 +277,34 @@ public class Boards implements Serializable{
     @Override
     public String toString() {
         return whitePlayer.getDice().toString() + "\n" + blackPlayer.getDice();
+    }
+
+    public static class Positions {
+        private final String coordinate;
+
+        public Positions(String coordinate) {
+            this.coordinate = coordinate;
+        }
+
+        public int getX() {
+            return Integer.parseInt(coordinate.substring(0, 1));
+        }
+
+        public int getY() {
+            return Integer.parseInt(coordinate.substring(1, 2));
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Positions positions = (Positions) o;
+            return Objects.equals(coordinate, positions.coordinate);
+        }
+
+        @Override
+        public String toString() {
+            return coordinate;
+        }
     }
 }

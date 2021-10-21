@@ -1,7 +1,7 @@
 package comp1140.ass2;
 
-import comp1140.ass2.State.Die;
-import comp1140.ass2.gui.guiPieces.GuiDie;
+import comp1140.ass2.state.Die;
+import comp1140.ass2.gui.guipieces.GuiDie;
 import javafx.geometry.Point3D;
 import javafx.scene.transform.Transform;
 import org.junit.jupiter.api.Test;

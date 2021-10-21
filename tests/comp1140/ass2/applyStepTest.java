@@ -1,15 +1,15 @@
 package comp1140.ass2;
 
-import comp1140.ass2.GameLogic.Game;
-import comp1140.ass2.GameLogic.PurCublino;
-import comp1140.ass2.State.Boards;
-import comp1140.ass2.State.Die;
+import comp1140.ass2.gamelogic.Game;
+import comp1140.ass2.gamelogic.PurCublino;
+import comp1140.ass2.state.Boards;
+import comp1140.ass2.state.Die;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 import java.util.Arrays;
 
-import static comp1140.ass2.GameLogic.Game.MoveType.*;
+import static comp1140.ass2.gamelogic.Game.MoveType.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.jupiter.api.Assertions.*;
 
