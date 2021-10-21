@@ -2,6 +2,7 @@ package comp1140.ass2.Controller;
 
 import comp1140.ass2.GameLogic.ContraCublino;
 import comp1140.ass2.GameLogic.Game;
+import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Die;
 import comp1140.ass2.gui.guiPieces.GuiDie;
 import comp1140.ass2.helperclasses.RoseNode;
@@ -92,8 +93,8 @@ public class EasyAI { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
 
     public static ContraCublino.ContraMove greedyAIMoveOnly(ContraCublino currentGameState) {
         RoseNode<ContraCublino> gameTree = new RoseNode<>(currentGameState);
-        DifficultAI.monteCarloExpansion(gameTree);
-        gameTree.getChildren().forEach(DifficultAI::monteCarloExpansion);
+        DifficultAI.monteCarloExpansionContra(gameTree);
+        gameTree.getChildren().forEach(DifficultAI::monteCarloExpansionContra);
         List<ContraCublino.ContraMove> legalMoves = List.of(currentGameState.generateLegalMoves());
         List<RoseNode<ContraCublino>> leaves = gameTree.getLeaves(new ArrayList<>());
         List<Double> evaluatedMoves = leaves.stream().map((x) -> greedyEvaluation(x.getState())).collect(Collectors.toList());
@@ -124,6 +125,57 @@ public class EasyAI { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
         Random rand = new Random();
         int randomMove = rand.nextInt(currentGameState.generateLegalMoves().length);
         return currentGameState.generateLegalMoves()[randomMove];
+    }
+
+    public static PurCublino randomMove(PurCublino currentGameState) {
+        Random rand = new Random();
+        int randomMove = rand.nextInt(currentGameState.generatePurMoves().length);
+        return currentGameState.generatePurMoves()[randomMove].getPossibleState();
+    }
+
+    public static Double greedyEvaluationPur(PurCublino currentGameState){
+        boolean isWhite = currentGameState.getCurrentPlayer().isWhite();
+        List<Die> playerDice = currentGameState.getCurrentPlayer().getDice();
+        List<Die> opponentDice = currentGameState.getOtherPlayer().getDice();
+
+        if (isWhite) {
+            if (playerDice.stream().allMatch(Die::isWhiteDieFinished)) return Double.MAX_VALUE;
+            if (opponentDice.stream().allMatch(Die::isBlackDieFinished)) return -Double.MAX_VALUE;
+            Double positionMark = (double) (2 * playerDice.stream().mapToInt(Die::evaluateApproachingDie).sum());
+            return playerDice.stream().mapToInt(Die::getY).sum() + positionMark;
+        } else {
+            if (playerDice.stream().allMatch(Die::isBlackDieFinished)) return Double.MAX_VALUE;
+            if (opponentDice.stream().allMatch(Die::isWhiteDieFinished)) return -Double.MAX_VALUE;
+            Double positionMark = (double) (2 * playerDice.stream().mapToInt(Die::evaluateApproachingDie).sum());
+            return playerDice.stream().mapToInt((x) -> 7 - x.getY()).sum() + positionMark;
+        }
+    }
+
+    public static PurCublino greedyAIPur(PurCublino currentGameState){
+        PurCublino.PurMove[] legalMoves = currentGameState.generatePurMoves();
+        List<Double> evaluatedMoves = Arrays.stream(legalMoves).map((x) -> greedyEvaluationPur(x.getPossibleState())).collect(Collectors.toList());
+        int generatedMoveIndex = evaluatedMoves.indexOf(evaluatedMoves.stream().max(Double::compareTo).orElse(0D));
+        assert generatedMoveIndex != -1;
+        return legalMoves[generatedMoveIndex].getPossibleState();
+    }
+
+
+
+    public static PurCublino.PurMove purGreedyMove(PurCublino currentState) {
+        RoseNode<PurCublino> gameTree = new RoseNode<>(currentState);
+        DifficultAI.monteCarloExpansionPur(gameTree);
+        gameTree.getChildren().forEach(DifficultAI::monteCarloExpansionPur);
+        List<PurCublino.PurMove> legalMoves = List.of(currentState.generatePurMoves());
+        List<RoseNode<PurCublino>> leaves = gameTree.getLeaves(new ArrayList<>());
+        List<Double> evaluatedMoves = leaves.stream().map((x) -> greedyEvaluationPur(x.getState())).collect(Collectors.toList());
+        int generatedMoveIndex = evaluatedMoves.indexOf(evaluatedMoves.stream().max(Double::compareTo).orElse(0D));
+        RoseNode<PurCublino> wanted = leaves.get(generatedMoveIndex);
+        while (wanted.getParent().getParent() != null) {
+            wanted = wanted.getParent();
+        }
+        int generatedIndex = legalMoves.stream().map((x) -> x.getPossibleState().getBoard()).collect(Collectors.toList()).indexOf(wanted.getState().getBoard());
+        assert generatedIndex != -1;
+        return legalMoves.get(generatedIndex);
     }
 
     /**

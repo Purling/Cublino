@@ -368,6 +368,17 @@ public class Die implements Serializable {
         return null;
     }
 
+    /**
+     * Evaluate the position of a die when it is approaching the edge
+     * @return
+     */
+    public int evaluateApproachingDie(){
+        if(this.isWhite()){
+            return this.getY() == 6 ? this.getBack() - 3 : 0;
+        }
+        else return this.getY() == 1 ? this.getFront() - 3: 0;
+    }
+
     public int getDown() {
         return down;
     }
