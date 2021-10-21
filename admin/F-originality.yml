@@ -42,7 +42,7 @@ declaration: >-
   - comment: Used to flatten a list of lists
     url: https://stackoverflow.com/a/25147125
     licence: CC BY-SA 3.0
-    - comment: Modified to format the toString() method of a tree
+  - comment: Modified to format the toString() method of a tree
     url: https://stackoverflow.com/a/27265035
     licence: CC BY-SA 3.0
 
