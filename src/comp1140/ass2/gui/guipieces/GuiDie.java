@@ -4,6 +4,7 @@ import comp1140.ass2.controller.Controller;
 import comp1140.ass2.state.Die;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point3D;
+import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
@@ -77,8 +78,11 @@ public class GuiDie extends MeshView {
         // Apply the appropriate die texture to the mesh
         if (controllers != null) {
             Skin appropriateSkin = controllers[die.isWhite() ? 0 : 1].getDiceSkin();
-            if (appropriateSkin != Skin.NONE)
-                setMaterial(GuiBoard.makePhongFromAsset("die/" + filenameOfSkin(appropriateSkin)));
+            if (appropriateSkin != Skin.NONE) {
+                PhongMaterial material = GuiBoard.makePhongFromAsset("die/" + filenameOfSkin(appropriateSkin));
+                material.setBumpMap(GuiBoard.imageFromAsset("die/bumpMap.png"));
+                setMaterial(material);
+            }
         }
 
 
