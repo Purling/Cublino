@@ -2,6 +2,7 @@ package comp1140.ass2.gui;
 
 import comp1140.ass2.Controller.Controller;
 import comp1140.ass2.gui.guiPieces.GuiBoard;
+import comp1140.ass2.gui.guiPieces.GuiSkybox;
 import comp1140.ass2.gui.guiPieces.Menu;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -45,7 +46,7 @@ public class Board extends Application {
         primaryStage.show();
     }
 
-    public void startGame(boolean isPur, Controller[] controllers) throws Exception {
+    public void startGame(boolean isPur, GuiSkybox.Locale locale, Controller[] controllers) throws Exception {
         root.getChildren().clear();
 
         Label turnDisplayer = new Label("White");
@@ -63,7 +64,7 @@ public class Board extends Application {
         takeBack.setLayoutX(VIEWER_WIDTH-100);
         takeBack.setLayoutY(50);
 
-        game = new GuiBoard((isPur ? "P" : "C") + "Wa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", controllers, isPur,true, turnDisplayer);
+        game = new GuiBoard((isPur ? "P" : "C") + "Wa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", locale, controllers, isPur,true, turnDisplayer);
 
         root.getChildren().addAll(game, turnDisplayer, takeBack);
     }

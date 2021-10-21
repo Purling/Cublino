@@ -2,6 +2,7 @@ package comp1140.ass2.gui;
 
 
 import comp1140.ass2.gui.guiPieces.GuiBoard;
+import comp1140.ass2.gui.guiPieces.GuiSkybox;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -39,7 +40,7 @@ public class Viewer extends Application {
      */
     void makePlacement(String placement) throws Exception {
         root.getChildren().remove(boardSubscene);
-        boardSubscene = new GuiBoard(placement, null, true, false, null);
+        boardSubscene = new GuiBoard(placement, GuiSkybox.Locale.NONE, null, true, false, null);
         root.getChildren().add(boardSubscene);
     }
 
@@ -75,7 +76,7 @@ public class Viewer extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        boardSubscene = new GuiBoard("", null, true, false, null);
+        boardSubscene = new GuiBoard("", GuiSkybox.Locale.RANDOM, null, true, false, null);
 
         primaryStage.setTitle("Cublino Viewer");
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);

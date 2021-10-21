@@ -72,7 +72,7 @@ public class GuiBoard extends SubScene {
      * @param turnLabel the text label in the HUD to be updated with info about the game
      * @throws Exception if moves can be made but null HUD label is provided
      */
-    public GuiBoard(String placement, Controller[] controllers, boolean isPur, boolean playable, Label turnLabel) throws Exception {
+    public GuiBoard(String placement, GuiSkybox.Locale locale, Controller[] controllers, boolean isPur, boolean playable, Label turnLabel) throws Exception {
         super(new Group(), VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
 
         this.controllers = controllers;
@@ -146,7 +146,7 @@ public class GuiBoard extends SubScene {
         pointLight.setTranslateY(-125);
         root.getChildren().add(pointLight);
 
-        boardRoot.getChildren().add(new GuiSkybox(imageFromAsset("skybox2.png")));
+        boardRoot.getChildren().add(new GuiSkybox(locale));
 
         boardRoot.getChildren().add(new GuiAvatar(this, 180, controllers[0].getName()));
         boardRoot.getChildren().add(new GuiAvatar(this, 0, controllers[1].getName()));

@@ -8,6 +8,14 @@ import javafx.scene.layout.HBox;
 
 public class Menu extends Group {
     public Menu(Board board) {
+
+        ChoiceBox<String> skybox = new ChoiceBox<>();
+        skybox.getItems().addAll("Random", "Lake", "Tundra", "Mars");
+        skybox.getSelectionModel().select(0);
+        skybox.setLayoutX(100);
+        skybox.setPrefWidth(150);
+        skybox.setLayoutY(50);
+
         PlayerMenu p1Menu = new PlayerMenu(0);
         PlayerMenu p2Menu = new PlayerMenu(1);
         p1Menu.setLayoutY(100);
@@ -24,6 +32,7 @@ public class Menu extends Group {
         beginButton.setOnAction(actionEvent -> {
             try {
                 board.startGame(gameMode.getSelectionModel().getSelectedIndex() == 0,
+                        skyboxFromDropdown(skybox.getSelectionModel().getSelectedIndex()),
                         new Controller[] {p1Menu.asController(), p2Menu.asController()});
             } catch (Exception e) {
                 e.printStackTrace();
@@ -31,7 +40,7 @@ public class Menu extends Group {
         beginButton.setLayoutX(400);
         beginButton.setLayoutY(200);
 
-        getChildren().addAll(p1Menu, p2Menu, gameMode, beginButton);
+        getChildren().addAll(skybox, p1Menu, p2Menu, gameMode, beginButton);
     }
 
     public static class PlayerMenu extends Group {
@@ -117,5 +126,15 @@ public class Menu extends Group {
                 }
             }
         }
+    }
+
+    public GuiSkybox.Locale skyboxFromDropdown(int i) {
+        return switch (i) {
+            case 0 -> GuiSkybox.Locale.RANDOM;
+            case 1 -> GuiSkybox.Locale.LAKE;
+            case 2 -> GuiSkybox.Locale.TUNDRA;
+            case 3 -> GuiSkybox.Locale.MARS;
+            default -> GuiSkybox.Locale.NONE;
+        };
     }
 }

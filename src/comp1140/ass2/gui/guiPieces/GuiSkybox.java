@@ -6,15 +6,28 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.transform.Rotate;
 
+import java.util.Random;
+
 public class GuiSkybox extends Group {
+
+    public enum Locale {
+        RANDOM, NONE, TUNDRA, MARS, LAKE
+    }
+
+    private final static Locale[] randomLocales = {Locale.LAKE, Locale.LAKE, Locale.TUNDRA, Locale.TUNDRA, Locale.MARS};
 
     // Top, Bottom, Back, Left, Front, Right
     private final ImageView[] faces = new ImageView[6];
 
     private final static double SIZE = 5000;
 
-    public GuiSkybox(Image image) {
+    public GuiSkybox(Locale locale) {
         super();
+
+        if (locale == Locale.RANDOM) {
+            Random r = new Random();
+            locale = randomLocales[r.nextInt(randomLocales.length)];
+        }
 
         for (int i = 0; i < 6; i++) {
             faces[i] = new ImageView();
@@ -23,7 +36,7 @@ public class GuiSkybox extends Group {
             getChildren().add(faces[i]);
         }
 
-        setTranslateY(1000);
+        if (locale == Locale.MARS) setTranslateY(1000);
 
         // Position all six faces
         faces[0].setTranslateX(-SIZE);
@@ -59,10 +72,14 @@ public class GuiSkybox extends Group {
         faces[4].setRotationAxis(Rotate.Y_AXIS);
         faces[4].setRotate(-90);
 
-        updateImage(image);
+        switch(locale) {
+            case TUNDRA -> updateImage(GuiBoard.imageFromAsset("skybox1.png"));
+            case MARS -> updateImage(GuiBoard.imageFromAsset("skybox2.png"));
+            case LAKE -> updateImage(GuiBoard.imageFromAsset("skybox3.png"));
+        }
     }
 
-    void updateImage(Image image) {
+    private void updateImage(Image image) {
         for (ImageView view : faces) {
             view.setImage(image);
         }
