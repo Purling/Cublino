@@ -5,10 +5,10 @@ import javafx.scene.shape.Box;
 
 public class GuiTile extends Box {
 
-    final static PhongMaterial whiteTileMaterial = GuiBoard.makePhongFromAsset("whiteTile.png");
-    final static PhongMaterial blackTileMaterial = GuiBoard.makePhongFromAsset("blackTile.png");
-    final static PhongMaterial darkRedTileMaterial = GuiBoard.makePhongFromAsset("previousSelectedTile.png");
-    final static PhongMaterial redTileMaterial = GuiBoard.makePhongFromAsset("selectedTile.png");
+    final static PhongMaterial whiteTileMaterial = GuiBoard.makePhongFromAsset("tile/whiteTile.png");
+    final static PhongMaterial blackTileMaterial = GuiBoard.makePhongFromAsset("tile/blackTile.png");
+    final static PhongMaterial darkRedTileMaterial = GuiBoard.makePhongFromAsset("tile/previousSelectedTile.png");
+    final static PhongMaterial redTileMaterial = GuiBoard.makePhongFromAsset("tile/selectedTile.png");
 
     Position position;
 

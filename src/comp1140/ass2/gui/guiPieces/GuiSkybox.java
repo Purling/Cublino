@@ -11,10 +11,10 @@ import java.util.Random;
 public class GuiSkybox extends Group {
 
     public enum Locale {
-        RANDOM, NONE, TUNDRA, MARS, LAKE
+        RANDOM, NONE, TUNDRA, MARS, LAKE, WHEAT, SKY
     }
 
-    private final static Locale[] randomLocales = {Locale.LAKE, Locale.LAKE, Locale.TUNDRA, Locale.TUNDRA, Locale.MARS};
+    private final static Locale[] randomLocales = {Locale.LAKE, Locale.TUNDRA, Locale.MARS, Locale.WHEAT};
 
     // Top, Bottom, Back, Left, Front, Right
     private final ImageView[] faces = new ImageView[6];
@@ -36,7 +36,7 @@ public class GuiSkybox extends Group {
             getChildren().add(faces[i]);
         }
 
-        if (locale == Locale.MARS) setTranslateY(1000);
+        if (locale == Locale.MARS) setTranslateY(1500);
 
         // Position all six faces
         faces[0].setTranslateX(-SIZE);
@@ -72,10 +72,19 @@ public class GuiSkybox extends Group {
         faces[4].setRotationAxis(Rotate.Y_AXIS);
         faces[4].setRotate(-90);
 
-        switch(locale) {
-            case TUNDRA -> updateImage(GuiBoard.imageFromAsset("skybox1.png"));
-            case MARS -> updateImage(GuiBoard.imageFromAsset("skybox2.png"));
-            case LAKE -> updateImage(GuiBoard.imageFromAsset("skybox3.png"));
+
+
+        String imageSource = switch(locale) {
+            case RANDOM -> null;
+            case NONE -> null;
+            case TUNDRA -> "siberian";
+            case MARS -> "martian";
+            case LAKE -> "placid";
+            case WHEAT -> "tuscan";
+            case SKY -> "overcast";
+        };
+        if (locale != Locale.NONE && locale != Locale.RANDOM) {
+            updateImage(GuiBoard.imageFromAsset("skybox/" + imageSource + ".png"));
         }
     }
 

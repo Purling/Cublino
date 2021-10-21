@@ -64,7 +64,7 @@ public class GuiDie extends MeshView {
         if (controllers != null) {
             Skin appropriateSkin = controllers[die.isWhite() ? 0 : 1].getDiceSkin();
             if (appropriateSkin != Skin.NONE)
-                setMaterial(GuiBoard.makePhongFromAsset(filenameOfSkin(appropriateSkin)));
+                setMaterial(GuiBoard.makePhongFromAsset("die/" + filenameOfSkin(appropriateSkin)));
         }
 
 
