@@ -42,6 +42,7 @@ public class DifficultAI {
         DifficultAI difficultAIContra = new DifficultAI(contra);
         DifficultAI difficultAIPur = new DifficultAI(pur);
         difficultAIContra.monteCarloMainContra();
+        difficultAIPur.monteCarloMainPur();
     }
 
     /**
