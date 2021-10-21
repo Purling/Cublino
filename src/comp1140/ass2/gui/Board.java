@@ -29,6 +29,7 @@ public class Board extends Application {
     private static final int VIEWER_HEIGHT = 700;
 
     GuiBoard game;
+    Menu menu;
 
     Group root;
 
@@ -40,10 +41,17 @@ public class Board extends Application {
 
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
 
-        root.getChildren().add(new Menu(this));
+        menu = new Menu(this);
+
+        showMenu();
 
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public void showMenu() {
+        root.getChildren().clear();
+        root.getChildren().add(menu);
     }
 
     public void startGame(boolean isPur, GuiSkybox.Locale locale, Controller[] controllers) throws Exception {
@@ -66,6 +74,11 @@ public class Board extends Application {
 
         game = new GuiBoard((isPur ? "P" : "C") + "Wa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", locale, controllers, isPur,true, turnDisplayer);
 
-        root.getChildren().addAll(game, turnDisplayer, takeBack);
+        Button toMenu = new Button("Menu");
+        toMenu.setOnMouseClicked(e -> {showMenu();});
+        toMenu.setLayoutX(VIEWER_WIDTH-100);
+        toMenu.setLayoutY(20);
+
+        root.getChildren().addAll(game, turnDisplayer, toMenu, takeBack);
     }
 }
