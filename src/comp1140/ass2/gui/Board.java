@@ -7,6 +7,7 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -57,8 +58,13 @@ public class Board extends Application {
         turnDisplayer.setScaleX(1.5);
         turnDisplayer.setScaleY(1.5);
 
+        Button takeBack = new Button("Takeback");
+        takeBack.setOnMouseClicked(e -> {game.takeBack();});
+        takeBack.setLayoutX(VIEWER_WIDTH-100);
+        takeBack.setLayoutY(50);
+
         game = new GuiBoard((isPur ? "P" : "C") + "Wa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", controllers, isPur,true, turnDisplayer);
 
-        root.getChildren().addAll(game, turnDisplayer);
+        root.getChildren().addAll(game, turnDisplayer, takeBack);
     }
 }

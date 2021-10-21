@@ -63,6 +63,8 @@ public class GuiBoard extends SubScene {
     private MediaPlayer moveSfx;
     private MediaPlayer stepSfx;
 
+    private final ArrayList<Game> stateHistory = new ArrayList<>();
+
     /**
      * Constructs a board and all reliant 3D elements to represent a game position
      * @param placement The initial position of the board to be displayed
@@ -157,6 +159,8 @@ public class GuiBoard extends SubScene {
         boardRoot.setTranslateX(450);
 
         handleBoardRotate(0, 0);
+
+        stateHistory.add(game.deepClone());
 
         if (permitsMoveMaking) haveCurrentPlayerMakeMove();
     }
@@ -310,7 +314,37 @@ public class GuiBoard extends SubScene {
             d.setTranslationFromDie();
         }
         game.endTurn();
+        stateHistory.add(game.deepClone());
         haveCurrentPlayerMakeMove();
+    }
+
+    public void takeBack() {
+        if (controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].getType() != Controller.ControllerType.HUMAN) return;
+        for (GuiDie d : guiDice) {
+            boardRoot.getChildren().remove(d);
+        }
+        guiDice.clear();
+
+        if (stateHistory.size() > 2) {
+            stateHistory.remove(stateHistory.size()-1);
+            stateHistory.remove(stateHistory.size()-1);
+            game = stateHistory.get(stateHistory.size()-1);
+        } else {
+            game = stateHistory.get(0);
+            stateHistory.clear();
+            stateHistory.add(game.deepClone());
+        }
+
+        for (int y = 0; y < 7; y++) {
+            for (int x = 0; x < 7; x++) {
+                Die die = game.getBoard().getAt(x, y);
+                if (die != null) {
+                    GuiDie m = new GuiDie(die, this, controllers);
+                    boardRoot.getChildren().add(m);
+                    guiDice.add(m);
+                }
+            }
+        }
     }
 
     /**

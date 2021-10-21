@@ -23,7 +23,6 @@ public abstract class Game implements Serializable {
 
     public static final int TIP_DISTANCE = 1;
     private final List<Move> stepHistory = new ArrayList<>();
-    private final List<Game> turnHistory = new ArrayList<>();
     /**
      * the current board two players are playing on
      */
@@ -45,6 +44,7 @@ public abstract class Game implements Serializable {
      * Empty constructor for Game
      */
     public Game() {
+
     }
 
     /**
@@ -124,8 +124,6 @@ public abstract class Game implements Serializable {
         currentPlayer = otherPlayer;
         otherPlayer = temp;
         stepHistory.clear();
-        turnHistory.clear();
-        turnHistory.add(deepClone());
         currentMoveDie = null;
     }
 
