@@ -16,14 +16,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import javax.swing.*;
-
 /**
- * A very simple viewer for piece placements in the Cublino game.
- * <p>
- * NOTE: This class is separate from your main game class.  This
- * class does not play a game, it just illustrates various piece
- * placements.
+ * A comprehensive class for playing games of Cublino.
  *
  * @author Zane Gates
  */
@@ -45,6 +39,10 @@ public class Board extends Application {
     boolean inGame = false;
     boolean pauseMenuVisible = false;
 
+    /**
+     * Starts the application
+     * @param primaryStage the stage from which the application will be built
+     */
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Cublino");
@@ -60,7 +58,8 @@ public class Board extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        turnDisplayer = new Label("White");
+        // Construct the label that shows whose turn it is currently
+        turnDisplayer = new Label("");
         turnDisplayer.setAlignment(Pos.TOP_LEFT);
         turnDisplayer.setTextAlignment(TextAlignment.LEFT);
         turnDisplayer.setLayoutX(40);
@@ -70,20 +69,23 @@ public class Board extends Application {
         turnDisplayer.setScaleX(1.5);
         turnDisplayer.setScaleY(1.5);
 
+        // Construct the take-back button
         takeBack = new Button("Takeback");
         takeBack.setOnMouseClicked(e -> {game.takeBack();});
-        takeBack.setLayoutX(VIEWER_WIDTH/2-50);
-        takeBack.setLayoutY(VIEWER_HEIGHT/2-20);
+        takeBack.setLayoutX(VIEWER_WIDTH*0.5-50);
+        takeBack.setLayoutY(VIEWER_HEIGHT*0.5-20);
         takeBack.setPrefWidth(100);
         takeBack.setTextAlignment(TextAlignment.CENTER);
 
+        // Construct a button to return to the menu
         toMenu = new Button("Menu");
         toMenu.setOnMouseClicked(e -> {showMenu();});
-        toMenu.setLayoutX(VIEWER_WIDTH/2-50);
-        toMenu.setLayoutY(VIEWER_HEIGHT/2+20);
+        toMenu.setLayoutX(VIEWER_WIDTH*0.5-50);
+        toMenu.setLayoutY(VIEWER_HEIGHT*0.5+20);
         toMenu.setPrefWidth(100);
         toMenu.setTextAlignment(TextAlignment.CENTER);
 
+        // Construct a translucent gray rectangle as a background for the pause menu
         Rectangle pauseBackground = new Rectangle();
         pauseBackground.setLayoutX(0);
         pauseBackground.setLayoutY(0);
@@ -92,6 +94,7 @@ public class Board extends Application {
         pauseBackground.setFill(Color.BLACK);
         pauseBackground.setOpacity(0.5);
 
+        // When ESCAPE is pressed while in a game, toggle the visibility of the pause menu
         scene.setOnKeyPressed(e -> {
             if (inGame && e.getCode() == KeyCode.ESCAPE) {
                 pauseMenuVisible = !pauseMenuVisible;
@@ -101,12 +104,22 @@ public class Board extends Application {
         });
     }
 
+    /**
+     * Shows the menu, and hides anything else currently visible, including the game and the pause menu
+     */
     public void showMenu() {
         inGame = false;
         root.getChildren().clear();
         root.getChildren().add(menu);
     }
 
+    /**
+     * Starts a game using settings read from the menu
+     * @param isPur whether the game-mode is Pur or Contra
+     * @param locale the skybox for this game
+     * @param controllers the controllers for each players
+     * @throws Exception if an invalid combination of parameters is given
+     */
     public void startGame(boolean isPur, GuiSkybox.Locale locale, Controller[] controllers) throws Exception {
         inGame = true;
         pauseMenuVisible = false;

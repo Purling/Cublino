@@ -76,6 +76,7 @@ public class Viewer extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
+        // Use a 3D sub scene for rendering the board alongside (behind) the controls
         boardSubscene = new GuiBoard("", GuiSkybox.Locale.RANDOM, null, true, false, null);
 
         primaryStage.setTitle("Cublino Viewer");
