@@ -104,7 +104,7 @@ public class GuiDie extends MeshView {
         setMouseTransparent(true);
 
         // Animate the die to show moves being made to it in real time
-        new AnimationTimer() {
+        if (controllers[die.isWhite() ? 0 : 1].getDiceSkin() != Skin.NONE) new AnimationTimer() {
             @Override
             public void handle(long l) {
                 // Check if no animation is currently playing

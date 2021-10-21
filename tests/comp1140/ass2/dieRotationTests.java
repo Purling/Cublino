@@ -1,5 +1,6 @@
 package comp1140.ass2;
 
+import comp1140.ass2.controller.Controller;
 import comp1140.ass2.state.Die;
 import comp1140.ass2.gui.guipieces.GuiDie;
 import javafx.geometry.Point3D;
@@ -33,7 +34,7 @@ class dieRotationTests {
                     // Construct the die and its model
                     String placementString = "" + o + x + y;
                     Die d = new Die(placementString);
-                    t = new GuiDie(d, null, null).necessaryRotations();
+                    t = new GuiDie(d, null, new Controller[]{new Controller(Controller.ControllerType.HUMAN, "", GuiDie.Skin.NONE)}).necessaryRotations();
 
                     // Make sure every face on the model is positioned where the die class suggests it should be
                     makeRotationAssertion(d.getTop(), up, "top");
