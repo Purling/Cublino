@@ -203,7 +203,7 @@ public class Cublino {
         if (board.getAt(end) != null) return false;
 
         if (board.isAdjacent(start, end)) {
-            return !purCublino.isMoveBackwards(start, end);
+            return purCublino.isMoveNotBackwards(start, end);
         } else if (Boards.getManhattanDistance(start, end) == jumpDistance) {
             return purCublino.isJumpValid(start, end);
         } else {

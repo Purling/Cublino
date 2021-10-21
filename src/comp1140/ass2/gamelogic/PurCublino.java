@@ -15,12 +15,12 @@ import java.util.stream.Stream;
 import static comp1140.ass2.state.Boards.BOARD_DIMENSION;
 
 /**
- * A gamemode of Cublino that extends from the Game class. It represents the game which is currently being played by the user
+ * A game mode of Cublino that extends from the Game class. It represents the game which is currently being played by the user
  *
  * @author Ziling Ouyang, Yuechen Liu
  */
 
-public class PurCublino extends Game implements Serializable, DeepCloneable<PurCublino> {
+public class PurCublino extends Game implements Serializable, DeepCloneable<Game> {
 
     /**
      * The distance of a jump
@@ -71,7 +71,7 @@ public class PurCublino extends Game implements Serializable, DeepCloneable<PurC
         MoveType moveType;
         boolean correctDie = firstEntry || isDieCorrect(die);
 
-        if (!isMoveBackwards(diePosition, endPosition) && distance == TIP_DISTANCE && correctDie && firstEntry) {
+        if (isMoveNotBackwards(diePosition, endPosition) && distance == TIP_DISTANCE && correctDie && firstEntry) {
             applyTip(die, endPosition);
             setCurrentMoveDie(die);
             moveType = MoveType.TIP;
@@ -108,12 +108,12 @@ public class PurCublino extends Game implements Serializable, DeepCloneable<PurC
      * @return True if both players have simultaneously won, false otherwise
      */
     @Override
-    public boolean hasBothWon(Boards board) {
+    public boolean hasBothNotWon(Boards board) {
 
         List<Die> white = board.getWhitePlayer().getDice();
         List<Die> black = board.getBlackPlayer().getDice();
 
-        return white.stream().allMatch(Die::isWhiteDieFinished) && black.stream().allMatch(Die::isBlackDieFinished);
+        return !white.stream().allMatch(Die::isWhiteDieFinished) || !black.stream().allMatch(Die::isBlackDieFinished);
     }
 
     /**
@@ -125,7 +125,7 @@ public class PurCublino extends Game implements Serializable, DeepCloneable<PurC
      */
     public boolean isJumpValid(String startPosition, String endPosition) {
         String middle = Boards.getMiddlePosition(startPosition, endPosition);
-        return !isMoveBackwards(startPosition, endPosition)
+        return isMoveNotBackwards(startPosition, endPosition)
                 && (board.getAt(Boards.getPositionX(middle), Boards.getPositionY(middle)) != null)
                 && (Boards.sameAxis(startPosition, endPosition));
     }
@@ -155,7 +155,7 @@ public class PurCublino extends Game implements Serializable, DeepCloneable<PurC
      * @return True if the board has no violated rules, false otherwise
      */
     public boolean isGameValid(Boards board) {
-        return (isDiceAmountCorrect(board) && !hasBothWon(board));
+        return (isDiceAmountCorrect(board) && hasBothNotWon(board));
     }
 
     /**

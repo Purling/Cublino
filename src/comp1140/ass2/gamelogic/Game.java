@@ -1,38 +1,48 @@
 package comp1140.ass2.gamelogic;
 
+import comp1140.ass2.helperclasses.DeepCloneable;
 import comp1140.ass2.state.Boards;
 import comp1140.ass2.state.Die;
 import comp1140.ass2.state.Players;
-import comp1140.ass2.gui.Board;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
- * The player will be allowed to decide which version of cublino he or she wants to play.
- * Option includes PurCublino and ContraCublino
+ * The player will be allowed to decide which version of Cublino he or she wants to play.
+ * Options include PurCublino and ContraCublino
  *
  * @author Ziling Ouyang, minor edits by Zane Gates
  */
 
-public abstract class Game implements Serializable {
+public abstract class Game implements Serializable, DeepCloneable<Game> {
 
+    /**
+     * The distance moved in a tip step
+     */
     public static final int TIP_DISTANCE = 1;
+
+    /**
+     * The steps which the game has already performed in that turn
+     */
     private final List<Move> stepHistory = new ArrayList<>();
+
     /**
      * the current board two players are playing on
      */
     Boards board;
+
     /**
      * store the current player that is making his moves
      */
     private Players currentPlayer;
+
     /**
      * store the player who is not making a move
      */
     private Players otherPlayer;
+
     /**
      * The die that is currently selected to be moved
      */
@@ -66,7 +76,7 @@ public abstract class Game implements Serializable {
      *
      * @return True if both players have won, False otherwise
      */
-    abstract protected boolean hasBothWon(Boards board);
+    abstract protected boolean hasBothNotWon(Boards board);
 
     /**
      * Returns if each player has a legal amount of dice
@@ -74,13 +84,6 @@ public abstract class Game implements Serializable {
      * @return True if the dice amount is valid, False otherwise
      */
     abstract protected boolean isDiceAmountCorrect(Boards board);
-
-    /**
-     * Getter for currentMoveDie
-     */
-    public Die getCurrentMoveDie() {
-        return currentMoveDie;
-    }
 
     /**
      * Setter for currentMoveDie
@@ -94,11 +97,11 @@ public abstract class Game implements Serializable {
      *
      * @return True if the die is going backwards, False otherwise
      */
-    public boolean isMoveBackwards(String startPosition, String endPosition) {
+    public boolean isMoveNotBackwards(String startPosition, String endPosition) {
         if (currentPlayer.isWhite()) {
-            return (Boards.getPositionY(endPosition) - Boards.getPositionY(startPosition)) < 0;
+            return (Boards.getPositionY(endPosition) - Boards.getPositionY(startPosition)) >= 0;
         } else {
-            return (Boards.getPositionY(startPosition) - Boards.getPositionY(endPosition)) < 0;
+            return (Boards.getPositionY(startPosition) - Boards.getPositionY(endPosition)) >= 0;
         }
     }
 
@@ -112,6 +115,12 @@ public abstract class Game implements Serializable {
         return chosenDie.equals(currentMoveDie) && chosenDie.isWhite() == currentPlayer.isWhite();
     }
 
+    /**
+     * Apply the given step to the die
+     *
+     * @param die         The die that will be moved
+     * @param endPosition The position the die will end up in
+     */
     abstract public void applyStep(Die die, String endPosition);
 
     /**
@@ -125,29 +134,49 @@ public abstract class Game implements Serializable {
         currentMoveDie = null;
     }
 
+    /**
+     * Removes all elements from stepHistory list
+     */
     public void clearStepHistory() {
         stepHistory.clear();
     }
 
     /**
-     * Creates a deep copy of the game
-     *
-     * @return A deep copy the game
+     * Implements the deepClone method from DeepCloneable interface
      */
     public Game deepClone() {
+        ObjectOutputStream oos = null;
+        ObjectInputStream ois = null;
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos = new ObjectOutputStream(baos);
             oos.writeObject(this);
 
             ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bais);
+            ois = new ObjectInputStream(bais);
             return (Game) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             return null;
+        } finally {
+            try {
+                if (oos != null) {
+                    oos.close();
+                }
+                if (ois != null) {
+                    ois.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
+    /**
+     * Applies a tipping move upon the die
+     *
+     * @param initial     The die to be moved
+     * @param endPosition The position the die will be moved to
+     */
     public void applyTip(Die initial, String endPosition) {
 
         String start = initial.getPosition();
@@ -179,21 +208,18 @@ public abstract class Game implements Serializable {
         return stepHistory;
     }
 
+    /**
+     * Getter for currentPlayer
+     */
     public Players getCurrentPlayer() {
         return currentPlayer;
     }
 
+    /**
+     * Getter for board
+     */
     public Boards getBoard() {
         return board;
-    }
-
-    /**
-     * Display all the legal turns according to the current status of the board
-     *
-     * @return A list of boards representing different possible moves
-     */
-    public Board[] legalTurns() {
-        return null;
     }
 
     /**
@@ -218,112 +244,52 @@ public abstract class Game implements Serializable {
     public abstract GameResult getWinner();
 
     /**
-     * Given a new state and an old one (assuming that the new state results from a *step* applied to the old state) the methods finds the step
-     *
-     * @param originalGame The original game
-     * @param newGame      The new game after a step has been applied to the original
-     * @return The step in DieMove form
+     * Enum representing the different types of moves which can be played and also the original move
      */
-    public static DieMove findMove(Game originalGame, Game newGame) {
-        DieMove dieMove = new DieMove();
-        List<Die> originalCurrentPlayer = originalGame.currentPlayer.getDice();
-        List<Die> otherOpponentPlayer = newGame.otherPlayer.getDice();
-        Iterator<Die> iter = originalCurrentPlayer.iterator();
-        Iterator<Die> iter1 = otherOpponentPlayer.iterator();
-
-        while (iter.hasNext()) {
-            Die die = iter.next();
-
-            while (iter1.hasNext()) {
-                Die die1 = iter1.next();
-                if (die.equals(die1)) {
-                    iter.remove();
-                    iter1.remove();
-                }
-            }
-        }
-        dieMove.setDie(originalCurrentPlayer.get(0));
-        if (otherOpponentPlayer.isEmpty()) {
-            dieMove.setEndPosition(null);
-        } else {
-            dieMove.setEndPosition(otherOpponentPlayer.get(0).getPosition());
-        }
-        return dieMove;
-    }
-
     public enum MoveType {
         TIP, JUMP, ORIGIN, INVALID
     }
 
+    /**
+     * Enum representing outcomes / states the game can be in
+     */
     public enum GameResult {
         UNFINISHED, WHITE_WINS, BLACK_WINS, TIE
     }
 
-    public static class DieMove {
-        Die die;
-        String endPosition;
-
-        /**
-         * Empty constructor
-         */
-        public DieMove() {
-        }
-
-        public DieMove(Die die, String endPosition) {
-            this.die = die;
-            this.endPosition = endPosition;
-        }
-
-        /**
-         * Getter for endPosition
-         */
-        public String getEndPosition() {
-            return endPosition;
-        }
-
-        /**
-         * Setter for endPosition
-         */
-        public void setEndPosition(String endPosition) {
-            this.endPosition = endPosition;
-        }
-
-        /**
-         * Getter for possibleState
-         */
-        public Die getDie() {
-            return die;
-        }
-
-        /**
-         * Setter for possibleState
-         */
-        public void setDie(Die die) {
-            this.die = die;
-        }
-
-        /**
-         * To string method
-         */
-        @Override
-        public String toString() {
-            return endPosition;
-        }
-    }
-
+    /**
+     * Stores a move which has been played or will potentially be played
+     */
     public class Move implements Serializable {
+
+        /**
+         * The board which has been played already
+         */
         Boards historicalBoard;
+
+        /**
+         * The type of move
+         */
         MoveType type;
 
+        /**
+         * Constructor for Move
+         */
         public Move(Boards historicalBoard, MoveType type) {
             this.historicalBoard = historicalBoard;
             this.type = type;
         }
 
+        /**
+         * Getter for type
+         */
         public MoveType getType() {
             return type;
         }
 
+        /**
+         * Getter for historicalBoard
+         */
         public Boards getBoard() {
             return historicalBoard;
         }
