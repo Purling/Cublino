@@ -15,34 +15,6 @@ import static comp1140.ass2.state.Boards.boardToString;
  */
 public class Cublino {
 
-    // TODO Remove in production
-    // Dice orientation
-    // Applies for both black and white players
-    // a - Top: 1 Forward: 2 Left: 3
-    // b - Top: 1 Forward: 3 Left: 5
-    // c - Top: 1 Forward: 4 Left: 2
-    // d - Top: 1 Forward: 5 Left: 4
-    // e - Top: 2 Forward: 1 Left: 4
-    // f - Top: 2 Forward: 3 Left: 1
-    // g - Top: 2 Forward: 4 Left: 6
-    // h - Top: 2 Forward: 6 Left: 3
-    // i - Top: 3 Forward: 1 Left: 2
-    // j - Top: 3 Forward: 2 Left: 6
-    // k - Top: 3 Forward: 5 Left: 1
-    // l - Top: 3 Forward: 6 Left: 5
-    // m - Top: 4 Forward: 1 Left: 5
-    // n - Top: 4 Forward: 2 Left: 1
-    // o - Top: 4 Forward: 5 Left: 6
-    // p - Top: 4 Forward: 6 Left: 2
-    // q - Top: 5 Forward: 1 Left: 3
-    // r - Top: 5 Forward: 3 Left: 6
-    // s - Top: 5 Forward: 4 Left: 1
-    // t - Top: 5 Forward: 6 Left: 4
-    // u - Top: 6 Forward: 2 Left: 4
-    // v - Top: 6 Forward: 3 Left: 2
-    // w - Top: 6 Forward: 4 Left: 5
-    // x - Top: 6 Forward: 5 Left: 3
-
     /**
      * Task 3:
      * Determine whether the input state is well formed or not.

@@ -3,8 +3,8 @@ package comp1140.ass2.controller;
 import comp1140.ass2.gamelogic.ContraCublino;
 import comp1140.ass2.gamelogic.Game;
 import comp1140.ass2.gamelogic.PurCublino;
+import comp1140.ass2.helperclasses.DeepCloneable;
 import comp1140.ass2.helperclasses.RoseNode;
-import comp1140.ass2.state.Boards;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -13,12 +13,14 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 
 /**
- * A difficult AI controller
+ * A difficult AI controller i.e., an AI which should challenge the player
+ *
+ * @author Ziling Ouyang, Yuechen Liu
  */
-public class DifficultAI {
+public class DifficultAI implements DeepCloneable<DifficultAI> {
     private static final long RUN_TIME = 20000;
-    private RoseNode<Game> gameTree;
     private final Game game;
+    private final RoseNode<Game> gameTree;
 
     /**
      * Constructor for DifficultAI
@@ -28,36 +30,13 @@ public class DifficultAI {
         this.gameTree = new RoseNode<>(game);
     }
 
-    // For debugging purposes only
-    public static void main(String[] args) {
-//        Boards ContraBoard = new Boards("CWa1Wb1Wc1Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
-//        Boards PurBoard = new Boards("PWa1Wb1Lc2Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
-//        ContraCublino contra = new ContraCublino(true, ContraBoard); // remember to switch isWhite to false if black is the current player
-//        PurCublino pur = new PurCublino(true, PurBoard);
-//        DifficultAI difficultAIContra = new DifficultAI(contra);
-//        DifficultAI difficultAIPur = new DifficultAI(pur);
-//        difficultAIContra.monteCarloMainContra();
-//        difficultAIPur.monteCarloMainPur();
-
-//        Boards ContraBoard = new Boards("CWa1Wb1Wc1Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
-        Boards PurBoard = new Boards("pWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7");
-//        ContraCublino contra = new ContraCublino(true, ContraBoard); // remember to switch isWhite to false if black is the current player
-        PurCublino pur = new PurCublino(true, PurBoard);
-//        DifficultAI difficultAIContra = new DifficultAI(contra);
-        DifficultAI difficultAIPur = new DifficultAI(pur);
-        EasyAI.greedyAIPur(pur);
-        System.out.println(EasyAI.greedyAIPur(pur).getBoard().getStringRepresentation());
-//        difficultAIContra.monteCarloMainContra();
-//        difficultAIPur.monteCarloMainPur();
-    }
-
     /**
      * Expands a node so that its children are the possible states reached after playing a move. If there are no possible moves, the child is the same game but
      * with the turn ended.
      *
      * @param treeNode The node to be expanded
      */
-    public static void monteCarloExpansion(RoseNode<Game> treeNode) { // Consider where this should be
+    public static void monteCarloExpansion(RoseNode<Game> treeNode) {
         Game nodeToExpand = treeNode.getState();
         List<Game> children = Arrays.stream((nodeToExpand).generateLegalMoves()).map(ContraCublino.GameMove::getPossibleState)
                 .collect(toList());
@@ -75,9 +54,7 @@ public class DifficultAI {
     }
 
     /**
-     * Create a deep copy of the DifficultAI object
-     *
-     * @return a deep copy of the DifficultAI object
+     * Implements the deepClone method from DeepCloneable interface
      */
     public DifficultAI deepClone() {
         return new DifficultAI(this.game.deepClone());
@@ -99,7 +76,7 @@ public class DifficultAI {
         for (Future<RoseNode<Game>> future : futures) {
             try {
 
-                indices.add(getMaxChildIndexContra(future.get()));
+                indices.add(getMaxChildIndex(future.get()));
                 trees.add(future.get());
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
@@ -126,12 +103,12 @@ public class DifficultAI {
      *
      * @return The next best move as a board
      */
-    public RoseNode<Game> monteCarloTreeSearch(RoseNode<Game> gameTree) { // Assumes that a new gameTree is generated each time
+    public RoseNode<Game> monteCarloTreeSearch(RoseNode<Game> gameTree) {
         long start = System.currentTimeMillis();
         long end = start + RUN_TIME;
         Random rand = new Random();
         monteCarloExpansion(gameTree);
-        while (System.currentTimeMillis() < end) { // can potentially exit earlier
+        while (System.currentTimeMillis() < end) {
             RoseNode<Game> selectedNode = findNodeContra(gameTree);
             if (selectedNode.getVisitCount() == 0) {
                 if (selectedNode.getState() instanceof ContraCublino) {
@@ -162,7 +139,7 @@ public class DifficultAI {
      * @param treeNode The node from which to get the best child node
      * @return The best child node
      */
-    private int getMaxChildIndexContra(RoseNode<Game> treeNode) { // Can also make this based on percentages think about the case of more than 1 "best"
+    private int getMaxChildIndex(RoseNode<Game> treeNode) {
         List<Integer> winScores = treeNode.getChildren().stream().map(RoseNode::getWinCount).collect(toList());
         return winScores.indexOf(winScores.stream().max(Integer::compareTo).orElseThrow());
     }
@@ -191,6 +168,12 @@ public class DifficultAI {
         return contra.getWinner();
     }
 
+    /**
+     * Simulates a random or semi-random game that is played from the current state given
+     *
+     * @param pur The current game being played
+     * @return The result of the simulation
+     */
     public Game.GameResult simulatePur(PurCublino pur) {
         // Really need to optimise simulate, it is one of the things preventing the tree search from being very fast
         // Random moves is probably a bit too slow,
@@ -274,6 +257,11 @@ public class DifficultAI {
         return node.getChildren().get(indices.get(rand.nextInt(indices.size())));
     }
 
+    /**
+     * A class to implement multithreading
+     *
+     * @author Ziling Ouyang
+     */
     public static class RunMonteCarlo implements Callable<RoseNode<Game>> {
         private final DifficultAI ai;
 
