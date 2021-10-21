@@ -1,4 +1,4 @@
-package comp1140.ass2.State;
+package comp1140.ass2.state;
 
 import comp1140.ass2.helperclasses.DeepCloneable;
 

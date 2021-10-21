@@ -1,4 +1,4 @@
-package comp1140.ass2.State;
+package comp1140.ass2.state;
 
 import comp1140.ass2.helperclasses.DeepCloneable;
 
@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Comparator;
 
-import static comp1140.ass2.State.Direction.*;
+import static comp1140.ass2.state.Direction.*;
 
 /**
  * Represents a Die in Cublino

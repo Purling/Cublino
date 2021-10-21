@@ -1,6 +1,6 @@
 package comp1140.ass2;
 
-import comp1140.ass2.gui.guiPieces.GuiDie;
+import comp1140.ass2.gui.guipieces.GuiDie;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 

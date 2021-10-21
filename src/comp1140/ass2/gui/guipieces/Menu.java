@@ -1,6 +1,6 @@
-package comp1140.ass2.gui.guiPieces;
+package comp1140.ass2.gui.guipieces;
 
-import comp1140.ass2.Controller.Controller;
+import comp1140.ass2.controller.Controller;
 import comp1140.ass2.gui.Board;
 import javafx.scene.Group;
 import javafx.scene.control.*;

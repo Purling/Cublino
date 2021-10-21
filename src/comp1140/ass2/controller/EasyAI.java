@@ -1,10 +1,8 @@
-package comp1140.ass2.Controller;
+package comp1140.ass2.controller;
 
-import comp1140.ass2.GameLogic.ContraCublino;
-import comp1140.ass2.GameLogic.Game;
-import comp1140.ass2.GameLogic.PurCublino;
-import comp1140.ass2.State.Die;
-import comp1140.ass2.gui.guiPieces.GuiDie;
+import comp1140.ass2.gamelogic.ContraCublino;
+import comp1140.ass2.gamelogic.PurCublino;
+import comp1140.ass2.state.Die;
 import comp1140.ass2.helperclasses.RoseNode;
 
 import java.util.ArrayList;

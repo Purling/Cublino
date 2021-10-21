@@ -1,16 +1,14 @@
-package comp1140.ass2.GameLogic;
+package comp1140.ass2.gamelogic;
 
-import comp1140.ass2.Controller.Controller;
-import comp1140.ass2.State.Boards;
-import comp1140.ass2.State.Die;
-import comp1140.ass2.State.Players;
+import comp1140.ass2.state.Boards;
+import comp1140.ass2.state.Die;
+import comp1140.ass2.state.Players;
 import comp1140.ass2.gui.Board;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * The player will be allowed to decide which version of cublino he or she wants to play.

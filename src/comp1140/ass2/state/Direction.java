@@ -1,4 +1,4 @@
-package comp1140.ass2.State;
+package comp1140.ass2.state;
 
 /**
  * Representing the direction of the movement of the dice

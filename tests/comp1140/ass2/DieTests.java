@@ -1,12 +1,12 @@
 package comp1140.ass2;
 
 
-import comp1140.ass2.State.Die;
+import comp1140.ass2.state.Die;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
-import static comp1140.ass2.State.Die.dieToEncoding;
-import static comp1140.ass2.State.Direction.*;
+import static comp1140.ass2.state.Die.dieToEncoding;
+import static comp1140.ass2.state.Direction.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

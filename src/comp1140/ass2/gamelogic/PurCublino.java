@@ -1,8 +1,8 @@
-package comp1140.ass2.GameLogic;
+package comp1140.ass2.gamelogic;
 
-import comp1140.ass2.State.Boards;
-import comp1140.ass2.State.Die;
-import comp1140.ass2.State.Direction;
+import comp1140.ass2.state.Boards;
+import comp1140.ass2.state.Die;
+import comp1140.ass2.state.Direction;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static comp1140.ass2.State.Boards.BOARD_DIMENSION;
+import static comp1140.ass2.state.Boards.BOARD_DIMENSION;
 
 /**
  * A gamemode of Cublino that extends from the Game class

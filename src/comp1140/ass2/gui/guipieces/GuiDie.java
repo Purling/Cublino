@@ -1,7 +1,7 @@
-package comp1140.ass2.gui.guiPieces;
+package comp1140.ass2.gui.guipieces;
 
-import comp1140.ass2.Controller.Controller;
-import comp1140.ass2.State.Die;
+import comp1140.ass2.controller.Controller;
+import comp1140.ass2.state.Die;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point3D;
 import javafx.scene.shape.MeshView;

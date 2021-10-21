@@ -1,4 +1,4 @@
-package comp1140.ass2.gui.guiPieces;
+package comp1140.ass2.gui.guipieces;
 
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point3D;
