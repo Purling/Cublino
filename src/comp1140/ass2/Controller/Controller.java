@@ -85,7 +85,10 @@ public class Controller {
         }
 
         // If a move has been made and an associated gui is provided, alert the GUI that a move has been made
-        if (gui != null && type != ControllerType.HUMAN) Platform.runLater(() -> gui.moveComplete());
+        if (gui != null && type != ControllerType.HUMAN) Platform.runLater(() -> {
+            System.out.println("move complete()");
+            gui.moveComplete();
+        });
     }
 
     /**
@@ -103,6 +106,7 @@ public class Controller {
         int endY   = encodedMove.charAt(3)-49;
 
         Die movingDie = game.getBoard().getAt(startX, startY);
+        game.applyStep(movingDie, endX + "" + endY);
 
         // Any other dice that are not present on the final board must have been removed,
         // which we will indicate through the deleted die flag

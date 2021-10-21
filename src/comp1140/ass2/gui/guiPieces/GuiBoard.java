@@ -140,13 +140,13 @@ public class GuiBoard extends SubScene {
         tableBase.setRadius(650);
         tableBase.setHeight(40);
         tableBase.setTranslateY(80);
-        tableBase.setMaterial(GuiTile.blackTileMaterial);
+        tableBase.setMaterial(makePhongFromAsset("spruce.jpg"));
         boardRoot.getChildren().add(tableBase);
         Cylinder tableLeg = new Cylinder();
         tableLeg.setRadius(50);
         tableLeg.setHeight(500);
         tableLeg.setTranslateY(325);
-        tableLeg.setMaterial(GuiTile.blackTileMaterial);
+        tableLeg.setMaterial(makePhongFromAsset("spruce.jpg"));
         boardRoot.getChildren().add(tableLeg);
 
         // Establish soft white lighting to remove shading and shadows
