@@ -39,9 +39,12 @@ declaration: >-
 # Add as many "url+licence+comment" entries as necessary
 # (or remove it altogether if you haven't used any external code)
 #code:
-#  - comment:
-#    url:
-#    licence:
+  - comment: Used to flatten a list of lists
+    url: https://stackoverflow.com/a/25147125
+    licence: CC BY-SA 3.0
+    - comment: Modified to format the toString() method of a tree
+    url: https://stackoverflow.com/a/27265035
+    licence: CC BY-SA 3.0
 
 # Use this to list any assets (artwork, sound, etc) that you used.
 # Provide a comment explaining your use of that asset and the URL
