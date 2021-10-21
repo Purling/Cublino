@@ -3,6 +3,7 @@ package comp1140.ass2.gui.guiPieces;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -40,6 +41,16 @@ public class GuiAvatar extends Group {
         text.setMouseTransparent(true);
         subGroup.getChildren().add(text);
 
+        ImageView view = new ImageView();
+        view.setScaleX(0.25);
+        view.setScaleY(0.25);
+        view.setLayoutX(-260);
+        view.setLayoutY(-400);
+        view.setImage(GuiBoard.imageFromAsset("humanLogo.png"));
+        view.setMouseTransparent(true);
+        subGroup.getChildren().add(view);
+
+
         // Move this tag to the edge of the board, and rotate it to the appropriate edge
         subGroup.setTranslateZ(125 * 3.5);
         subGroup.setTranslateY(-100);
@@ -62,7 +73,9 @@ public class GuiAvatar extends Group {
                 // Use a smooth curve to fade the opacity
                 double opacity = (2/(Math.pow(difference / 90, 2)+1))-1;
                 if (opacity < 0) opacity = 0;
-                setOpacity(opacity);
+
+                text.setOpacity(opacity);
+                view.setOpacity(opacity);
             }
         }.start();
     }
