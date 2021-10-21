@@ -1,6 +1,6 @@
 package comp1140.ass2.gui.guipieces;
 
-import comp1140.ass2.Controller.Controller;
+import comp1140.ass2.controller.Controller;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
