@@ -11,7 +11,7 @@ import java.util.Random;
 /**
  * A skybox surrounding the board, implemented through cubemaps, with various preset locations
  *
- * Author: Zane Gates
+ * @author Zane Gates
  */
 public class GuiSkybox extends Group {
 

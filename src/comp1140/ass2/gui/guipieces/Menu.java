@@ -13,7 +13,7 @@ import javafx.scene.text.TextAlignment;
  * A menu containing all the options for the game,
  * displayed at the start of the program and in between every game
  *
- * Author: Zane Gates
+ * @author Zane Gates
  */
 public class Menu extends Group {
 

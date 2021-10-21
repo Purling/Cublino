@@ -9,7 +9,7 @@ import javafx.scene.shape.Box;
 /**
  * A class representing one of the tiles on the 7x7 Cublino board
  *
- * Author: Zane Gates
+ * @author Zane Gates
  */
 public class GuiTile extends Group {
 
