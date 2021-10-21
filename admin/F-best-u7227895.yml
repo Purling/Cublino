@@ -34,8 +34,7 @@ declaration: >-
 
 # I wish to submit the following methods as entirely my own (remove this if
 # you want to just submit classes):
-#method:
-# 
+method:
 - generatePurMoves https://gitlab.cecs.anu.edu.au/u7312578/comp1140-ass2-tue12s/-/blob/master/src/comp1140/ass2/gamelogic/PurCublino.java#L228-368
 
 # sign *your* name and uid here
