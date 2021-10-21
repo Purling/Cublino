@@ -26,6 +26,7 @@ import javafx.scene.transform.Rotate;
 
 /**
  * Displays a possibly interactive board.
+ * This is the parent class in the GUI system, from which almost everything else is called.
  *
  * @author Zane Gates
  */
@@ -36,6 +37,8 @@ public class GuiBoard extends SubScene {
     private static final int VIEWER_HEIGHT = 700;
 
     private static final String URI_BASE = "assets/";
+
+    private static final double MOUSE_SENSITIVITY = 0.1;
 
     Game game;
     Label turnLabel;
@@ -70,18 +73,17 @@ public class GuiBoard extends SubScene {
      * @param placement The initial position of the board to be displayed
      * @param playable whether or not moves can be made in the GUI. The board can be rotated regardless
      * @param turnLabel the text label in the HUD to be updated with info about the game
-     * @throws Exception if moves can be made but null HUD label is provided
+     * @throws Exception if an incorrect configuration is provided (e.g. moves can be made but no label is given)
      */
     public GuiBoard(String placement, GuiSkybox.Locale locale, Controller[] controllers, boolean isPur, boolean playable, Label turnLabel) throws Exception {
         super(new Group(), VIEWER_WIDTH, VIEWER_HEIGHT, true, SceneAntialiasing.BALANCED);
 
+        // Initialise fields
         this.controllers = controllers;
-
         this.permitsMoveMaking = playable;
-        if (permitsMoveMaking && turnLabel == null)
+        if (playable == (turnLabel == null))
             throw new InvalidSetupException("Any playable board must have an associated HUD");
         this.turnLabel = turnLabel;
-
         Group root = new Group();
         this.setRoot(root);
         boardTiles = new GuiTile[7][7];
@@ -100,16 +102,10 @@ public class GuiBoard extends SubScene {
                 // Construct the checkerboard tile
                 boardTiles[x][y] = new GuiTile(new Position(x, y), this);
                 boardRoot.getChildren().add(boardTiles[x][y]);
-
-                // If the game state contains a die at the current position, construct it as well
-                Die die = game.getBoard().getAt(x, y);
-                if (die != null) {
-                    GuiDie m = new GuiDie(die, this, controllers);
-                    boardRoot.getChildren().add(m);
-                    guiDice.add(m);
-                }
             }
         }
+        // And, construct any dice on the board
+        createGuiDice();
 
         // These next four handlers connect mouse controls to their corresponding actions
         setEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
@@ -141,28 +137,45 @@ public class GuiBoard extends SubScene {
 
         // Establish soft white lighting to remove shading and shadows
         root.getChildren().add(new AmbientLight(Color.rgb(175, 175, 175)));
-        // Use a stronger light to draw attention towards the board
+        // Use a stronger light to draw attention towards the board and add highlights
         PointLight pointLight = new PointLight(Color.rgb(200, 200, 225));
         pointLight.setTranslateY(-125);
         root.getChildren().add(pointLight);
 
+        // Add a skybox with the user-selected background
         boardRoot.getChildren().add(new GuiSkybox(locale));
 
-        boardRoot.getChildren().add(new GuiAvatar(this, 180, controllers[0].getName()));
-        boardRoot.getChildren().add(new GuiAvatar(this, 0, controllers[1].getName()));
+        // Add avatars at each end of the board to represent the player 'sitting' at that position
+        if (controllers != null && controllers.length == 2) {
+            boardRoot.getChildren().add(new GuiAvatar(this, 180, controllers[0].getName()));
+            boardRoot.getChildren().add(new GuiAvatar(this, 0, controllers[1].getName()));
+        }
 
+        // Prepare sound effects
         moveSfx = playableFromAsset("sfx/woodenThump.mp3");
         stepSfx = playableFromAsset("sfx/woodenHit.mp3");
         moveSfx.setVolume(0.2);
         stepSfx.setVolume(0.2);
 
+        // Center board in camera
         boardRoot.setTranslateX(450);
 
+        // Initialise the camera in its default position
         handleBoardRotate(0, 0);
 
+        // Add the starting position to allow take-backs
         stateHistory.add(game.deepClone());
 
+        // The first player should move
         if (permitsMoveMaking) haveCurrentPlayerMakeMove();
+    }
+
+    /**
+     * A simpler constructor to display an uninteractive board
+     * @param placement the game state to display
+     */
+    public GuiBoard(String placement) throws Exception {
+        this(placement, GuiSkybox.Locale.NONE, null, true, false, null);
     }
 
     /**
@@ -171,10 +184,13 @@ public class GuiBoard extends SubScene {
      * @param xPosition the x-coordinate of the mouse on the screen
      */
     private void handleSelectDie(double xPosition, double yPosition) {
+        // Selected only the mouse-over tile
         mouseDown = true;
         selectedTiles.clear();
         selectedTiles.add(mouseOverTile);
 
+        // To select a die, it must be on the currently selected position, the color
+        // of the currently-moving player, not deleted, and owned by a human player
         for (GuiDie m : guiDice) {
             if (mouseOverTile != null && m.die.getPosition().equals(mouseOverTile.toString())
                     && m.die.isWhite() == game.getCurrentPlayer().isWhite() && !m.die.isDeleted()
@@ -184,6 +200,7 @@ public class GuiBoard extends SubScene {
             }
         }
 
+        // If no die is selected, prepare to rotate the board
         selectedDie = null;
         mouseX = xPosition;
         mouseY = yPosition;
@@ -205,24 +222,35 @@ public class GuiBoard extends SubScene {
      * @param xPosition the x-coordinate of the mouse on the screen
      */
     private void handleBoardRotate(double xPosition, double yPosition) {
-        cameraYaw += (mouseX-xPosition)/10;
-        cameraPitch += (mouseY-yPosition)/10;
+        // Update the angle of the camera in both planes depending on the movement of the mouse since the last tick
+        cameraYaw += (mouseX-xPosition)*MOUSE_SENSITIVITY;
+        cameraPitch += (mouseY-yPosition)*MOUSE_SENSITIVITY;
+
+        // Clamp the vertical angle to between 2 and 89 degrees so the user can't look under directly over the board
         if (cameraPitch > -2) cameraPitch = -2;
         if (cameraPitch < -89) cameraPitch = -89;
+
         mouseX = xPosition;
         mouseY = yPosition;
 
+        // Update the rotations of the board and camera, and move the camera to keep the board in view
         boardRoot.setRotate(cameraYaw);
         camera.setRotate(cameraPitch);
         camera.setTranslateZ(-700*Math.cos(Math.toRadians(cameraPitch))+362);
         camera.setTranslateY(250*Math.sin(Math.toRadians(cameraPitch)) - 400);
     }
 
+    /**
+     * Plays the sound effect representing the completion of either player's move
+     */
     public void playMoveSfx() {
         moveSfx.stop();
         moveSfx.play();
     }
 
+    /**
+     * Plays the sound effect denoting one part of a move starting to be performed
+     */
     public void playStepSfx() {
         stepSfx.stop();
         stepSfx.play();
@@ -235,6 +263,7 @@ public class GuiBoard extends SubScene {
     private void handleDieRelease() {
         selectedDie = null;
 
+        // If an actual move (not just invalid steps) has been made, complete the move
         for (Game.Move m : game.getStepHistory()) {
             if (m.getType() == Game.MoveType.JUMP || m.getType() == Game.MoveType.TIP) {
                 moveComplete();
@@ -242,6 +271,7 @@ public class GuiBoard extends SubScene {
             }
         }
 
+        // Deselect everything
         mouseDown = false;
         selectedTiles.clear();
         redrawSelection();
@@ -291,14 +321,20 @@ public class GuiBoard extends SubScene {
             boardTiles[mouseOverTile.x][mouseOverTile.y].setSelected(GuiTile.SelectionType.CURRENT);
     }
 
+    /**
+     * Request a move from the controller representing the current player if the game has not finished.
+     */
     private void haveCurrentPlayerMakeMove() {
+        // Check if the game has finished
         Game.GameResult result = game.getWinner();
         if (result == Game.GameResult.UNFINISHED) {
+            // If it hasn't, asynchronously request a move from this player, and indicate this in the GUI
             turnLabel.setText(controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].getName() + "'s turn.");
             new Thread(() -> {
                 controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].requestMove(game,this);
             }).start();
         } else {
+            // If the game is over, stop anyone from making moves, and show the result in the UI
             permitsMoveMaking = false;
             switch(result) {
                 case TIE: turnLabel.setText("Tie!"); return;
@@ -308,6 +344,9 @@ public class GuiBoard extends SubScene {
         }
     }
 
+    /**
+     * Completes the current player's turn. This function assumes that a valid move has actually been made.
+     */
     public void moveComplete() {
         for (GuiDie d : guiDice) {
             d.setTranslationFromDie();
@@ -317,13 +356,22 @@ public class GuiBoard extends SubScene {
         haveCurrentPlayerMakeMove();
     }
 
+    /**
+     * Undo the most-recently made pair of moves.
+     */
     public void takeBack() {
+        // Take-backs can only be performed when the current player is human
         if (controllers[game.getCurrentPlayer().isWhite() ? 0 : 1].getType() != Controller.ControllerType.HUMAN) return;
+
+        // Destroy any UI dice -- since the previous game is a clone that uses different
+        // dice, they will be unlinked from the current dice, so we must recreate them
         for (GuiDie d : guiDice) {
             boardRoot.getChildren().remove(d);
         }
         guiDice.clear();
 
+        // Peel off the two most recent turns (one from each player, so the same player is making a move)
+        // If this is not possible because we are very close to the start, just go back to the start of the game.
         if (stateHistory.size() > 2) {
             stateHistory.remove(stateHistory.size()-1);
             stateHistory.remove(stateHistory.size()-1);
@@ -334,8 +382,15 @@ public class GuiBoard extends SubScene {
             stateHistory.add(game.deepClone());
         }
 
+        // Recreate the GUI's dice
+        createGuiDice();
+    }
+
+    private void createGuiDice() {
+        // Iterate over every tile on the board
         for (int y = 0; y < 7; y++) {
             for (int x = 0; x < 7; x++) {
+                // If the game state contains a die at the current position, construct it
                 Die die = game.getBoard().getAt(x, y);
                 if (die != null) {
                     GuiDie m = new GuiDie(die, this, controllers);
@@ -367,14 +422,25 @@ public class GuiBoard extends SubScene {
         return result;
     }
 
+    /**
+     * Construct a simple image from a file stored in the assets folder
+     * @param path the relative path to the image, including the file type
+     * @return the Image
+     */
     public static Image imageFromAsset(String path) {
         return new Image(new File(URI_BASE + path).toURI().toString());
     }
 
+    /**
+     * Construct a playable audio object from a file in the assets folder
+     * @param path the relative path to the sound, including the file type
+     * @return the sound effect or music asset
+     */
     public static MediaPlayer playableFromAsset(String path) {
         return new MediaPlayer(new Media(new File(URI_BASE + path).toURI().toString()));
     }
 
+    // An error raised whenever an invalid combination of parameters are passed to the constructor
     private static class InvalidSetupException extends Exception {
         public InvalidSetupException(String errorMessage) {
             super(errorMessage);

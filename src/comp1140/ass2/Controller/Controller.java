@@ -8,6 +8,12 @@ import comp1140.ass2.gui.guiPieces.GuiBoard;
 import comp1140.ass2.gui.guiPieces.GuiDie;
 import javafx.application.Platform;
 
+/**
+ * Represents one of the players in the game, which can be
+ * owned by either a human or an AI of graduated difficulties
+ *
+ * Author: Zane Gates, Ziling Ouyang
+ */
 public class Controller {
     public enum ControllerType {HUMAN, EASY_AI, DIFFICULT_AI}
 
@@ -16,7 +22,10 @@ public class Controller {
     GuiDie.Skin diceSkin;
 
     /**
-     * Constructor for Controller
+     * Constructs a controller with all of the relevant seetings
+     * @param type the owner of this controller
+     * @param name the in-game name
+     * @param diceSkin the die skin used
      */
     public Controller(ControllerType type, String name, GuiDie.Skin diceSkin) {
         this.type = type;
@@ -38,9 +47,12 @@ public class Controller {
 
     /**
      * If the player is AI, then automatically choose the move;
-     * @param gui The UI components
+     * @param game The game state from which to make a move
+     * @param gui The board that should be updated once a move has been made
      */
     public void requestMove(Game game, GuiBoard gui) {
+        // Call the relevant AI on the relevant type of game, if not controlled by a HUMAN
+        // Once the move has been calculated, apply it to the initial game state
         if (game instanceof PurCublino) {
             switch (type) {
                 case EASY_AI -> {
@@ -72,17 +84,28 @@ public class Controller {
             }
         }
 
+        // If a move has been made and an associated gui is provided, alert the GUI that a move has been made
         if (gui != null && type != ControllerType.HUMAN) Platform.runLater(() -> gui.moveComplete());
     }
 
-    void applyGeneratedMove(String encodedMove, Game game, Game finalState) {
+    /**
+     * Applies an encoded move to a game to make it match the given state after the move has been made
+     * while preserving object references to the initial game state and its dice
+     * @param encodedMove the encoded move in either Contra or Pur
+     * @param game the initial game to make the application from
+     * @param finalState the resulting state that should be identical to the final game
+     */
+    private void applyGeneratedMove(String encodedMove, Game game, Game finalState) {
+        // From the string encoding of the move, discern the starting and ending coordinates
         int startX = encodedMove.charAt(0)-97;
         int startY = encodedMove.charAt(1)-49;
         int endX   = encodedMove.charAt(2)-97;
         int endY   = encodedMove.charAt(3)-49;
-        System.out.println(startX +"," + startY + " -> " + endX + "," + endY);
+
         Die movingDie = game.getBoard().getAt(startX, startY);
-        game.applyStep(movingDie, endX + "" + endY);
+
+        // Any other dice that are not present on the final board must have been removed,
+        // which we will indicate through the deleted die flag
         for (Die d : game.getCurrentPlayer().getDice()) {
             if (d != movingDie && finalState.getBoard().getAt(d.getX(), d.getY()) == null) {
                 d.delete();

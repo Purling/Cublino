@@ -1,9 +1,21 @@
 package comp1140.ass2.gui.guiPieces;
 
+/**
+ * A simple helper class, representing a position in Board space.
+ * Differs from the Position class used in State classes by having clamp checks to disallow off-board moves
+ * but with less unnecessary functionality elsewhere.
+ *
+ * Author: Zane Gates
+ */
 public class Position {
     public int x;
     public int y;
 
+    /**
+     * Constructs a position by clamping the x and y variables to the range (0,0) -- (6,6) inclusive
+     * @param x the un-clamped x position
+     * @param y the un-clamped y position
+     */
     public Position(int x, int y) {
         this.x = x;
         this.y = y;
