@@ -10,8 +10,13 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+
+import javax.swing.*;
 
 /**
  * A very simple viewer for piece placements in the Cublino game.
@@ -33,6 +38,13 @@ public class Board extends Application {
 
     Group root;
 
+    Label turnDisplayer;
+    Button takeBack;
+    Button toMenu;
+
+    boolean inGame = false;
+    boolean pauseMenuVisible = false;
+
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Cublino");
@@ -47,17 +59,8 @@ public class Board extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
 
-    public void showMenu() {
-        root.getChildren().clear();
-        root.getChildren().add(menu);
-    }
-
-    public void startGame(boolean isPur, GuiSkybox.Locale locale, Controller[] controllers) throws Exception {
-        root.getChildren().clear();
-
-        Label turnDisplayer = new Label("White");
+        turnDisplayer = new Label("White");
         turnDisplayer.setAlignment(Pos.TOP_LEFT);
         turnDisplayer.setTextAlignment(TextAlignment.LEFT);
         turnDisplayer.setLayoutX(40);
@@ -67,18 +70,48 @@ public class Board extends Application {
         turnDisplayer.setScaleX(1.5);
         turnDisplayer.setScaleY(1.5);
 
-        Button takeBack = new Button("Takeback");
+        takeBack = new Button("Takeback");
         takeBack.setOnMouseClicked(e -> {game.takeBack();});
-        takeBack.setLayoutX(VIEWER_WIDTH-100);
-        takeBack.setLayoutY(50);
+        takeBack.setLayoutX(VIEWER_WIDTH/2-50);
+        takeBack.setLayoutY(VIEWER_HEIGHT/2-20);
+        takeBack.setPrefWidth(100);
+        takeBack.setTextAlignment(TextAlignment.CENTER);
 
-        game = new GuiBoard((isPur ? "P" : "C") + "Wa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", locale, controllers, isPur,true, turnDisplayer);
-
-        Button toMenu = new Button("Menu");
+        toMenu = new Button("Menu");
         toMenu.setOnMouseClicked(e -> {showMenu();});
-        toMenu.setLayoutX(VIEWER_WIDTH-100);
-        toMenu.setLayoutY(20);
+        toMenu.setLayoutX(VIEWER_WIDTH/2-50);
+        toMenu.setLayoutY(VIEWER_HEIGHT/2+20);
+        toMenu.setPrefWidth(100);
+        toMenu.setTextAlignment(TextAlignment.CENTER);
 
-        root.getChildren().addAll(game, turnDisplayer, toMenu, takeBack);
+        Rectangle pauseBackground = new Rectangle();
+        pauseBackground.setLayoutX(0);
+        pauseBackground.setLayoutY(0);
+        pauseBackground.setWidth(VIEWER_WIDTH);
+        pauseBackground.setHeight(VIEWER_HEIGHT);
+        pauseBackground.setFill(Color.BLACK);
+        pauseBackground.setOpacity(0.5);
+
+        scene.setOnKeyPressed(e -> {
+            if (inGame && e.getCode() == KeyCode.ESCAPE) {
+                pauseMenuVisible = !pauseMenuVisible;
+                if (pauseMenuVisible) root.getChildren().addAll(pauseBackground, takeBack, toMenu);
+                else root.getChildren().removeAll(pauseBackground, takeBack, toMenu);
+            }
+        });
+    }
+
+    public void showMenu() {
+        inGame = false;
+        root.getChildren().clear();
+        root.getChildren().add(menu);
+    }
+
+    public void startGame(boolean isPur, GuiSkybox.Locale locale, Controller[] controllers) throws Exception {
+        inGame = true;
+        pauseMenuVisible = false;
+        root.getChildren().clear();
+        game = new GuiBoard((isPur ? "P" : "C") + "Wa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7", locale, controllers, isPur,true, turnDisplayer);
+        root.getChildren().addAll(game, turnDisplayer);
     }
 }
