@@ -1,5 +1,8 @@
 package comp1140.ass2.gui.guipieces;
 
+import javafx.scene.Group;
+import javafx.scene.PointLight;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 
@@ -8,7 +11,7 @@ import javafx.scene.shape.Box;
  *
  * Author: Zane Gates
  */
-public class GuiTile extends Box {
+public class GuiTile extends Group {
 
     final static PhongMaterial whiteTileMaterial = GuiBoard.makePhongFromAsset("tile/whiteTile.png");
     final static PhongMaterial blackTileMaterial = GuiBoard.makePhongFromAsset("tile/blackTile.png");
@@ -17,6 +20,10 @@ public class GuiTile extends Box {
 
     Position position;
 
+    Box box;
+
+    PointLight selectionLight;
+
     /**
      * Constructs a tile on the GUI like a JavaFx box
      * @param position the position to construct it at, in board space
@@ -24,21 +31,29 @@ public class GuiTile extends Box {
      */
     public GuiTile(Position position, GuiBoard board) {
         // Create a 125x20x125 box at put it at the correct position
-        super(125, 20, 125);
-        setTranslateX(125 * (position.x - 3));
-        setTranslateY(50);
-        setTranslateZ(125 * (position.y - 3));
+        box = new Box(125, 20, 125);
+        box.setTranslateX(125 * (position.x - 3));
+        box.setTranslateY(50);
+        box.setTranslateZ(125 * (position.y - 3));
         this.position = new Position(position.x, position.y);
 
-        // Tiles should start deselected
-        setSelected(SelectionType.UNSELECTED);
+        // Tiles should start deselected, using a material according to a checkerboard pattern
+        box.setMaterial((position.x + position.y) % 2 == 0 ? whiteTileMaterial : blackTileMaterial);
         toBack();
 
         // Mouse-overs are all handled by the viewer, so just connect it to the relevant functions
-        setOnMouseEntered(e -> board.handleMouseOverTile(position));
-        setOnMouseDragEntered(e -> board.handleMouseOverTile(position));
-        setOnMouseExited(e -> board.handleMouseExitTile(position));
-        setOnMouseDragExited(e -> board.handleMouseExitTile(position));
+        box.setOnMouseEntered(e -> board.handleMouseOverTile(position));
+        box.setOnMouseDragEntered(e -> board.handleMouseOverTile(position));
+        box.setOnMouseExited(e -> board.handleMouseExitTile(position));
+        box.setOnMouseDragExited(e -> board.handleMouseExitTile(position));
+
+        selectionLight = new PointLight();
+        selectionLight.setTranslateX(125 * (position.x - 3));
+        selectionLight.setTranslateY(25);
+        selectionLight.setTranslateZ(125 * (position.y - 3));
+
+        getChildren().addAll(box, selectionLight);
+        setSelected(SelectionType.UNSELECTED);
     }
 
     /**
@@ -47,12 +62,11 @@ public class GuiTile extends Box {
      */
     public void setSelected(SelectionType s) {
         switch (s) {
-            // Draw a checkerboard pattern by the parity of the sum of the tile's coordinates
-            case UNSELECTED -> setMaterial((position.x + position.y) % 2 == 0
-                    ? whiteTileMaterial : blackTileMaterial);
-            case PREVIOUS -> setMaterial(darkRedTileMaterial);
-            case CURRENT -> setMaterial(redTileMaterial);
+            case UNSELECTED -> selectionLight.setColor(Color.rgb(255, 255, 255));
+            case PREVIOUS -> selectionLight.setColor(Color.rgb(225, 225, 150));
+            case CURRENT -> selectionLight.setColor(Color.rgb(255, 255, 255));
         }
+        selectionLight.setLightOn(s != SelectionType.UNSELECTED);
     }
 
     public enum SelectionType {UNSELECTED, PREVIOUS, CURRENT}
