@@ -34,15 +34,27 @@ public class DifficultAI {
         }
     }
 
+    // For debugging purposes only
     public static void main(String[] args) {
-        Boards ContraBoard = new Boards("CWa1Wb1Wc1Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
-        Boards PurBoard = new Boards("PWa1Wb1Lc2Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
-        ContraCublino contra = new ContraCublino(true, ContraBoard); // remember to switch isWhite to false if black is the current player
+//        Boards ContraBoard = new Boards("CWa1Wb1Wc1Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
+//        Boards PurBoard = new Boards("PWa1Wb1Lc2Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
+//        ContraCublino contra = new ContraCublino(true, ContraBoard); // remember to switch isWhite to false if black is the current player
+//        PurCublino pur = new PurCublino(true, PurBoard);
+//        DifficultAI difficultAIContra = new DifficultAI(contra);
+//        DifficultAI difficultAIPur = new DifficultAI(pur);
+//        difficultAIContra.monteCarloMainContra();
+//        difficultAIPur.monteCarloMainPur();
+
+//        Boards ContraBoard = new Boards("CWa1Wb1Wc1Wd1We1Wf1Lg2ic6va7vb7vd7ve7vf7vg7");
+        Boards PurBoard = new Boards("pWa1Wb1Wc1Wd1We1Wf1Wg1va7vb7vc7vd7ve7vf7vg7");
+//        ContraCublino contra = new ContraCublino(true, ContraBoard); // remember to switch isWhite to false if black is the current player
         PurCublino pur = new PurCublino(true, PurBoard);
-        DifficultAI difficultAIContra = new DifficultAI(contra);
+//        DifficultAI difficultAIContra = new DifficultAI(contra);
         DifficultAI difficultAIPur = new DifficultAI(pur);
-        difficultAIContra.monteCarloMainContra();
-        difficultAIPur.monteCarloMainPur();
+        EasyAI.greedyAIPur(pur);
+        System.out.println(EasyAI.greedyAIPur(pur).getBoard().getStringRepresentation());
+//        difficultAIContra.monteCarloMainContra();
+//        difficultAIPur.monteCarloMainPur();
     }
 
     /**
@@ -182,18 +194,6 @@ public class DifficultAI {
      * @param treeNode The node from which to get the best child node
      * @return The best child node
      */
-    private Boards getMaxChild(RoseNode<ContraCublino> treeNode) { // Can also make this based on percentages
-        List<Integer> winScores = treeNode.getChildren().stream().map(RoseNode::getWinCount).collect(toList());
-        int indexWanted = winScores.indexOf(winScores.stream().max(Integer::compareTo).orElseThrow());
-        return treeNode.getChildren().get(indexWanted).getState().getBoard(); // Get rid of in production
-    }
-
-    /**
-     * Finds the child node with the most wins / win-visit ratio depending on what is wanted
-     *
-     * @param treeNode The node from which to get the best child node
-     * @return The best child node
-     */
     private int getMaxChildIndexContra(RoseNode<ContraCublino> treeNode) { // Can also make this based on percentages think about the case of more than 1 "best"
         List<Integer> winScores = treeNode.getChildren().stream().map(RoseNode::getWinCount).collect(toList());
         return winScores.indexOf(winScores.stream().max(Integer::compareTo).orElseThrow());
@@ -271,13 +271,12 @@ public class DifficultAI {
         // Random moves is probably a bit too slow,
         // greedy with lookahead of 1 is probably too stupid. Maybe try greedy with a lookahead of 2 or 3 in combination with random
         int counter = 1;
-        EasyAI easy = new EasyAI();
         while (pur.getWinner().equals(Game.GameResult.UNFINISHED)) {
             boolean everyThird = (counter % 3) == 0;
             // Can be any move making mechanism. e.g., minimax, greedy, etc
             // Currently a combination of random and greedy
             if (everyThird) pur = EasyAI.randomMove(pur);
-            if (pur.getWinner().equals(Game.GameResult.UNFINISHED)) pur = easy.greedyAIPur(pur);
+            if (pur.getWinner().equals(Game.GameResult.UNFINISHED)) pur = EasyAI.greedyAIPur(pur);
             if (pur.getWinner().equals(Game.GameResult.UNFINISHED) && everyThird) pur = EasyAI.randomMove(pur);
             counter++;
         }

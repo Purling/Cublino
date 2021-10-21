@@ -12,9 +12,11 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
+ * AI which generates moves which shouldn't challenge the player too much
+ *
  * @author Ziling Ouyang, Zane Gates
  */
-public class EasyAI { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
+public class EasyAI {
 
     /**
      * Empty constructor for EasyAI
@@ -119,16 +121,12 @@ public class EasyAI { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
         return currentGameState.generateLegalMoves()[randomMove].getPossibleState();
     }
 
-    public static ContraCublino.ContraMove moveOnly(ContraCublino currentGameState) {
-        Random rand = new Random();
-        int randomMove = rand.nextInt(currentGameState.generateLegalMoves().length);
-        return currentGameState.generateLegalMoves()[randomMove];
-    }
-
     public static PurCublino randomMove(PurCublino currentGameState) {
         Random rand = new Random();
         int randomMove = rand.nextInt(currentGameState.generatePurMoves().length);
-        return currentGameState.generatePurMoves()[randomMove].getPossibleState();
+        PurCublino returnState = currentGameState.generatePurMoves()[randomMove].getPossibleState();
+        returnState.endTurn();
+        return returnState;
     }
 
     public static Double greedyEvaluationPur(PurCublino currentGameState){
@@ -157,8 +155,12 @@ public class EasyAI { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
         return legalMoves[generatedMoveIndex].getPossibleState();
     }
 
-
-
+    /**
+     * Returns the greedyAI generated move for pur but in a format easily readable by the GUI
+     *
+     * @param currentState The current state the game is in
+     * @return The potential move to be made
+     */
     public static PurCublino.PurMove purGreedyMove(PurCublino currentState) {
         RoseNode<PurCublino> gameTree = new RoseNode<>(currentState);
         DifficultAI.monteCarloExpansionPur(gameTree);
@@ -172,13 +174,6 @@ public class EasyAI { // Maybe split into two i.e., PurEasyAI and ContraEasyAI
             wanted = wanted.getParent();
         }
         int generatedIndex = legalMoves.stream().map((x) -> x.getPossibleState().getBoard()).collect(Collectors.toList()).indexOf(wanted.getState().getBoard());
-        assert generatedIndex != -1;
         return legalMoves.get(generatedIndex);
-    }
-
-    /**
-     * If the player is AI, then automatically choose the move;
-     */
-    public void requestMove() {
     }
 }
