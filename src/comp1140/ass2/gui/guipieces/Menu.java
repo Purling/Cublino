@@ -49,7 +49,7 @@ public class Menu extends Group {
 
         // A dropdown menu containing the options for the skybox
         skybox = new ChoiceBox<>();
-        skybox.getItems().addAll("Random", "Placid", "Tuscan", "Siberian", "Martian", "Overcast");
+        skybox.getItems().addAll("Random", "Placid", "Siberian", "Martian", "Overcast");
         skybox.getSelectionModel().select(0);
         skybox.setLayoutX(520);
         skybox.setPrefWidth(200);
@@ -233,10 +233,9 @@ public class Menu extends Group {
         return switch (i) {
             case 0 -> GuiSkybox.Locale.RANDOM;
             case 1 -> GuiSkybox.Locale.LAKE;
-            case 2 -> GuiSkybox.Locale.WHEAT;
-            case 3 -> GuiSkybox.Locale.TUNDRA;
-            case 4 -> GuiSkybox.Locale.MARS;
-            case 5 -> GuiSkybox.Locale.SKY;
+            case 2 -> GuiSkybox.Locale.TUNDRA;
+            case 3 -> GuiSkybox.Locale.MARS;
+            case 4 -> GuiSkybox.Locale.SKY;
             default -> GuiSkybox.Locale.NONE;
         };
     }
