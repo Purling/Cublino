@@ -37,6 +37,7 @@ public class GuiAvatar extends Group {
         text.setLayoutX(-300);
         text.setText(name);
         text.setTextAlignment(TextAlignment.CENTER);
+        text.setMouseTransparent(true);
         subGroup.getChildren().add(text);
 
         // Move this tag to the edge of the board, and rotate it to the appropriate edge

@@ -86,7 +86,6 @@ public class Controller {
 
         // If a move has been made and an associated gui is provided, alert the GUI that a move has been made
         if (gui != null && type != ControllerType.HUMAN) Platform.runLater(() -> {
-            System.out.println("move complete()");
             gui.moveComplete();
         });
     }

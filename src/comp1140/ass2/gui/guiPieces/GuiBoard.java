@@ -5,6 +5,7 @@ import comp1140.ass2.GameLogic.ContraCublino;
 import comp1140.ass2.GameLogic.Game;
 import comp1140.ass2.GameLogic.PurCublino;
 import comp1140.ass2.State.Die;
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
@@ -22,6 +23,7 @@ import java.util.List;
 import comp1140.ass2.State.Boards;
 
 import javafx.scene.*;
+import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
 
@@ -68,6 +70,9 @@ public class GuiBoard extends SubScene {
     private MediaPlayer stepSfx;
 
     private final ArrayList<Game> stateHistory = new ArrayList<>();
+
+    private boolean playingInitialAnimation = true;
+    private double initialAnimationTime = 0;
 
     /**
      * Constructs a board and all reliant 3D elements to represent a game position
@@ -135,19 +140,26 @@ public class GuiBoard extends SubScene {
         camera.setRotationAxis(new Point3D(1, 0, 0));
         setCamera(camera);
 
-        // Constructs two cylinders to serve as a one-legged table on which the game board is set
-        Cylinder tableBase = new Cylinder();
-        tableBase.setRadius(650);
-        tableBase.setHeight(40);
-        tableBase.setTranslateY(80);
-        tableBase.setMaterial(makePhongFromAsset("spruce.jpg"));
-        boardRoot.getChildren().add(tableBase);
-        Cylinder tableLeg = new Cylinder();
-        tableLeg.setRadius(50);
-        tableLeg.setHeight(500);
-        tableLeg.setTranslateY(325);
-        tableLeg.setMaterial(makePhongFromAsset("spruce.jpg"));
-        boardRoot.getChildren().add(tableLeg);
+        if (locale != GuiSkybox.Locale.NONE) {
+            // Constructs two cylinders to serve as a one-legged table on which the game board is set
+            Cylinder tableBase = new Cylinder();
+            tableBase.setRadius(650);
+            tableBase.setHeight(40);
+            tableBase.setTranslateY(80);
+            tableBase.setMaterial(makePhongFromAsset("spruce.jpg"));
+            boardRoot.getChildren().add(tableBase);
+            Cylinder tableLeg = new Cylinder();
+            tableLeg.setRadius(50);
+            tableLeg.setHeight(500);
+            tableLeg.setTranslateY(325);
+            tableLeg.setMaterial(makePhongFromAsset("spruce.jpg"));
+            boardRoot.getChildren().add(tableLeg);
+
+            Box gameBoardEdge = new Box(890, 15, 890);
+            gameBoardEdge.setTranslateY(52.5);
+            gameBoardEdge.setMaterial(GuiTile.blackTileMaterial);
+            boardRoot.getChildren().add(gameBoardEdge);
+        }
 
         // Establish soft white lighting to remove shading and shadows
         root.getChildren().add(new AmbientLight(Color.rgb(175, 175, 175)));
@@ -182,6 +194,28 @@ public class GuiBoard extends SubScene {
 
         // The first player should move
         if (permitsMoveMaking) haveCurrentPlayerMakeMove();
+
+        new AnimationTimer() {
+            @Override
+            public void handle(long l) {
+                if (playingInitialAnimation) {
+                    if (initialAnimationTime == 0) initialAnimationTime = l;
+                    double progress = (l-initialAnimationTime)/3.5e9;
+                    if (progress >= 1) playingInitialAnimation = false;
+
+                    progress = 0.5*(1-Math.cos(Math.PI*progress));
+
+                    cameraPitch = -85+50*progress;
+                    cameraYaw = 195*(progress-1)+20;
+                }
+
+                // Update the rotations of the board and camera, and move the camera to keep the board in view
+                boardRoot.setRotate(cameraYaw);
+                camera.setRotate(cameraPitch);
+                camera.setTranslateZ(-700*Math.cos(Math.toRadians(cameraPitch))+362);
+                camera.setTranslateY(250*Math.sin(Math.toRadians(cameraPitch)) - 400);
+            }
+        }.start();
     }
 
     /**
@@ -199,6 +233,7 @@ public class GuiBoard extends SubScene {
      */
     private void handleSelectDie(double xPosition, double yPosition) {
         // Selected only the mouse-over tile
+        playingInitialAnimation = false;
         mouseDown = true;
         selectedTiles.clear();
         selectedTiles.add(mouseOverTile);
@@ -224,7 +259,7 @@ public class GuiBoard extends SubScene {
      * Try to move the currently picked-up die into the currently indicated position
      */
     private void handleApplyStep() {
-        if (mouseOverTile == null) return;
+        if (mouseOverTile == null || selectedDie == null) return;
         game.applyStep(selectedDie.die, mouseOverTile.toString());
         selectedTiles.add(new Position(selectedDie.die.getX(), selectedDie.die.getY()));
         selectedDie.setTranslationFromDie();
@@ -246,12 +281,6 @@ public class GuiBoard extends SubScene {
 
         mouseX = xPosition;
         mouseY = yPosition;
-
-        // Update the rotations of the board and camera, and move the camera to keep the board in view
-        boardRoot.setRotate(cameraYaw);
-        camera.setRotate(cameraPitch);
-        camera.setTranslateZ(-700*Math.cos(Math.toRadians(cameraPitch))+362);
-        camera.setTranslateY(250*Math.sin(Math.toRadians(cameraPitch)) - 400);
     }
 
     /**
