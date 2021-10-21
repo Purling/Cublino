@@ -11,20 +11,18 @@ import javafx.application.Platform;
 /**
  * Represents one of the players in the game, which can be
  * owned by either a human or an AI of graduated difficulties
- *
- * Author: Zane Gates, Ziling Ouyang
+ * <p>
+ * Author: Whole group
  */
 public class Controller {
-    public enum ControllerType {HUMAN, EASY_AI, DIFFICULT_AI}
-
     ControllerType type;
     String name;
     GuiDie.Skin diceSkin;
-
     /**
-     * Constructs a controller with all of the relevant seetings
-     * @param type the owner of this controller
-     * @param name the in-game name
+     * Constructs a controller with all of relevant settings
+     *
+     * @param type     the owner of this controller
+     * @param name     the in-game name
      * @param diceSkin the die skin used
      */
     public Controller(ControllerType type, String name, GuiDie.Skin diceSkin) {
@@ -47,8 +45,9 @@ public class Controller {
 
     /**
      * If the player is AI, then automatically choose the move;
+     *
      * @param game The game state from which to make a move
-     * @param gui The board that should be updated once a move has been made
+     * @param gui  The board that should be updated once a move has been made
      */
     public void requestMove(Game game, GuiBoard gui) {
         // Call the relevant AI on the relevant type of game, if not controlled by a HUMAN
@@ -94,16 +93,17 @@ public class Controller {
     /**
      * Applies an encoded move to a game to make it match the given state after the move has been made
      * while preserving object references to the initial game state and its dice
+     *
      * @param encodedMove the encoded move in either Contra or Pur
-     * @param game the initial game to make the application from
-     * @param finalState the resulting state that should be identical to the final game
+     * @param game        the initial game to make the application from
+     * @param finalState  the resulting state that should be identical to the final game
      */
     private void applyGeneratedMove(String encodedMove, Game game, Game finalState) {
         // From the string encoding of the move, discern the starting and ending coordinates
-        int startX = encodedMove.charAt(0)-97;
-        int startY = encodedMove.charAt(1)-49;
-        int endX   = encodedMove.charAt(2)-97;
-        int endY   = encodedMove.charAt(3)-49;
+        int startX = encodedMove.charAt(0) - 97;
+        int startY = encodedMove.charAt(1) - 49;
+        int endX = encodedMove.charAt(2) - 97;
+        int endY = encodedMove.charAt(3) - 49;
 
         Die movingDie = game.getBoard().getAt(startX, startY);
         game.applyStep(movingDie, endX + "" + endY);
@@ -121,4 +121,6 @@ public class Controller {
             }
         }
     }
+
+    public enum ControllerType {HUMAN, EASY_AI, DIFFICULT_AI}
 }

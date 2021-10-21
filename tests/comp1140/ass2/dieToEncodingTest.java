@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 
-import static comp1140.ass2.State.Die.dieToEnc;
+import static comp1140.ass2.State.Die.dieToEncoding;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
                     String die = ""+zero+one+two;
                     Die dice = new Die(die);
 
-                    assertEquals(die, dieToEnc(dice), "Die with string \"" + die + " returns the string \"" + die + " which is valid.");
+                    assertEquals(die, dieToEncoding(dice), "Die with string \"" + die + " returns the string \"" + die + " which is valid.");
 
                     }
                 }
@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
                     String die = ""+zero+one+two;
                     Die dice = new Die(die);
 
-                    assertEquals(die, dieToEnc(dice), "Die with string \"" + die + " returns the string \"" + die + " which is valid.");
+                    assertEquals(die, dieToEncoding(dice), "Die with string \"" + die + " returns the string \"" + die + " which is valid.");
 
                 }
             }

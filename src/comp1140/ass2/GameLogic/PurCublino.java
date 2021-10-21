@@ -200,7 +200,7 @@ public class PurCublino extends Game implements Serializable {
                     PurCublino clone = deepClone();
                     Die dieClone = die.deepClone();
                     clone.applyTip(dieClone, dieClone.getPositionOver(direction, 1));
-                    move += Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1);
+                    move += Die.dieToEncoding(die).substring(1) + Die.dieToEncoding(dieClone).substring(1);
                     PurMove m = new PurMove(clone, move);
                     possibleMoves.add(m);
                 }
@@ -242,7 +242,7 @@ public class PurCublino extends Game implements Serializable {
                 Die dieClone = die.deepClone();
                 clone.applyJump(dieClone, dieClone.getPositionOver(direction, 2));
                 if (!moves.contains(dieClone.getPosition())) {
-                    move += Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1);
+                    move += Die.dieToEncoding(die).substring(1) + Die.dieToEncoding(dieClone).substring(1);
                     PurMove m = new PurMove(clone, move);
                     possibleMoves.add(m);
                 }
@@ -262,7 +262,7 @@ public class PurCublino extends Game implements Serializable {
                     PurCublino clone = deepClone();
                     Die dieClone = die.deepClone();
                     clone.applyJump(dieClone, dieClone.getPositionOver(direction, 2));
-                    move += Die.dieToEnc(die).substring(1) + Die.dieToEnc(dieClone).substring(1);
+                    move += Die.dieToEncoding(die).substring(1) + Die.dieToEncoding(dieClone).substring(1);
                     PurMove m = new PurMove(clone, move);
                     possibleMoves.add(m);
                 }
