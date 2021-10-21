@@ -10,8 +10,10 @@ of our project implements the following features:
  - Generates simple Contra moves (Task 14)
  - Generates smart Contra moves (Task 14)
  - Easy (greedy) and difficult (MCTS) AI opponents for Contra and Pur
- - 3D models and animation for GUI
+ - Viewing and playing games occurs in a 3D environment
+ - Various 3D models and animations for GUI
  - Ability to "take back" / reverse moves
- - Graphical features for the GUI (e.g., Skins for dice, backgrounds while playing, names, etc)
+ - Graphical features for the GUI (e.g., Skins for dice, backgrounds while playing, player avatars, etc)
+ - A menu for the GUI
 
 additional features...
