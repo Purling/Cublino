@@ -34,10 +34,10 @@ declaration: >-
 #    url:
 #    licence:
 
-# I wish to submit the following methods as entirely my own (remove this if
-# you want to just submit classes):
-method:
-   - monteCarloMainContra()
+# I wish to submit the following classes as entirely my own (remove this if
+# you want to just submit methods):
+class:
+   - src/comp1140/ass2/controller/DifficultAI.java
 
 # sign *your* name and uid here
 name: Ziling Ouyang
