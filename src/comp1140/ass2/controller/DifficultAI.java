@@ -64,20 +64,21 @@ public class DifficultAI implements DeepCloneable<DifficultAI> {
      * Multithreading the MCTS
      */
     public int monteCarloMain() {
-        ExecutorService executor = Executors.newFixedThreadPool(4);
+        int numberOfThreads = 4;
+        ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
         List<Integer> indices = new ArrayList<>();
         List<RoseNode<Game>> trees = new ArrayList<>();
         List<Future<RoseNode<Game>>> futures = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < numberOfThreads; i++) {
             Callable<RoseNode<Game>> callable = new RunMonteCarlo(this);
             Future<RoseNode<Game>> future = executor.submit(callable);
             futures.add(future);
         }
         for (Future<RoseNode<Game>> future : futures) {
             try {
-
-                indices.add(getMaxChildIndex(future.get()));
-                trees.add(future.get());
+                int maxChild = getMaxChildIndex(future.get());
+                indices.add(maxChild);
+                trees.add(future.get().getChildren().get(maxChild));
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -89,7 +90,7 @@ public class DifficultAI implements DeepCloneable<DifficultAI> {
             return wins.indexOf(wins.stream().max(Integer::compareTo).orElse(0));
         } else {
             List<Integer> frequencies = indices.stream().map((x) -> Collections.frequency(indices, x)).collect(Collectors.toList());
-            if (frequencies.stream().allMatch((x) -> x == 2)) { // TODO fix this so it actually sums up the relevant (i.e., most voted) choices instead of all
+            if (frequencies.stream().allMatch((x) -> x == 2)) {
                 List<Integer> wins = trees.stream().map(RoseNode::getWinCount).collect(toList());
                 return wins.indexOf(wins.stream().max(Integer::compareTo).orElse(0));
             }
@@ -125,10 +126,6 @@ public class DifficultAI implements DeepCloneable<DifficultAI> {
                     backPropagate(selectedNode, simulatePur((PurCublino) firstChild.getState()));
                 }
             }
-        }
-        System.out.println("Win count:" + gameTree.getWinCount() + "  Visit count:" + gameTree.getVisitCount());
-        for (RoseNode<Game> state : gameTree.getChildren()) {
-            System.out.println("Win count:" + state.getWinCount() + "  Visit count:" + state.getVisitCount());
         }
         return (gameTree);
     }

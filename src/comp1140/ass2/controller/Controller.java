@@ -3,9 +3,9 @@ package comp1140.ass2.controller;
 import comp1140.ass2.gamelogic.ContraCublino;
 import comp1140.ass2.gamelogic.Game;
 import comp1140.ass2.gamelogic.PurCublino;
-import comp1140.ass2.state.Die;
 import comp1140.ass2.gui.guipieces.GuiBoard;
 import comp1140.ass2.gui.guipieces.GuiDie;
+import comp1140.ass2.state.Die;
 import javafx.application.Platform;
 
 /**
@@ -15,9 +15,22 @@ import javafx.application.Platform;
  * Author: Whole group
  */
 public class Controller {
+
+    /**
+     * The type of controller e.g., Human, AI
+     */
     ControllerType type;
+
+    /**
+     * The name of the player
+     */
     String name;
+
+    /**
+     * The texture of the dice
+     */
     GuiDie.Skin diceSkin;
+
     /**
      * Constructs a controller with all of relevant settings
      *
@@ -31,14 +44,23 @@ public class Controller {
         this.diceSkin = diceSkin;
     }
 
+    /**
+     * Getter for type
+     */
     public ControllerType getType() {
         return type;
     }
 
+    /**
+     * Getter for diceSkin
+     */
     public GuiDie.Skin getDiceSkin() {
         return diceSkin;
     }
 
+    /**
+     * Getter for name
+     */
     public String getName() {
         return name;
     }
@@ -121,5 +143,8 @@ public class Controller {
         }
     }
 
+    /**
+     * Enum representing the types of controllers
+     */
     public enum ControllerType {HUMAN, EASY_AI, DIFFICULT_AI}
 }
