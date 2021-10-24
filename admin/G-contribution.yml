@@ -10,8 +10,8 @@ declaration: >-
 contributions:
   - uid: u7312578
     contribution: 33
-  - uid:
-    contribution:
+  - uid: u7334218
+    contribution: 33
   - uid:
     contribution:
 
@@ -20,7 +20,7 @@ contributions:
 signatures:
   - name: Ziling Ouyang
     uid: u7312578
-  - name:
-    uid:
+  - name: Zane Gates
+    uid: u7334218
   - name:
     uid:
